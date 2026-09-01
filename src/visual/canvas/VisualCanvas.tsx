@@ -2,6 +2,7 @@
 
 import { Canvas } from "@react-three/fiber";
 import React, { useCallback, useEffect, useRef } from "react";
+import type * as THREE from "three";
 
 import { VisualRuntimeErrorBoundary } from "../errors/VisualRuntimeErrorBoundary";
 import { attachContextController } from "../lifecycle/context-controller";
@@ -31,7 +32,7 @@ export function VisualCanvas({
   }, [setStatus, updateDiagnostics]);
 
   const handleCreated = useCallback(
-    (state: { gl: import("three").WebGLRenderer }) => {
+    (state: { gl: THREE.WebGLRenderer }) => {
       const canvas = state.gl.domElement;
       cleanupContextRef.current?.();
       cleanupContextRef.current = attachContextController(canvas);

@@ -60,5 +60,11 @@ export function VisualRuntime({ qualityProfile, activeSceneId = "calibration" }:
     };
   }, [invalidate]);
 
+  const runtimeStatus = useSceneStore((state) => state.runtimeStatus);
+
+  if (runtimeStatus === "lost" || runtimeStatus === "failed") {
+    return null;
+  }
+
   return <>{activeSceneId === "calibration" && <CalibrationScene />}</>;
 }

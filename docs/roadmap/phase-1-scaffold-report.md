@@ -4,7 +4,7 @@
 - **Scope:** PR 1 — application, toolchain, and testable shell
 - **Route:** `/lab/visual-system`
 - **Local port:** `3154`
-- **Status:** implementation complete; CI and review integration pending
+- **Status:** implementation complete; CI install gate pending supply-chain policy window
 
 ## What changed
 
@@ -61,6 +61,7 @@ production build passes.
 | Playwright mobile/reduced-motion test | PASS | `390 × 844`, touch context, reduced motion |
 | Playwright visual fixture | PASS | screenshot generated in ignored `test-results/` output |
 | axe Playwright check | PASS | no automated violations |
+| GitHub Actions run `33544793834` | BLOCKED | clean runner reached Node/pnpm setup, then rejected fresh Next pins via `minimumReleaseAge` |
 
 The reviewed local screenshots are generated at:
 
@@ -74,11 +75,13 @@ They remain ignored until a visual baseline is explicitly approved.
 ## Environment limitation
 
 The local runner uses Node `24.19.0`, so pnpm emits an engine warning against the required
-`24.20.0` pin. The lockfile was generated with pnpm `11.25.0`. A local frozen reinstall is
-currently blocked by the workstation's external `minimumReleaseAge` policy because the accepted
-Next.js `16.3.4` packages were published too recently; the policy must not be weakened in the
-repository to hide that condition. The CI job is the authoritative clean-runner frozen-install
-check.
+`24.20.0` pin. The lockfile was generated with pnpm `11.25.0`. Both the local runner and clean
+GitHub runner currently reject the accepted Next.js `16.3.4` packages because they were published
+too recently for the active external `minimumReleaseAge` policy. The first CI run also exposed and
+the next commit fixed a workflow ordering issue where pnpm was used before Corepack activation;
+the current run reaches dependency installation correctly. The repository does not weaken that
+supply-chain control. Rerun the CI after the policy window expires, or approve a narrowly scoped
+exception for the exact accepted Next.js pin.
 
 ## Next PR
 

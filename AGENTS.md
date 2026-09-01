@@ -17,9 +17,11 @@ The governing principle is:
 
 ## Current project phase
 
-The repository is in **Phase 0: architecture, tooling, agent guidance, and measurable quality gates**.
+- **Phase 0:** Accepted
+- **Phase 1:** Active
+- **Current project phase:** Phase 1 — Visual Technology Spike
 
-Until Phase 1 is explicitly started:
+Until the Phase 1 spike is accepted:
 
 - do not invent portfolio content;
 - do not build the complete homepage;

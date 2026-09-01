@@ -1,5 +1,8 @@
 # Phase 0 foundation manifest
 
+- Status: Accepted
+- Accepted: 2026-09-01
+
 This change intentionally contains no application implementation.
 
 ## Included

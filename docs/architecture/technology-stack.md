@@ -157,6 +157,14 @@ Do not put high-frequency pointer, particle, camera, or shader state through Rea
 - Browser captures are the source of truth for implementation acceptance.
 - Reference websites are observational inputs, never code or asset sources.
 
+## Temporary tooling compatibility overrides
+
+- **`experimental.useTypeScriptCli = false` in `next.config.ts`:**
+  - **Rationale:** Next.js 16.3's experimental default CLI TypeScript inspection path failed to parse compiler options under pinned TypeScript 6.0.3 (`Could not parse output from TypeScript's --showConfig`).
+  - **Behavior:** Explicitly disabling the CLI path directs Next.js to use its stable TypeScript compiler API path during build and type generation.
+  - **Independent verification:** Standalone strict typechecking remains enforced via `pnpm typecheck` (`pnpm typegen && tsc --noEmit`).
+  - **Re-evaluation criteria:** This override will be re-evaluated during future deliberate updates to Next.js or TypeScript; its removal requires a clean build, successful typecheck, and green CI across all runners.
+
 ## Phase 1 bootstrap rule
 
 Phase 1 creates the application manually or from a temporary `create-next-app@16.3.4` scaffold, then copies only the reviewed files into this repository. It must:

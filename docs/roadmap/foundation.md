@@ -1,6 +1,8 @@
 # Foundation roadmap
 
-- **Status:** Active
+- **Phase 0 status:** Accepted
+- **Phase 1 status:** Active
+- **Current project phase:** Phase 1 — Visual Technology Spike
 - **Decision date:** 2026-09-01
 
 ## Gate model
@@ -8,6 +10,8 @@
 A later phase cannot compensate for a failed earlier foundation. Each phase ends with an explicit accept/reject gate.
 
 ## Phase 0 — architecture and agent foundation
+
+**Status: Accepted**
 
 ### Deliverables
 
@@ -40,6 +44,8 @@ A later phase cannot compensate for a failed earlier foundation. Each phase ends
 - CMS integration.
 
 ## Phase 1 — visual technology spike
+
+**Status: Active**
 
 Route: `/lab/visual-system`
 

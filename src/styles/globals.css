@@ -1,0 +1,63 @@
+@layer reset, tokens, base;
+
+@layer reset {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+
+  body,
+  h1,
+  h2,
+  h3,
+  p,
+  dl,
+  dd,
+  figure {
+    margin: 0;
+  }
+}
+
+@layer tokens {
+  :root {
+    --color-canvas: #030405;
+    --color-canvas-raised: #07090d;
+    --color-ink: #f1efe9;
+    --color-ink-muted: #9a9ea8;
+    --color-line: rgb(255 255 255 / 0.1);
+    --accent-cyan: #57e6dd;
+    --accent-violet: #846cff;
+    --accent-magenta: #ef5aa8;
+    --font-mono: "SFMono-Regular", "Cascadia Code", "Roboto Mono", Consolas, monospace;
+  }
+}
+
+@layer base {
+  html {
+    background: var(--color-canvas);
+  }
+
+  body {
+    background:
+      radial-gradient(circle at 85% 8%, rgb(132 108 255 / 0.04), transparent 22rem), var(--color-canvas);
+    color: var(--color-ink);
+    font-family: Arial, Helvetica, sans-serif;
+    min-width: 320px;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: rgb(87 230 221 / 0.24);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent-cyan);
+    outline-offset: 4px;
+  }
+}

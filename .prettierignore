@@ -1,0 +1,13 @@
+node_modules
+.next
+out
+dist
+coverage
+test-results
+playwright-report
+.lighthouseci
+*.tsbuildinfo
+pnpm-lock.yaml
+next-env.d.ts
+docs/
+artifacts/

@@ -4,9 +4,13 @@ A cinematic scientific portfolio for Mateusz Zelent, built as a dark digital gal
 
 ## Status
 
-**Phase 0 — architecture and quality foundation**
+**Phase 0: Accepted**
 
-No production page is being implemented yet. The repository first establishes:
+**Phase 1: Active — Visual Technology Spike**
+
+The isolated `/lab/visual-system` spike is now the active implementation target. No
+production homepage or portfolio content is being implemented yet. The repository
+foundation establishes:
 
 - a fixed technology stack;
 - rendering and motion ownership;

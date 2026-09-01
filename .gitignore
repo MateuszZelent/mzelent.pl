@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Next.js
+.next/
+out/
+
+# Build and test output
+coverage/
+dist/
+playwright-report/
+test-results/
+.lighthouseci/
+*.tsbuildinfo
+
+# Visual QA output not selected as a baseline
+artifacts/
+screenshots/local/
+
+# Local environment
+.env
+.env.*
+!.env.example
+.vercel/
+
+# Editors and operating systems
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# Logs
+*.log
+pnpm-debug.log*
+
+# Asset intermediates
+assets/intermediate/
+assets/cache/

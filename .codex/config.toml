@@ -1,0 +1,5 @@
+# Project-scoped Codex configuration.
+# Keep write-heavy subagents serialized by ownership even when read-heavy work is parallelized.
+
+[agents]
+max_concurrent_threads_per_session = 6

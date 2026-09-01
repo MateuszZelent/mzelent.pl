@@ -1,0 +1,170 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mzelent.pl/schemas/asset-manifest.schema.json",
+  "title": "mzelent.pl production asset manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "purpose",
+    "kind",
+    "author",
+    "source",
+    "license",
+    "sourceFiles",
+    "outputs",
+    "colorSpace",
+    "qualityTiers",
+    "fallback",
+    "reviewedAt"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "purpose": {
+      "type": "string",
+      "minLength": 1
+    },
+    "kind": {
+      "enum": [
+        "glb",
+        "texture",
+        "transparent-raster",
+        "svg",
+        "video",
+        "hdr",
+        "scientific-data",
+        "other"
+      ]
+    },
+    "author": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source": {
+      "type": "string",
+      "minLength": 1
+    },
+    "license": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sourceFiles": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "outputs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "bytes",
+          "format"
+        ],
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "format": {
+            "type": "string"
+          },
+          "width": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "height": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "vertices": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "triangles": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "textureMemoryBytesEstimate": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "colorSpace": {
+      "enum": [
+        "srgb",
+        "linear",
+        "mixed",
+        "not-applicable"
+      ]
+    },
+    "physicalUnits": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "artisticTransformation": {
+      "type": "boolean",
+      "default": false
+    },
+    "toolchain": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "tool",
+          "version"
+        ],
+        "properties": {
+          "tool": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "command": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "qualityTiers": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "enum": [
+          "high",
+          "medium",
+          "low",
+          "static"
+        ]
+      }
+    },
+    "fallback": {
+      "type": "string",
+      "minLength": 1
+    },
+    "notes": {
+      "type": "string"
+    },
+    "reviewedAt": {
+      "type": "string",
+      "format": "date"
+    }
+  }
+}

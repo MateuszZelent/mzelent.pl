@@ -37,7 +37,7 @@ export default function VisualSystemPage() {
         </nav>
       </header>
 
-      <section className={styles.hero} id="laboratory-shell" aria-labelledby="laboratory-title">
+      <section className={styles.hero} id="laboratory-shell" tabIndex={-1} aria-labelledby="laboratory-title">
         <div className={styles.heroCopy}>
           <p className={styles.eyebrow}>01 — visual technology spike</p>
           <h1 id="laboratory-title">Visual System Laboratory</h1>
@@ -45,11 +45,11 @@ export default function VisualSystemPage() {
             A quiet test surface for a future scientific visual language. The semantic shell and its static
             fallback are usable before any enhanced rendering layer is available.
           </p>
-          <div className={styles.heroMeta} aria-label="Current shell capabilities">
-            <span>Semantic DOM</span>
-            <span>Static fallback</span>
-            <span>No runtime enhancement</span>
-          </div>
+          <ul className={styles.heroMeta} aria-label="Current shell capabilities">
+            <li>Semantic DOM</li>
+            <li>Static fallback</li>
+            <li>No runtime enhancement</li>
+          </ul>
         </div>
 
         <div className={styles.sceneFrame} data-testid="scene-frame">
@@ -86,7 +86,9 @@ export default function VisualSystemPage() {
           The static poster is the complete fallback while the enhanced visual layer is unavailable.
         </p>
         <noscript>
-          <p className={styles.noScriptNote}>JavaScript is disabled. The semantic shell and static poster remain available.</p>
+          <p className={styles.noScriptNote}>
+            JavaScript is disabled. The semantic shell and static poster remain available.
+          </p>
         </noscript>
       </section>
 

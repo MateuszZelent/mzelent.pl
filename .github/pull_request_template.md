@@ -33,18 +33,18 @@ Evidence links:
 
 ## Performance evidence
 
-| Metric | Baseline | This change | Budget | Result |
-|---|---:|---:|---:|---|
-| frame p50 | | | | |
-| frame p95 | | | | |
-| draw calls | | | | |
-| points/triangles | | | | |
-| estimated GPU memory | | | | |
-| initial route JS | | | | |
-| visual-engine JS | | | | |
-| initial transfer | | | | |
-| LCP | | | | |
-| CLS | | | | |
+| Metric               | Baseline | This change | Budget | Result |
+| -------------------- | -------: | ----------: | -----: | ------ |
+| frame p50            |          |             |        |        |
+| frame p95            |          |             |        |        |
+| draw calls           |          |             |        |        |
+| points/triangles     |          |             |        |        |
+| estimated GPU memory |          |             |        |        |
+| initial route JS     |          |             |        |        |
+| visual-engine JS     |          |             |        |        |
+| initial transfer     |          |             |        |        |
+| LCP                  |          |             |        |        |
+| CLS                  |          |             |        |        |
 
 - [ ] no per-frame React state or allocations
 - [ ] resources/listeners/tickers are cleaned up

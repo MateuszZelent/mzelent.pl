@@ -20,7 +20,12 @@ describe("Visual System Laboratory shell", () => {
     render(<VisualSystemPage />);
 
     expect(document.querySelector("canvas")).not.toBeInTheDocument();
+    expect(document.getElementById("laboratory-shell")).toHaveAttribute("tabindex", "-1");
+    expect(screen.getByRole("list", { name: "Current shell capabilities" })).toBeInTheDocument();
     expect(screen.getByRole("navigation", { name: "Laboratory sections" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Return to shell" })).toHaveAttribute("href", "#laboratory-shell");
+    expect(screen.getByRole("link", { name: "Return to shell" })).toHaveAttribute(
+      "href",
+      "#laboratory-shell",
+    );
   });
 });

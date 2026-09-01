@@ -4,7 +4,7 @@
 - **Scope:** PR 1 — application, toolchain, and testable shell
 - **Route:** `/lab/visual-system`
 - **Local port:** `3154`
-- **Status:** complete and verified locally and in GitHub Actions CI
+- **Status:** hardened, audited, and verified locally and in GitHub Actions CI
 
 ## What changed
 
@@ -12,10 +12,15 @@
 - Added a pinned Next.js App Router application with a strict TypeScript setup.
 - Added a semantic, server-rendered visual-system shell with a designed black static poster,
   reserved future canvas region, stable scroll intervals, and a development-only diagnostics panel.
-- Added Vitest/React Testing Library unit coverage, Playwright smoke/visual/no-JavaScript coverage,
+- Hardened `next-env.d.ts`: untracked from Git, ignored via `.gitignore`, and integrated via `pnpm typegen`.
+- Pinned `@types/node` to exact `24.13.3` to match the Node.js 24 LTS runtime.
+- Added exact pinned `prettier@3.9.6` with `.prettierrc.json`, `.prettierignore`, and `format` / `format:check` scripts.
+- Pinned GitHub Actions to immutable commit SHAs and configured clean-tree gate checks.
+- Enhanced accessibility and Windows High Contrast support (`@media (forced-colors: active)`),
+  keyboard-accessible skip link focus (`tabIndex={-1}` on target), and semantic hero capability lists (`<ul>`/`<li>`).
+- Added Playwright artifact upload in CI for `playwright-report/**` and `test-results/**`.
+- Added Vitest/React Testing Library unit coverage, Playwright smoke/visual/no-JavaScript/forced-colors/keyboard coverage,
   and an axe accessibility check.
-- Added a GitHub Actions quality job for frozen installation, static checks, production build,
-  Chromium installation, and production Playwright smoke tests.
 
 ## Deliberately deferred
 
@@ -32,6 +37,8 @@ shell and toolchain are reviewed.
 | Next.js | `16.3.4` |
 | React / React DOM | `19.2.8` |
 | TypeScript | `6.0.3` |
+| `@types/node` | `24.13.3` |
+| Prettier | `3.9.6` |
 | Three.js / R3F / GSAP / Lenis | intentionally not installed in PR 1 |
 | Playwright | `1.62.1` |
 | Vitest | `4.1.11` |
@@ -45,44 +52,49 @@ change to the accepted application stack.
 Next's default TypeScript CLI path was also incompatible with the pinned TypeScript 6.0.3 output
 in this environment (`Could not parse output from TypeScript's --showConfig`). The scaffold uses
 Next's TypeScript API path explicitly in `next.config.ts`; strict typechecking still runs and the
-production build passes.
+production build passes. This override is documented in `docs/architecture/technology-stack.md`.
 
 ## Validation evidence
 
 | Check | Result | Evidence |
 | --- | --- | --- |
-| `git diff --check` | PASS | no whitespace errors |
-| `pnpm lint` (`eslint .`) | PASS | flat config, no lint findings |
-| `pnpm typecheck` (`tsc --noEmit`) | PASS | strict TypeScript check |
+| `pnpm format:check` | PASS | all matched files adhere to Prettier rules |
+| `pnpm lint` (`eslint .`) | PASS | flat config, 0 errors, 0 warnings |
+| `pnpm typecheck` (`pnpm typegen && tsc --noEmit`) | PASS | strict TypeScript check with route type generation |
 | `pnpm test` (`vitest run`) | PASS | 1 file, 2 tests |
-| `pnpm build` (`next build`) | PASS | static `/lab/visual-system` route generated |
-| `PLAYWRIGHT_USE_PRODUCTION=1 pnpm test:e2e` | PASS | 5 Chromium tests passing |
-| Playwright no-JavaScript test | PASS | semantic heading and static poster remain visible |
+| `pnpm build` (`next build`) | PASS | static `/_not-found` and `/lab/visual-system` routes generated |
+| `PLAYWRIGHT_USE_PRODUCTION=1 pnpm test:e2e` | PASS | 7 Chromium tests passing (smoke, no-JS, keyboard, forced-colors, visual, a11y) |
+| Playwright keyboard test | PASS | Tab activates skip link, Enter transfers focus to `#laboratory-shell` with valid URL hash |
+| Playwright forced-colors test | PASS | `forcedColors: "active"`, heading, navigation, surface sample, and focus outline visible |
+| Playwright no-JavaScript test | PASS | semantic heading and static poster remain visible without JS |
 | Playwright mobile/reduced-motion test | PASS | `390 × 844`, touch context, reduced motion |
 | Playwright visual fixture | PASS | screenshots generated in ignored `test-results/` output |
-| Playwright a11y check (`axe`) | PASS | no automated violations |
-| GitHub Actions run `33544979442` | PASS | clean runner passed supply-chain check, static checks, build, and Playwright smoke |
+| Playwright a11y check (`axe`) | PASS | 0 automated violations via `@axe-core/playwright` |
+| Clean tracked tree gate | PASS | `git diff --check`, `git diff --exit-code`, untracked files clean |
+| GitHub Actions workflow `CI` | PASS | verified automated quality pipeline |
 
-The reviewed local screenshots are generated at:
+## Artifacts and visual evidence
 
-```text
-test-results/visual-system-captures-the-shell-visual-fixture-visual-chromium/visual-system-shell.png
-test-results/visual-system-keeps-the-fa-b54c2-reduced-motion-input-visual-chromium/visual-system-mobile-shell.png
-```
+The CI workflow publishes Playwright test artifacts with name `playwright-evidence-${{ github.run_number }}-${{ github.run_attempt }}` (retention: 7 days):
 
-They remain ignored until a visual baseline is explicitly approved.
+- `test-results/visual-system-captures-the-shell-visual-fixture-visual-chromium/visual-system-shell.png`
+- `test-results/visual-system-keeps-the-fa-b54c2-reduced-motion-input-visual-chromium/visual-system-mobile-shell.png`
+- `test-results/visual-system-remains-read-f5bd3-n-forced-colors-mode-visual-chromium/visual-system-forced-colors.png`
 
-## Supply-chain and environment status
+> [!NOTE]
+> Screenshots are technically generated during test execution as evidence for manual review. They are not approved as permanent golden visual baselines until explicitly signed off by the repository owner.
 
-- **Supply-chain policy window:** The initial CI install gate failure was caused by pnpm's 24-hour
-  `minimumReleaseAge` verification rejecting packages published within the preceding 24 hours.
-  The latest pinned package (`@next/swc-win32-x64-msvc@16.3.4`) was published at `2026-08-31T19:56:52Z`.
-  Once the 24-hour window elapsed after `2026-09-01T19:57:00Z`, `pnpm install --frozen-lockfile`
-  passed verification cleanly without weakening security policies or modifying lockfiles.
-- **Node engine pin:** The local development environment uses Node `24.19.0`, producing a minor
-  engine warning against the required `24.20.0` pin. The GitHub Actions runner executes under exact
-  Node `24.20.0` configured via `.node-version`.
-- **Port:** Configured and verified on port `3154` (`http://localhost:3154/lab/visual-system`).
+## Audit findings and resolutions
+
+1. **`next-env.d.ts` tracking:** Removed from Git tracking, added to `.gitignore`, `typegen` script added, and `AGENTS.md` updated.
+2. **`@types/node` mismatch:** Replaced 26.x with exact pinned `@types/node@24.13.3`.
+3. **Automated code formatting:** Added exact pinned `prettier@3.9.6`, `.prettierrc.json`, `.prettierignore`, `format` / `format:check` scripts, and integrated into `check` and CI.
+4. **GitHub Actions security:** Pinned actions to immutable commit SHAs (`checkout`, `setup-node`, `upload-artifact`) with minimal `contents: read` permissions and `NEXT_TELEMETRY_DISABLED: "1"`.
+5. **Playwright evidence publishing:** Configured `actions/upload-artifact` with `if: always()` and run-specific artifact naming.
+6. **High contrast / Forced colors:** Removed `forced-color-adjust: none` on `.surfaceSample` and added `@media (forced-colors: active)` rules. Added E2E test verifying visibility and contrast.
+7. **Skip link & hero semantics:** Added `tabIndex={-1}` to `#laboratory-shell` for keyboard focus, added keyboard navigation test, and converted hero capability metadata to a semantic `<ul>`/`<li>`.
+8. **TypeScript compatibility override:** Documented `useTypeScriptCli = false` in `docs/architecture/technology-stack.md`.
+9. **Clean tracked tree gate:** Added strict `git diff --check`, `git diff --exit-code`, and status checks to CI.
 
 ## Next PR
 

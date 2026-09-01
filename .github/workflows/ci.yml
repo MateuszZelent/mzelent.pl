@@ -51,13 +51,13 @@ jobs:
       - name: Production build
         run: pnpm build
 
-      - name: Install Chromium
-        run: pnpm exec playwright install --with-deps chromium
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium firefox webkit
 
       - name: Playwright browser tests
         env:
           PLAYWRIGHT_USE_PRODUCTION: "1"
-        run: pnpm test:e2e -- --project=chromium
+        run: pnpm test:e2e
 
       - name: Verify clean tracked tree
         run: |

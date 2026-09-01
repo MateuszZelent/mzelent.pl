@@ -1,6 +1,5 @@
 import styles from "./visual-system.module.css";
-
-import { DevelopmentDiagnostics } from "./development-diagnostics";
+import { VisualStageClient } from "./visual-stage.client";
 
 const sectionLinks = [
   { href: "#ambient-field", label: "Ambient field" },
@@ -48,37 +47,15 @@ export default function VisualSystemPage() {
           <ul className={styles.heroMeta} aria-label="Current shell capabilities">
             <li>Semantic DOM</li>
             <li>Static fallback</li>
-            <li>No runtime enhancement</li>
+            <li>WebGL2 single runtime</li>
           </ul>
         </div>
 
         <div className={styles.sceneFrame} data-testid="scene-frame">
-          <div
-            className={styles.canvasSlot}
-            data-testid="canvas-slot"
-            data-canvas-slot="reserved"
-            aria-hidden="true"
-          >
-            <span>Future canvas region</span>
-          </div>
-          <div
-            className={styles.scenePoster}
-            data-testid="static-poster"
-            role="img"
-            aria-label="Static poster showing a restrained layered field calibration"
-          >
-            <span className={styles.posterOrb} aria-hidden="true" />
-            <span className={styles.posterRing} aria-hidden="true" />
-            <span className={styles.posterTrace} aria-hidden="true" />
-            <span className={styles.posterAxis} aria-hidden="true" />
-            <span className={styles.posterScale} aria-hidden="true" />
-            <span className={styles.posterCoordinate} aria-hidden="true">
-              00.01 / 03.00
-            </span>
-          </div>
+          <VisualStageClient />
           <div className={styles.sceneFooter}>
-            <span>Poster / static state</span>
-            <span>Field 00 — idle</span>
+            <span>Visual runtime</span>
+            <span>Calibration scene — demand loop</span>
           </div>
         </div>
 
@@ -109,11 +86,11 @@ export default function VisualSystemPage() {
         <dl className={styles.measureList}>
           <div>
             <dt>State</dt>
-            <dd>Static / ready</dd>
+            <dd>Single canvas runtime</dd>
           </div>
           <div>
             <dt>Canvas</dt>
-            <dd>Reserved</dd>
+            <dd>WebGL2 / Demand</dd>
           </div>
           <div>
             <dt>Input</dt>
@@ -158,8 +135,6 @@ export default function VisualSystemPage() {
         <p>Phase 1 / Visual Technology Spike</p>
         <a href="#laboratory-shell">Return to shell</a>
       </footer>
-
-      <DevelopmentDiagnostics />
     </main>
   );
 }

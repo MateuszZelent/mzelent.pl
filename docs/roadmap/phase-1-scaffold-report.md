@@ -4,7 +4,7 @@
 - **Scope:** PR 1 — application, toolchain, and testable shell
 - **Route:** `/lab/visual-system`
 - **Local port:** `3154`
-- **Status:** implementation complete; CI install gate pending supply-chain policy window
+- **Status:** complete and verified locally and in GitHub Actions CI
 
 ## What changed
 
@@ -52,16 +52,16 @@ production build passes.
 | Check | Result | Evidence |
 | --- | --- | --- |
 | `git diff --check` | PASS | no whitespace errors |
-| `./node_modules/.bin/eslint .` | PASS | flat config, no lint findings |
-| `./node_modules/.bin/tsc --noEmit` | PASS | strict TypeScript check |
-| `./node_modules/.bin/vitest run` | PASS | 1 file, 2 tests |
-| `./node_modules/.bin/next build` | PASS | static `/lab/visual-system` route generated |
-| `PLAYWRIGHT_USE_PRODUCTION=1 ./node_modules/.bin/playwright test` | PASS | 5 Chromium tests |
+| `pnpm lint` (`eslint .`) | PASS | flat config, no lint findings |
+| `pnpm typecheck` (`tsc --noEmit`) | PASS | strict TypeScript check |
+| `pnpm test` (`vitest run`) | PASS | 1 file, 2 tests |
+| `pnpm build` (`next build`) | PASS | static `/lab/visual-system` route generated |
+| `PLAYWRIGHT_USE_PRODUCTION=1 pnpm test:e2e` | PASS | 5 Chromium tests passing |
 | Playwright no-JavaScript test | PASS | semantic heading and static poster remain visible |
 | Playwright mobile/reduced-motion test | PASS | `390 × 844`, touch context, reduced motion |
-| Playwright visual fixture | PASS | screenshot generated in ignored `test-results/` output |
-| axe Playwright check | PASS | no automated violations |
-| GitHub Actions run `33544793834` | BLOCKED | clean runner reached Node/pnpm setup, then rejected fresh Next pins via `minimumReleaseAge` |
+| Playwright visual fixture | PASS | screenshots generated in ignored `test-results/` output |
+| Playwright a11y check (`axe`) | PASS | no automated violations |
+| GitHub Actions run `33544979442` | PASS | clean runner passed supply-chain check, static checks, build, and Playwright smoke |
 
 The reviewed local screenshots are generated at:
 
@@ -72,16 +72,17 @@ test-results/visual-system-keeps-the-fa-b54c2-reduced-motion-input-visual-chromi
 
 They remain ignored until a visual baseline is explicitly approved.
 
-## Environment limitation
+## Supply-chain and environment status
 
-The local runner uses Node `24.19.0`, so pnpm emits an engine warning against the required
-`24.20.0` pin. The lockfile was generated with pnpm `11.25.0`. Both the local runner and clean
-GitHub runner currently reject the accepted Next.js `16.3.4` packages because they were published
-too recently for the active external `minimumReleaseAge` policy. The first CI run also exposed and
-the next commit fixed a workflow ordering issue where pnpm was used before Corepack activation;
-the current run reaches dependency installation correctly. The repository does not weaken that
-supply-chain control. Rerun the CI after the policy window expires, or approve a narrowly scoped
-exception for the exact accepted Next.js pin.
+- **Supply-chain policy window:** The initial CI install gate failure was caused by pnpm's 24-hour
+  `minimumReleaseAge` verification rejecting packages published within the preceding 24 hours.
+  The latest pinned package (`@next/swc-win32-x64-msvc@16.3.4`) was published at `2026-08-31T19:56:52Z`.
+  Once the 24-hour window elapsed after `2026-09-01T19:57:00Z`, `pnpm install --frozen-lockfile`
+  passed verification cleanly without weakening security policies or modifying lockfiles.
+- **Node engine pin:** The local development environment uses Node `24.19.0`, producing a minor
+  engine warning against the required `24.20.0` pin. The GitHub Actions runner executes under exact
+  Node `24.20.0` configured via `.node-version`.
+- **Port:** Configured and verified on port `3154` (`http://localhost:3154/lab/visual-system`).
 
 ## Next PR
 

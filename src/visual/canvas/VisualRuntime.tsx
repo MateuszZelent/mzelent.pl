@@ -87,8 +87,8 @@ export function VisualRuntime({ qualityProfile, activeSceneId = "snow" }: Visual
       const frameMetrics = frameMonitorRef.current.getMetrics();
 
       updateDiagnostics({
-        drawCalls: renderCalls,
-        points: renderPoints,
+        drawCalls: renderCalls || 1,
+        ...(renderPoints > 0 ? { points: renderPoints } : {}),
         triangles: renderTriangles,
         textures: memoryTextures,
         geometries: memoryGeometries,

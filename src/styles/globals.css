@@ -60,4 +60,28 @@
     outline: 2px solid var(--accent-cyan);
     outline-offset: 4px;
   }
+
+  .skip-link {
+    position: absolute;
+    top: -9999px;
+    left: 1rem;
+    z-index: 10000;
+    padding: 0.65rem 1.25rem;
+    background: #030405;
+    color: var(--accent-cyan);
+    border: 1px solid var(--accent-cyan);
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: top 0.2s ease;
+  }
+
+  .skip-link:focus,
+  .skip-link:focus-visible {
+    top: 1rem;
+    outline: 2px solid var(--accent-cyan);
+    outline-offset: 2px;
+  }
 }

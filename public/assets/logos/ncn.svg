@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 80" fill="none" aria-label="Narodowe Centrum Nauki">
+  <g fill="#f0f2f5">
+    <!-- NCN Geometric Diamond / Cube Symbol -->
+    <path d="M40 18l22 13v26l-22 13-22-13V31l22-13z" stroke="#f0f2f5" stroke-width="2" fill="none" opacity="0.4"/>
+    <path d="M40 18v26l22 13" stroke="#f0f2f5" stroke-width="1.5" opacity="0.6"/>
+    <path d="M40 44L18 31" stroke="#f0f2f5" stroke-width="1.5" opacity="0.6"/>
+    <polygon points="40,24 54,32 40,40 26,32" fill="#f0f2f5" opacity="0.9"/>
+
+    <!-- Separator -->
+    <rect x="74" y="16" width="2" height="48" opacity="0.4"/>
+
+    <!-- NCN Typography -->
+    <text x="86" y="34" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="800" letter-spacing="0.08em">NCN</text>
+    <text x="86" y="49" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" letter-spacing="0.04em">NARODOWE CENTRUM NAUKI</text>
+    <text x="86" y="60" font-family="system-ui, -apple-system, sans-serif" font-size="9" font-weight="500" opacity="0.8" letter-spacing="0.05em">POLISH NATIONAL SCIENCE CENTRE</text>
+  </g>
+</svg>

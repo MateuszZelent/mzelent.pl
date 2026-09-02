@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useRef, useSyncExternalStore } from "react";
 
+import { useTranslation } from "../../content/i18n/i18n-context";
 import { useSceneStore } from "../../visual/state/scene-store";
 import styles from "./MountainHero.module.css";
 
@@ -28,6 +29,7 @@ export interface MountainHeroProps {
 }
 
 export function MountainHero({ snowCanvas }: MountainHeroProps) {
+  const { t } = useTranslation();
   const osReducedMotion = useSyncExternalStore(subscribeReducedMotion, readReducedMotion, () => false);
   const motionMode = useSceneStore((state) => state.motionMode);
   const tierOverride = useSceneStore((state) => state.tierOverride);
@@ -229,22 +231,19 @@ export function MountainHero({ snowCanvas }: MountainHeroProps) {
       <div ref={contentRef} className={styles.contentContainer}>
         <div className={styles.heroBadge}>
           <span className={styles.badgePulse} aria-hidden="true" />
-          <span>Scientific Portfolio & Visual Laboratory</span>
+          <span>{t.hero.badge}</span>
         </div>
 
         <h1 className={styles.heroTitle}>
-          Exploring magnetic textures <br />
-          <span className={styles.heroTitleAccent}>& nonlinear wave dynamics.</span>
+          {t.hero.titleLine1} {t.hero.titleLine2} <br />
+          <span className={styles.heroTitleAccent}>{t.hero.titleAccent}</span>
         </h1>
 
-        <p className={styles.heroLead}>
-          Theoretical and computational research across chiral skyrmions, spin waves, nanomagnetic vector
-          fields, and high-performance physics simulations.
-        </p>
+        <p className={styles.heroLead}>{t.hero.lead}</p>
 
         <div className={styles.heroActions}>
           <a href="#research" className={styles.primaryButton}>
-            Explore Research
+            {t.hero.ctaResearch}
             <svg
               className={styles.buttonIcon}
               width="16"
@@ -263,24 +262,24 @@ export function MountainHero({ snowCanvas }: MountainHeroProps) {
           </a>
 
           <Link href="/lab/visual-system?tier=medium" className={styles.secondaryButton}>
-            Visual Laboratory
+            {t.hero.ctaLab}
           </Link>
         </div>
 
         <div className={styles.metricRow}>
           <div className={styles.metricItem}>
             <span className={styles.metricValue}>01</span>
-            <span className={styles.metricLabel}>Topological Solitons</span>
+            <span className={styles.metricLabel}>{t.hero.domain1}</span>
           </div>
           <div className={styles.metricDivider} aria-hidden="true" />
           <div className={styles.metricItem}>
             <span className={styles.metricValue}>02</span>
-            <span className={styles.metricLabel}>Spin-Wave Optics</span>
+            <span className={styles.metricLabel}>{t.hero.domain2}</span>
           </div>
           <div className={styles.metricDivider} aria-hidden="true" />
           <div className={styles.metricItem}>
             <span className={styles.metricValue}>03</span>
-            <span className={styles.metricLabel}>GPU Vector Fields</span>
+            <span className={styles.metricLabel}>{t.hero.domain3}</span>
           </div>
         </div>
       </div>

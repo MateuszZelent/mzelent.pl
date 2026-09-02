@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 80" fill="none" aria-label="RPTU Kaiserslautern-Landau">
+  <g fill="#f0f2f5">
+    <!-- RPTU Main Mark -->
+    <path d="M12 18h24c9.9 0 16 5.4 16 14.2 0 6.6-3.8 11.6-10 13.4l11.4 18.4h-9.8L33.2 46.8H20.4V64H12V18zm8.4 21.6h15c5.2 0 8.4-2.8 8.4-7.2 0-4.6-3.2-7.2-8.4-7.2h-15v14.4z"/>
+    <path d="M60 18h22c9.6 0 16 5.8 16 15 0 9.2-6.4 15-16 15H68.4V64H60V18zm8.4 22.8h13.2c5.4 0 8.8-3.2 8.8-7.8 0-4.6-3.4-7.8-8.8-7.8H68.4v15.6z"/>
+    <path d="M112 25.2h-14V18h36.4v7.2h-14V64H112V25.2z"/>
+    <path d="M144 18h8.4v29.2c0 10.4 6 16.8 15.6 16.8s15.6-6.4 15.6-16.8V18H192v29c0 15.2-9.6 24.2-24 24.2s-24-9-24-24.2V18z"/>
+    
+    <!-- Dividing line -->
+    <rect x="206" y="16" width="2" height="48" opacity="0.4"/>
+    
+    <!-- Subtitle text -->
+    <text x="216" y="32" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" letter-spacing="0.05em">Rheinland-Pfälzische</text>
+    <text x="216" y="45" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" letter-spacing="0.05em">Technische Universität</text>
+    <text x="216" y="58" font-family="system-ui, -apple-system, sans-serif" font-size="9" font-weight="500" opacity="0.8" letter-spacing="0.04em">Kaiserslautern · Landau</text>
+  </g>
+</svg>

@@ -13,10 +13,12 @@ describe("Homepage Shell & Mountain Hero Components", () => {
 
     expect(screen.getByRole("region", { name: "Hero Introduction" })).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { level: 1, name: /Exploring magnetic textures/i }),
+      screen.getByRole("heading", { level: 1, name: /Badania struktur|Exploring magnetic/i }),
     ).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /Explore Research/i })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /Visual Laboratory/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Zobacz Badania|Explore Research/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: /Laboratorium Wizualne|Visual Laboratory/i }),
+    ).toBeInTheDocument();
 
     expect(screen.getByTestId("parallax-layer-sky")).toBeInTheDocument();
     expect(screen.getByTestId("parallax-layer-midground")).toBeInTheDocument();
@@ -40,7 +42,9 @@ describe("Homepage Shell & Mountain Hero Components", () => {
     );
 
     expect(screen.getByRole("banner")).toBeInTheDocument();
-    expect(screen.getByRole("heading", { level: 2, name: /Computational Physics/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { level: 2, name: /Fizyka Obliczeniowa|Computational Physics/i }),
+    ).toBeInTheDocument();
     expect(screen.getByTestId("research-card-topological-solitons")).toBeInTheDocument();
     expect(screen.getByTestId("research-card-spin-wave-optics")).toBeInTheDocument();
     expect(screen.getByTestId("research-card-gpu-vector-fields")).toBeInTheDocument();

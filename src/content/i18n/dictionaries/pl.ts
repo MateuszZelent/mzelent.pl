@@ -1,0 +1,91 @@
+import type { TranslationDictionary } from "../types";
+
+export const dictionaryPl: TranslationDictionary = {
+  nav: {
+    brandTitle: "Mateusz Zelent",
+    research: "Badania",
+    grants: "Granty & Projekty",
+    software: "Oprogramowanie",
+    publications: "Publikacje",
+    visualLab: "Laboratorium Wizualne",
+    activeResearch: "Aktywne Badania",
+    labSandbox: "Piaskownica Lab",
+  },
+  hero: {
+    badge: "PORTFOLIO NAUKOWE & LABORATORIUM WIZUALNE",
+    titleLine1: "Badania struktur",
+    titleLine2: "magnetycznych",
+    titleAccent: "& nieliniowej dynamiki fal.",
+    lead: "Teoretyczne i obliczeniowe badania nad chiralnymi skyrmionami, falami spinowymi, nanostrukturami magnetycznymi i wysokowydajnymi symulacjami fizycznymi.",
+    ctaResearch: "Zobacz Badania",
+    ctaLab: "Laboratorium Wizualne",
+    domain1: "Solitony Topologiczne",
+    domain2: "Optyka Fal Spinowych",
+    domain3: "Pola Wektorowe GPU",
+  },
+  researchGrid: {
+    tag: "01 / Główne Osie Badawcze",
+    title: "Fizyka Obliczeniowa",
+    titleAccent: "& Nanostruktury Magnetyczne",
+    lead: "Łączenie fundamentalnej magnetyki analitycznej z wielkoskalowymi symulacjami numerycznymi, chiralnymi strukturami spinowymi i akcelerowanym na GPU modelowaniem fal.",
+  },
+  grants: {
+    tag: "02 / Aktywne Projekty & Granty",
+    title: "Finansowane Badania",
+    titleAccent: "& Stypendia Europejskie",
+    lead: "Projekty naukowe wspierane przez Horyzont Europa (Działania Marii Skłodowskiej-Curie) oraz Narodowe Centrum Nauki (NCN).",
+    projectDetails: "Szczegóły Projektu",
+    hostPartner: "Instytucja Goszcząca / Partner:",
+    budget: "Budżet:",
+    grantNo: "Nr Umowy:",
+    statusActive: "W trakcie realizacji",
+    statusCompleted: "Zakończony",
+  },
+  software: {
+    tag: "03 / Oprogramowanie & Solwery",
+    title: "Narzędzia Open-Source",
+    titleAccent: "do Symulacji Nanomagnetycznych",
+    lead: "Specjalistyczne pakiety numeryczne do obliczania trajektorii fal spinowych, optyki promieniowej i śledzenia ładunku topologicznego w czasie rzeczywistym.",
+    repoLink: "Repozytorium GitHub",
+  },
+  publications: {
+    tag: "04 / Wybrane Publikacje",
+    title: "Artykuły Recenzowane",
+    titleAccent: "& Prace w Physical Review",
+    lead: "Kluczowe publikacje rozwijające magnetyzm powierzchni zakrzywionych, gradientowe soczewki magnoniczne i dynamikę skyrmionów w prestiżowych czasopismach fizycznych.",
+    viewAll: "Pełny Wykaz Publikacji →",
+    openAccess: "Otwarty Dostęp",
+    doi: "DOI",
+    copyBibtex: "Kopiuj BibTeX",
+    copied: "Skopiowano!",
+  },
+  affiliations: {
+    title: "Afiliacje Naukowe & Finansowanie",
+    subtitle:
+      "Badania realizowane we współpracy z RPTU Kaiserslautern-Landau oraz Uniwersytetem im. Adama Mickiewicza w Poznaniu pod auspicjami Komisji Europejskiej i NCN.",
+    mscaNote:
+      "Projekt MSCA PF 'CNMA' nr 101108257 finansowany ze środków Unii Europejskiej w ramach programu Horyzont Europa.",
+    ncnNote: "Projekty SONATA i OPUS dofinansowane przez Narodowe Centrum Nauki (NCN).",
+  },
+  footer: {
+    roleBio:
+      "Adiunkt · Instytut Spintroniki i Informacji Kwantowej · Wydział Fizyki, Uniwersytet im. Adama Mickiewicza w Poznaniu · Stypendysta MSCA w RPTU Kaiserslautern-Landau.",
+    navigationTitle: "Nawigacja",
+    architectureTitle: "Architektura",
+    backToTop: "Do góry",
+    copyright: "Wszelkie prawa zastrzeżone. Stworzone zgodnie z najwyższymi standardami inżynierii webowej.",
+  },
+  publicationsPage: {
+    heading: "Wykaz Publikacji",
+    headingAccent: "i Artykułów Naukowych",
+    subheading:
+      "Kompletna bibliografia artykułów w czasopismach JCR (Physical Review B, Applied Physics Letters, Nature Communications) oraz preprintów badawczych dra Mateusza Zelenta.",
+    searchPlaceholder: "Szukaj publikacji (tytuł, autor, słowo kluczowe)...",
+    allJournals: "Wszystkie czasopisma",
+    allYears: "Wszystkie lata",
+    totalFound: "Liczba publikacji:",
+    backToHome: "← Strona Główna",
+    syncNotice: "Dane zsynchronizowane z profilem Google Scholar dra Mateusza Zelenta.",
+    noResults: "Brak publikacji spełniających podane kryteria wyszukiwania.",
+  },
+};

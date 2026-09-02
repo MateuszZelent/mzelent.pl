@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 80" fill="none" aria-label="Uniwersytet im. Adama Mickiewicza w Poznaniu">
+  <g fill="#f0f2f5">
+    <!-- Stylized Academic Emblem -->
+    <circle cx="40" cy="40" r="28" stroke="#f0f2f5" stroke-width="2" fill="none" opacity="0.4"/>
+    <circle cx="40" cy="40" r="23" stroke="#f0f2f5" stroke-width="1" fill="none" opacity="0.6"/>
+    <!-- Central Eagle & Scepter motif -->
+    <path d="M40 22l4 7h6l-5 5 2 7-7-4-7 4 2-7-5-5h6l4-7z" fill="#f0f2f5"/>
+    <path d="M28 44c2-5 7-9 12-9s10 4 12 9c-2 2-6 3-12 3s-10-1-12-3z" opacity="0.85"/>
+    <rect x="34" y="49" width="12" height="4" rx="1" fill="#f0f2f5"/>
+    <rect x="31" y="54" width="18" height="2" rx="0.5" opacity="0.8"/>
+
+    <!-- Separator -->
+    <rect x="80" y="16" width="2" height="48" opacity="0.4"/>
+
+    <!-- Text Logotype -->
+    <text x="92" y="32" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="700" letter-spacing="0.08em">UAM</text>
+    <text x="92" y="47" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" letter-spacing="0.04em">UNIWERSYTET IM. ADAMA MICKIEWICZA</text>
+    <text x="92" y="59" font-family="system-ui, -apple-system, sans-serif" font-size="9" font-weight="500" opacity="0.8" letter-spacing="0.05em">W POZNANIU · EST. 1919</text>
+  </g>
+</svg>

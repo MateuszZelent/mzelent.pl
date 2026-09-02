@@ -23,7 +23,7 @@ describe("Phase 3 Information and Content Model", () => {
       expect(pub.doi.length).toBeGreaterThan(3);
       expect(pub.doiUrl).toMatch(/^https:\/\/doi\.org\//);
       expect(pub.bibtex).toContain("@article");
-      expect(pub.year).toBeGreaterThanOrEqual(2020);
+      expect(pub.year).toBeGreaterThanOrEqual(2018);
     }
   });
 
@@ -39,11 +39,11 @@ describe("Phase 3 Information and Content Model", () => {
   });
 
   it("validates funded research grants and project numbers", () => {
-    expect(grants.length).toBeGreaterThanOrEqual(2);
+    expect(grants.length).toBeGreaterThanOrEqual(3);
 
     for (const grant of grants) {
       expect(grant.grantNumber).toBeTruthy();
-      expect(grant.funder).toContain("National Science Centre");
+      expect(grant.funder).toMatch(/National Science Centre|European Union/);
       expect(grant.role).toBeTruthy();
     }
   });

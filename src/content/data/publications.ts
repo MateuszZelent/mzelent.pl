@@ -101,4 +101,29 @@ export const publicationsData: Publication[] = [
   doi = {10.1063/5.0011234}
 }`,
   },
+  {
+    id: "zelent-scirep-2019-antidots",
+    title: "All-optical excitation and control of spin waves in bicomponent magnonic crystals",
+    authors: ["M. Zelent", "J. W. Kłos", "M. Krawczyk"],
+    year: 2019,
+    journal: "Scientific Reports",
+    volume: "9",
+    pages: "8912",
+    doi: "10.1038/s41598-019-45300-3",
+    doiUrl: "https://doi.org/10.1038/s41598-019-45300-3",
+    abstract:
+      "Femtosecond laser excitation and spatio-temporal interference of high-frequency spin waves in periodic magnetic antidot lattices.",
+    keywords: ["Magnonic Crystals", "Antidot Lattices", "Ultrafast Magnetism"],
+    featured: false,
+    openAccess: true,
+    bibtex: `@article{ZelentSciRep2019,
+  title = {All-optical excitation and control of spin waves in bicomponent magnonic crystals},
+  author = {Zelent, M. and K{\\l}os, J. W. and Krawczyk, M.},
+  journal = {Sci. Rep.},
+  volume = {9},
+  pages = {8912},
+  year = {2019},
+  doi = {10.1038/s41598-019-45300-3}
+}`,
+  },
 ];

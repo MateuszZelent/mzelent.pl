@@ -1,24 +1,26 @@
+"use client";
+
 import React from "react";
 
 import { software } from "../../content";
+import { useTranslation } from "../../content/i18n/i18n-context";
 import styles from "./SoftwareShowcase.module.css";
 
 export function SoftwareShowcase() {
+  const { t } = useTranslation();
+
   return (
-    <section id="software" className={styles.section} aria-label="Computational Software & Solvers">
+    <section id="software" className={styles.section} aria-label={t.software.title}>
       <div className={styles.container}>
         <div className={styles.sectionHeader}>
           <div className={styles.sectionTag}>
-            <span>02 / Computational Software & Solvers</span>
+            <span>{t.software.tag}</span>
           </div>
           <h2 className={styles.sectionTitle}>
-            Open-Source Tools <br />
-            <span className={styles.sectionTitleAccent}>for Nanomagnetic Simulation</span>
+            {t.software.title} <br />
+            <span className={styles.sectionTitleAccent}>{t.software.titleAccent}</span>
           </h2>
-          <p className={styles.sectionLead}>
-            Specialized packages designed to calculate spin-wave trajectories, ray optics, and real-time
-            topological soliton numbers from continuum micromagnetic datasets.
-          </p>
+          <p className={styles.sectionLead}>{t.software.lead}</p>
         </div>
 
         <div className={styles.softwareGrid}>
@@ -64,7 +66,7 @@ export function SoftwareShowcase() {
                   className={styles.repoLink}
                   aria-label={`View ${tool.name} source code on GitHub`}
                 >
-                  <span>GitHub Repository</span>
+                  <span>{t.software.repoLink}</span>
                   <span aria-hidden="true">↗</span>
                 </a>
               </div>

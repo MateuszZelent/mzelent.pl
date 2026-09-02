@@ -3,10 +3,12 @@
 import React, { useRef } from "react";
 
 import { researchDomains } from "../../content";
+import { useTranslation } from "../../content/i18n/i18n-context";
 import styles from "./ResearchGrid.module.css";
 
 export function ResearchGrid() {
   const containerRef = useRef<HTMLElement>(null);
+  const { t } = useTranslation();
 
   const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     const card = e.currentTarget;
@@ -22,16 +24,13 @@ export function ResearchGrid() {
       <div className={styles.container}>
         <div className={styles.sectionHeader}>
           <div className={styles.sectionTag}>
-            <span>01 / Core Research Axes</span>
+            <span>{t.researchGrid.tag}</span>
           </div>
           <h2 className={styles.sectionTitle}>
-            Computational Physics <br />
-            <span className={styles.sectionTitleAccent}>& Magnetic Nanostructures</span>
+            {t.researchGrid.title} <br />
+            <span className={styles.sectionTitleAccent}>{t.researchGrid.titleAccent}</span>
           </h2>
-          <p className={styles.sectionLead}>
-            Bridging fundamental analytical magnetics with massive numerical simulations, chiral spin
-            textures, and GPU-accelerated wave modeling.
-          </p>
+          <p className={styles.sectionLead}>{t.researchGrid.lead}</p>
         </div>
 
         <div className={styles.grid}>

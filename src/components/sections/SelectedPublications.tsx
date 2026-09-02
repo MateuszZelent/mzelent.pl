@@ -1,28 +1,31 @@
+"use client";
+
+import Link from "next/link";
 import React from "react";
 
 import { publications } from "../../content";
+import { useTranslation } from "../../content/i18n/i18n-context";
 import styles from "./SelectedPublications.module.css";
 
 export function SelectedPublications() {
+  const { t } = useTranslation();
+
   return (
-    <section id="publications" className={styles.section} aria-label="Selected Publications">
+    <section id="publications" className={styles.section} aria-label={t.publications.title}>
       <div className={styles.container}>
         <div className={styles.sectionHeader}>
           <div className={styles.sectionTag}>
-            <span>03 / Selected Publications</span>
+            <span>{t.publications.tag}</span>
           </div>
           <h2 className={styles.sectionTitle}>
-            Peer-Reviewed Articles <br />
-            <span className={styles.sectionTitleAccent}>& Physical Review Studies</span>
+            {t.publications.title} <br />
+            <span className={styles.sectionTitleAccent}>{t.publications.titleAccent}</span>
           </h2>
-          <p className={styles.sectionLead}>
-            Key papers advancing curvilinear magnetism, graded refractive magnonic lenses, and chiral skyrmion
-            motion in leading physics journals.
-          </p>
+          <p className={styles.sectionLead}>{t.publications.lead}</p>
         </div>
 
         <div className={styles.publicationList}>
-          {publications.map((pub) => (
+          {publications.slice(0, 4).map((pub) => (
             <article
               key={pub.id}
               className={styles.publicationCard}
@@ -31,7 +34,9 @@ export function SelectedPublications() {
               <div className={styles.metaRow}>
                 <span className={styles.journalPill}>{pub.journal}</span>
                 <span className={styles.yearPill}>{pub.year}</span>
-                {pub.openAccess && <span className={styles.openAccessBadge}>Open Access</span>}
+                {pub.openAccess && (
+                  <span className={styles.openAccessBadge}>{t.publications.openAccess}</span>
+                )}
               </div>
 
               <h3 className={styles.paperTitle}>{pub.title}</h3>
@@ -60,6 +65,12 @@ export function SelectedPublications() {
               </div>
             </article>
           ))}
+        </div>
+
+        <div className={styles.viewAllWrapper}>
+          <Link href="/publications" className={styles.viewAllLink} data-testid="view-all-publications-btn">
+            <span>{t.publications.viewAll}</span>
+          </Link>
         </div>
       </div>
     </section>

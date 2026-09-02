@@ -31,4 +31,11 @@ test.describe("Accessibility & Semantic Integrity", () => {
       }
     }
   });
+
+  test("has no automated accessibility violations on the publications page @a11y", async ({ page }) => {
+    await page.goto("/publications");
+
+    const results = await new AxeBuilder({ page }).analyze();
+    expect(results.violations).toEqual([]);
+  });
 });

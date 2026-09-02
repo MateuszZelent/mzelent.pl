@@ -6,6 +6,8 @@ import { generatePersonJsonLd, generateScholarlyArticleJsonLd } from "../content
 import { Footer } from "../components/footer/Footer";
 import { MountainHero } from "../components/hero/MountainHero";
 import { Header } from "../components/navigation/Header";
+import { AffiliationsStrip } from "../components/sections/AffiliationsStrip";
+import { GrantsSection } from "../components/sections/GrantsSection";
 import { ResearchGrid } from "../components/sections/ResearchGrid";
 import { SelectedPublications } from "../components/sections/SelectedPublications";
 import { SoftwareShowcase } from "../components/sections/SoftwareShowcase";
@@ -31,17 +33,15 @@ export default function HomePage() {
         />
       )}
 
-      <a href="#main-content" className="skip-link">
-        Skip to main content
-      </a>
-
       <Header />
 
       <main id="main-content" tabIndex={-1}>
         <MountainHero snowCanvas={<HomeSnowCanvas />} />
         <ResearchGrid />
+        <GrantsSection />
         <SoftwareShowcase />
         <SelectedPublications />
+        <AffiliationsStrip />
       </main>
 
       <Footer />

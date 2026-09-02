@@ -3,10 +3,12 @@
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
+import { useTranslation } from "../../content/i18n/i18n-context";
 import styles from "./Header.module.css";
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const { language, setLanguage, t } = useTranslation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -18,6 +20,9 @@ export function Header() {
 
   return (
     <header className={`${styles.header} ${isScrolled ? styles.scrolled : ""}`}>
+      <a href="#main-content" className="skip-link" aria-label="Skip to main content">
+        {language === "pl" ? "Przejdź do treści głównej" : "Skip to main content"}
+      </a>
       <div className={styles.headerInner}>
         <Link href="/" className={styles.brand} aria-label="Mateusz Zelent Homepage">
           <span className={styles.brandMark}>MZ</span>
@@ -28,35 +33,64 @@ export function Header() {
           <ul className={styles.navList}>
             <li>
               <a href="#research" className={styles.navLink}>
-                Research
+                {t.nav.research}
+              </a>
+            </li>
+            <li>
+              <a href="#grants" className={styles.navLink}>
+                {t.nav.grants}
               </a>
             </li>
             <li>
               <a href="#software" className={styles.navLink}>
-                Software
+                {t.nav.software}
               </a>
             </li>
             <li>
-              <a href="#publications" className={styles.navLink}>
-                Publications
-              </a>
+              <Link href="/publications" className={styles.navLink}>
+                {t.nav.publications}
+              </Link>
             </li>
             <li>
               <Link href="/lab/visual-system?tier=medium" className={styles.navLink}>
-                Visual Lab
+                {t.nav.visualLab}
               </Link>
             </li>
           </ul>
         </nav>
 
         <div className={styles.headerRight}>
-          <div className={styles.statusIndicator} title="Status: Active Research & Development">
+          <div className={styles.langSwitch} role="group" aria-label="Language selection">
+            <button
+              type="button"
+              className={`${styles.langBtn} ${language === "pl" ? styles.langBtnActive : ""}`}
+              onClick={() => setLanguage("pl")}
+              aria-pressed={language === "pl"}
+              aria-label="Wersja polska"
+            >
+              PL
+            </button>
+            <span className={styles.langSep} aria-hidden="true">
+              /
+            </span>
+            <button
+              type="button"
+              className={`${styles.langBtn} ${language === "en" ? styles.langBtnActive : ""}`}
+              onClick={() => setLanguage("en")}
+              aria-pressed={language === "en"}
+              aria-label="English version"
+            >
+              EN
+            </button>
+          </div>
+
+          <div className={styles.statusIndicator} title={`Status: ${t.nav.activeResearch}`}>
             <span className={styles.statusDot} aria-hidden="true" />
-            <span className={styles.statusText}>Active Research</span>
+            <span className={styles.statusText}>{t.nav.activeResearch}</span>
           </div>
 
           <Link href="/lab/visual-system?tier=medium" className={styles.labButton}>
-            Lab Sandbox
+            {t.nav.labSandbox}
           </Link>
         </div>
       </div>

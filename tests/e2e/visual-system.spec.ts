@@ -9,7 +9,7 @@ test("renders the single canvas runtime and transitions from poster to ready @sm
   page.on("console", (message) => {
     if (message.type() === "error") {
       const text = message.text();
-      if (!text.includes("WebGL creation failed")) {
+      if (!text.includes("WebGL creation failed") && !text.includes("_next/hmr")) {
         consoleErrors.push(text);
       }
     }
@@ -55,7 +55,7 @@ test("supports keyboard navigation to skip link and focuses laboratory shell", a
   page.on("console", (message) => {
     if (message.type() === "error") {
       const text = message.text();
-      if (!text.includes("WebGL creation failed")) {
+      if (!text.includes("WebGL creation failed") && !text.includes("_next/hmr")) {
         consoleErrors.push(text);
       }
     }
@@ -89,7 +89,7 @@ test("keeps the static fallback in reduced-motion mode @visual", async ({ browse
   page.on("console", (message) => {
     if (message.type() === "error") {
       const text = message.text();
-      if (!text.includes("WebGL creation failed")) {
+      if (!text.includes("WebGL creation failed") && !text.includes("_next/hmr")) {
         consoleErrors.push(text);
       }
     }
@@ -122,7 +122,7 @@ test("falls back gracefully when WebGL2 is blocked @visual", async ({ browser, b
   page.on("console", (message) => {
     if (message.type() === "error") {
       const text = message.text();
-      if (!text.includes("WebGL creation failed")) {
+      if (!text.includes("WebGL creation failed") && !text.includes("_next/hmr")) {
         consoleErrors.push(text);
       }
     }
@@ -167,7 +167,7 @@ test("reacts smoothly to pointer movement across particle atmosphere", async ({ 
   page.on("console", (message) => {
     if (message.type() === "error") {
       const text = message.text();
-      if (!text.includes("WebGL creation failed")) {
+      if (!text.includes("WebGL creation failed") && !text.includes("_next/hmr")) {
         consoleErrors.push(text);
       }
     }
@@ -209,7 +209,7 @@ test("handles WebGL context loss and restoration gracefully", async ({ page }) =
   page.on("console", (message) => {
     if (message.type() === "error") {
       const text = message.text();
-      if (!text.includes("WebGL creation failed")) {
+      if (!text.includes("WebGL creation failed") && !text.includes("_next/hmr")) {
         consoleErrors.push(text);
       }
     }
@@ -277,7 +277,7 @@ test("handles viewport resize without duplicating canvas", async ({ page }) => {
   page.on("console", (message) => {
     if (message.type() === "error") {
       const text = message.text();
-      if (!text.includes("WebGL creation failed")) {
+      if (!text.includes("WebGL creation failed") && !text.includes("_next/hmr")) {
         consoleErrors.push(text);
       }
     }
@@ -320,7 +320,7 @@ test("supports 5 clean remount cycles without resource leaks", async ({ page }) 
   page.on("console", (message) => {
     if (message.type() === "error") {
       const text = message.text();
-      if (!text.includes("WebGL creation failed")) {
+      if (!text.includes("WebGL creation failed") && !text.includes("_next/hmr")) {
         consoleErrors.push(text);
       }
     }
@@ -385,7 +385,7 @@ test("remains readable and high contrast in forced-colors mode @visual", async (
   page.on("console", (message) => {
     if (message.type() === "error") {
       const text = message.text();
-      if (!text.includes("WebGL creation failed")) {
+      if (!text.includes("WebGL creation failed") && !text.includes("_next/hmr")) {
         consoleErrors.push(text);
       }
     }
@@ -420,7 +420,7 @@ test("captures the ready visual fixture @visual", async ({ page }, testInfo) => 
   page.on("console", (message) => {
     if (message.type() === "error") {
       const text = message.text();
-      if (!text.includes("WebGL creation failed")) {
+      if (!text.includes("WebGL creation failed") && !text.includes("_next/hmr")) {
         consoleErrors.push(text);
       }
     }

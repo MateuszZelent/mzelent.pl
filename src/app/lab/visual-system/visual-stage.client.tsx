@@ -1,10 +1,10 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import React, { useEffect, useState, useSyncExternalStore } from "react";
+import React, { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 
 import { RuntimeDiagnostics } from "../../../visual/diagnostics/RuntimeDiagnostics";
-import { type QualityProfile } from "../../../visual/quality/quality-contract";
+import { type QualityProfile, type QualityTier } from "../../../visual/quality/quality-contract";
 import { resolveQualityProfile } from "../../../visual/quality/quality-profile";
 import { useSceneStore } from "../../../visual/state/scene-store";
 import styles from "./visual-system.module.css";
@@ -83,7 +83,7 @@ function subscribeToCapabilities(onStoreChange: () => void): () => void {
 }
 
 export function VisualStageClient() {
-  const profile = useSyncExternalStore(
+  const detectedProfile = useSyncExternalStore(
     subscribeToCapabilities,
     readBrowserCapabilities,
     () => STATIC_FALLBACK_PROFILE,
@@ -93,20 +93,50 @@ export function VisualStageClient() {
 
   const runtimeStatus = useSceneStore((state) => state.runtimeStatus);
   const posterVisible = useSceneStore((state) => state.posterVisible);
+  const tierOverride = useSceneStore((state) => state.tierOverride);
   const setStatus = useSceneStore((state) => state.setStatus);
   const setPosterVisible = useSceneStore((state) => state.setPosterVisible);
   const setQualityTier = useSceneStore((state) => state.setQualityTier);
+  const setTierOverride = useSceneStore((state) => state.setTierOverride);
+  const setCapabilities = useSceneStore((state) => state.setCapabilities);
+
+  // Check URL query param for tier override (e.g. ?tier=high, ?tier=medium)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const params = new URLSearchParams(window.location.search);
+    const tierParam = params.get("tier");
+    if (tierParam && ["high", "medium", "low", "static"].includes(tierParam)) {
+      setTierOverride(tierParam as QualityTier);
+    }
+
+    const prefersReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+    const coarsePointer = window.matchMedia?.("(pointer: coarse)").matches ?? false;
+    setCapabilities(prefersReducedMotion, coarsePointer);
+  }, [setTierOverride, setCapabilities]);
+
+  // Compute effective profile (tierOverride takes precedence if active)
+  const activeProfile: QualityProfile = useMemo(() => {
+    if (!tierOverride) return detectedProfile;
+    return {
+      tier: tierOverride,
+      dprCap: tierOverride === "high" ? 1.75 : tierOverride === "medium" ? 1.35 : 1.0,
+      maxPixelLoad: 4_500_000,
+      antialias: tierOverride !== "low" && tierOverride !== "static",
+      powerPreference: tierOverride === "high" ? "high-performance" : "default",
+    };
+  }, [tierOverride, detectedProfile]);
 
   // Synchronize store when profile is evaluated
   useEffect(() => {
-    setQualityTier(profile.tier);
-    if (profile.tier === "static") {
+    setQualityTier(activeProfile.tier);
+    if (activeProfile.tier === "static") {
       setStatus("static");
       setPosterVisible(true);
     } else {
       setStatus("loading");
     }
-  }, [profile, setQualityTier, setStatus, setPosterVisible]);
+  }, [activeProfile, setQualityTier, setStatus, setPosterVisible]);
 
   // Support test automation remount cycles if requested
   useEffect(() => {
@@ -136,7 +166,7 @@ export function VisualStageClient() {
     }
   }, [runtimeStatus, setPosterVisible]);
 
-  const shouldRenderCanvas = testMounted && profile.tier !== "static";
+  const shouldRenderCanvas = testMounted && activeProfile.tier !== "static";
 
   return (
     <>
@@ -149,7 +179,7 @@ export function VisualStageClient() {
         {shouldRenderCanvas ? (
           <LazyVisualCanvas
             className={styles.webglCanvas}
-            qualityProfile={profile}
+            qualityProfile={activeProfile}
             activeSceneId="atmosphere"
             onError={() => {
               setStatus("failed");

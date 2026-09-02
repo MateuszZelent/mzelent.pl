@@ -12,9 +12,9 @@ void main() {
     discard;
   }
 
-  // Soft Gaussian micro-point core with crystalline glint
-  float core = exp(-dist * dist * 18.0);
-  float halo = exp(-dist * dist * 6.0) * 0.4;
+  // Sharp crystalline micro-point core with subtle glint
+  float core = exp(-dist * dist * 36.0);
+  float halo = exp(-dist * dist * 12.0) * 0.25;
   float shape = core + halo;
 
   // Gentle depth fade: visible across entire mountain sky depth range

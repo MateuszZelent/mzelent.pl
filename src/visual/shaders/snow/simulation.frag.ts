@@ -127,11 +127,11 @@ void main() {
       float pFactor = 1.0 - smoothstep(0.0, uPointerRadius, pDist);
       vec2 pDir = pDiff / pDist;
       
-      // Push force outwards from cursor
-      vec2 push = pDir * (uPointerForce * pFactor * 1.5);
+      // Push force outwards from cursor (responsive repulsive air wake)
+      vec2 push = pDir * (uPointerForce * pFactor * 2.6);
       
       // Swirling vortex wake from cursor movement velocity
-      vec2 vortex = vec2(-uPointerVel.y, uPointerVel.x) * (uPointerForce * pFactor * 2.0);
+      vec2 vortex = vec2(-uPointerVel.y, uPointerVel.x) * (uPointerForce * pFactor * 3.2);
       
       pointerForce.xy = (push + vortex) * uPointerActive;
     }
@@ -147,16 +147,16 @@ void main() {
   if (pos.y < -uBounds.y) {
     pos.y = uBounds.y + fract(sin(seed * 91.345 + uTime * 1.2) * 43758.5453) * 0.4;
     pos.x = (fract(sin(seed * 157.123 + uTime * 0.8) * 23421.631) * 2.0 - 1.0) * uBounds.x;
-    pos.z = (fract(sin(seed * 289.456 + uTime * 0.5) * 65432.189) * 2.0 - 1.0) * uBounds.z;
+    pos.z = -0.3 - fract(sin(seed * 289.456 + uTime * 0.5) * 65432.189) * 2.2;
   }
 
   // Horizontal edge wrap
   if (pos.x > uBounds.x) pos.x = -uBounds.x + 0.05;
   if (pos.x < -uBounds.x) pos.x = uBounds.x - 0.05;
 
-  // Depth edge wrap
-  if (pos.z > uBounds.z) pos.z = -uBounds.z + 0.05;
-  if (pos.z < -uBounds.z) pos.z = uBounds.z - 0.05;
+  // Depth edge wrap: strictly confined behind the first mountain (z in [-2.6, -0.2])
+  if (pos.z > -0.2) pos.z = -2.5;
+  if (pos.z < -2.6) pos.z = -0.3;
 
   gl_FragColor = vec4(pos, seed);
 }

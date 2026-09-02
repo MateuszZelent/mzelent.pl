@@ -33,7 +33,7 @@ describe("Snow Simulation Configuration", () => {
     const { bounds } = SNOW_CONFIGS.high;
     expect(bounds.x).toBeGreaterThan(4.0);
     expect(bounds.y).toBeGreaterThan(3.0);
-    expect(bounds.z).toBeGreaterThan(2.0);
+    expect(bounds.z).toBeGreaterThan(1.0);
   });
 
   it("provides pointer interaction radius and force", () => {

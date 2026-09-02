@@ -45,7 +45,7 @@ export class GpuSnowSimulator {
 
       const x = ((Math.sin(i * 0.37 + 1.1) * 0.5 + 0.5) * 2.0 - 1.0) * bounds.x;
       const y = ((Math.cos(i * 0.49 + 2.3) * 0.5 + 0.5) * 2.0 - 1.0) * bounds.y;
-      const z = ((Math.sin(i * 0.63 + 3.7) * 0.5 + 0.5) * 2.0 - 1.0) * bounds.z;
+      const z = -0.3 - seedFrac * 2.2;
 
       initialPositions[idx + 0] = x;
       initialPositions[idx + 1] = y;

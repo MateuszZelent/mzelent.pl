@@ -29,17 +29,17 @@
   z-index: 1;
 }
 
-.layerMidground {
+.layerSnow {
   z-index: 2;
 }
 
-.layerMist {
+.layerMidground {
   z-index: 3;
-  opacity: 0.85;
 }
 
-.layerSnow {
+.layerMist {
   z-index: 4;
+  opacity: 0.85;
 }
 
 .layerForeground {

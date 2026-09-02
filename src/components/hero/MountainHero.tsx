@@ -170,7 +170,14 @@ export function MountainHero({ snowCanvas }: MountainHeroProps) {
         />
       </div>
 
-      {/* Layer 2: Midground Alpine Mountain Peaks */}
+      {/* Layer 2: GPU Snow Canvas (Falls in the atmosphere BEHIND the mountain peaks!) */}
+      {!isReducedMotion && snowCanvas && (
+        <div ref={snowRef} className={styles.layerSnow} aria-hidden="true" data-testid="parallax-layer-snow">
+          {snowCanvas}
+        </div>
+      )}
+
+      {/* Layer 3: Midground Alpine Mountain Peaks (Sits in FRONT of the falling snow) */}
       <div
         ref={midRef}
         className={styles.layerMidground}
@@ -187,7 +194,7 @@ export function MountainHero({ snowCanvas }: MountainHeroProps) {
         />
       </div>
 
-      {/* Layer 3: Rolling Atmospheric Alpine Mist */}
+      {/* Layer 4: Rolling Atmospheric Alpine Mist */}
       <div ref={mistRef} className={styles.layerMist} aria-hidden="true" data-testid="parallax-layer-mist">
         <Image
           src="/assets/images/mountains/mist-clouds.webp"
@@ -197,13 +204,6 @@ export function MountainHero({ snowCanvas }: MountainHeroProps) {
           className={`${styles.layerImage} ${styles.animatedMist}`}
         />
       </div>
-
-      {/* Layer 3.5: GPU Snow Canvas (Falls behind the foreground mountain; disabled in reduced motion) */}
-      {!isReducedMotion && snowCanvas && (
-        <div ref={snowRef} className={styles.layerSnow} aria-hidden="true" data-testid="parallax-layer-snow">
-          {snowCanvas}
-        </div>
-      )}
 
       {/* Layer 4: Foreground Rocky Ridge & Crags (Opaque rocks sit in FRONT of falling snow) */}
       <div

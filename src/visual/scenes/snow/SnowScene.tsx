@@ -124,10 +124,18 @@ export function SnowScene({ qualityProfile }: SnowSceneProps) {
     const safeDelta = Math.min(delta, 0.05);
 
     const { current, velocity } = pointerTracker.update(safeDelta);
-    pointerPos2D.current.set(current.x, current.y);
-    pointerVel2D.current.set(velocity.x, velocity.y);
 
-    const isPointerActive = Math.abs(current.x) > 0.001 || Math.abs(current.y) > 0.001;
+    // Project pointer NDC [-1, 1] into world coordinates at the snow simulation plane (z ≈ -1.0)
+    const cam = state.camera as THREE.PerspectiveCamera;
+    const vFovRad = ((cam.fov ?? 45) * Math.PI) / 180;
+    const planeDistance = cam.position.z + 1.0;
+    const visibleHalfHeight = Math.tan(vFovRad / 2) * planeDistance;
+    const visibleHalfWidth = visibleHalfHeight * (cam.aspect || 1.6);
+
+    pointerPos2D.current.set(current.x * visibleHalfWidth, current.y * visibleHalfHeight);
+    pointerVel2D.current.set(velocity.x * visibleHalfWidth, velocity.y * visibleHalfHeight);
+
+    const isPointerActive = current.z > 0.01;
 
     const simTexture = simulator.step(
       state.clock.getElapsedTime(),

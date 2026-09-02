@@ -5,8 +5,11 @@ import { SNOW_CONFIGS, type SnowConfig } from "../scenes/snow/snow-config";
 import { snowSimulationFragmentShader } from "../shaders/snow/simulation.frag";
 import { snowSimulationVertexShader } from "../shaders/snow/simulation.vert";
 
+import { negotiateParticleCapabilities, type ParticleRuntimeCapabilities } from "./particle-capabilities";
+
 export class GpuSnowSimulator {
   readonly config: SnowConfig;
+  readonly capabilities: ParticleRuntimeCapabilities;
   private readonly renderer: THREE.WebGLRenderer;
   private targetA: THREE.WebGLRenderTarget;
   private targetB: THREE.WebGLRenderTarget;
@@ -22,6 +25,7 @@ export class GpuSnowSimulator {
   constructor(renderer: THREE.WebGLRenderer, tier: QualityTier) {
     this.renderer = renderer;
     this.config = SNOW_CONFIGS[tier];
+    this.capabilities = negotiateParticleCapabilities(renderer);
 
     const {
       fboWidth,
@@ -33,6 +37,9 @@ export class GpuSnowSimulator {
       pointerRadius,
       pointerForce,
     } = this.config;
+
+    const textureType =
+      this.capabilities.renderTargetType === "half-float" ? THREE.HalfFloatType : THREE.FloatType;
 
     const particleCount = fboWidth * fboHeight;
     const initialPositions = new Float32Array(particleCount * 4);
@@ -58,14 +65,14 @@ export class GpuSnowSimulator {
       fboWidth,
       fboHeight,
       THREE.RGBAFormat,
-      THREE.FloatType,
+      textureType,
     );
     this.initialPositionTexture.needsUpdate = true;
 
     // Create double-buffered FBO render targets
     const fboOptions: THREE.RenderTargetOptions = {
       format: THREE.RGBAFormat,
-      type: THREE.FloatType,
+      type: textureType,
       minFilter: THREE.NearestFilter,
       magFilter: THREE.NearestFilter,
       stencilBuffer: false,

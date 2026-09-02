@@ -2,12 +2,13 @@ import { create } from "zustand";
 
 import type { QualityTier } from "../quality/quality-contract";
 import { isValidStatusTransition, type RuntimeStatus } from "./runtime-status";
-import type { DiagnosticsSnapshot, SceneId, SceneState } from "./scene-contract";
+import type { DiagnosticsSnapshot, MotionMode, SceneId, SceneState } from "./scene-contract";
 
 export interface SceneStoreActions {
   readonly setStatus: (status: RuntimeStatus) => boolean;
   readonly setQualityTier: (tier: QualityTier) => void;
   readonly setTierOverride: (override: QualityTier | null) => void;
+  readonly setMotionMode: (mode: MotionMode) => void;
   readonly setCapabilities: (reducedMotion: boolean, coarsePointer: boolean) => void;
   readonly setVisibilityState: (visibility: DocumentVisibilityState) => void;
   readonly setActiveSceneId: (sceneId: SceneId) => void;
@@ -25,6 +26,7 @@ const initialDiagnostics: DiagnosticsSnapshot = {
   runtimeStatus: "idle",
   qualityTier: "medium",
   tierOverride: null,
+  motionMode: "auto",
   effectiveDpr: 1.0,
   viewportWidth: 0,
   viewportHeight: 0,
@@ -49,6 +51,7 @@ const initialState: SceneState = {
   runtimeStatus: "idle",
   qualityTier: "medium",
   tierOverride: null,
+  motionMode: "auto",
   reducedMotion: false,
   coarsePointer: false,
   visibilityState: "visible",
@@ -86,6 +89,12 @@ export const useSceneStore = create<VisualSceneStore>((set, get) => ({
     set((state) => ({
       tierOverride,
       diagnostics: { ...state.diagnostics, tierOverride },
+    })),
+
+  setMotionMode: (motionMode: MotionMode) =>
+    set((state) => ({
+      motionMode,
+      diagnostics: { ...state.diagnostics, motionMode },
     })),
 
   setCapabilities: (reducedMotion: boolean, coarsePointer: boolean) =>

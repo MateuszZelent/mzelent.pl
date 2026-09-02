@@ -7,7 +7,9 @@ import styles from "./Footer.module.css";
 
 export function Footer() {
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    const prefersReducedMotion =
+      typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    window.scrollTo({ top: 0, behavior: prefersReducedMotion ? "auto" : "smooth" });
   };
 
   return (

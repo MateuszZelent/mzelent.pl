@@ -5,7 +5,7 @@ import { Footer } from "../components/footer/Footer";
 import { MountainHero } from "../components/hero/MountainHero";
 import { Header } from "../components/navigation/Header";
 import { ResearchGrid } from "../components/sections/ResearchGrid";
-import { HomeVisualStage } from "./home-stage.client";
+import { HomeDiagnostics, HomeSnowCanvas } from "./home-stage.client";
 
 export const metadata: Metadata = {
   title: "Mateusz Zelent — Computational Physics & Magnetic Dynamics",
@@ -23,11 +23,13 @@ export default function HomePage() {
       <Header />
 
       <main id="main-content" tabIndex={-1}>
-        <MountainHero snowCanvas={<HomeVisualStage />} />
+        <MountainHero snowCanvas={<HomeSnowCanvas />} />
         <ResearchGrid />
       </main>
 
       <Footer />
+
+      <HomeDiagnostics />
     </>
   );
 }

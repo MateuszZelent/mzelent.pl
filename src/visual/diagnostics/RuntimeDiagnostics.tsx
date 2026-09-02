@@ -3,6 +3,7 @@
 import React from "react";
 
 import type { QualityTier } from "../quality/quality-contract";
+import type { MotionMode } from "../state/scene-contract";
 import { useSceneStore } from "../state/scene-store";
 
 export function RuntimeDiagnostics({
@@ -17,6 +18,7 @@ export function RuntimeDiagnostics({
 
   const diag = useSceneStore((state) => state.diagnostics);
   const setTierOverride = useSceneStore((state) => state.setTierOverride);
+  const setMotionMode = useSceneStore((state) => state.setMotionMode);
 
   if (!isEnabled) {
     return null;
@@ -24,6 +26,10 @@ export function RuntimeDiagnostics({
 
   const handleTierClick = (tier: QualityTier | null) => {
     setTierOverride(tier);
+  };
+
+  const handleMotionClick = (mode: MotionMode) => {
+    setMotionMode(mode);
   };
 
   return (
@@ -34,6 +40,7 @@ export function RuntimeDiagnostics({
       data-testid="runtime-diagnostics"
       data-status={diag.runtimeStatus}
       data-tier={diag.qualityTier}
+      data-motion-mode={diag.motionMode}
       data-dpr={diag.effectiveDpr}
       data-canvas-count={diag.canvasCount}
       data-webgl2={diag.webgl2Supported}
@@ -73,8 +80,12 @@ export function RuntimeDiagnostics({
         <div style={{ display: "flex", justifyContent: "space-between", padding: "2px 0" }}>
           <dt>OS Reduced Motion</dt>
           <dd style={{ color: diag.reducedMotionDetected ? "var(--accent-violet)" : "var(--color-ink)" }}>
-            {diag.reducedMotionDetected ? "active (fallback)" : "off"}
+            {diag.reducedMotionDetected ? "active (enforced)" : "off"}
           </dd>
+        </div>
+        <div style={{ display: "flex", justifyContent: "space-between", padding: "2px 0" }}>
+          <dt>Motion Mode</dt>
+          <dd style={{ color: "var(--color-ink)" }}>{diag.motionMode}</dd>
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", padding: "2px 0" }}>
           <dt>WebGL2</dt>
@@ -102,7 +113,7 @@ export function RuntimeDiagnostics({
         >
           Preview Tier Override:
         </span>
-        <div style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: "4px", flexWrap: "wrap", marginBottom: "6px" }}>
           {(["auto", "high", "medium", "low", "static"] as const).map((t) => {
             const isSelected = t === "auto" ? diag.tierOverride === null : diag.tierOverride === t;
             return (
@@ -122,6 +133,36 @@ export function RuntimeDiagnostics({
                 }}
               >
                 {t}
+              </button>
+            );
+          })}
+        </div>
+
+        <span
+          style={{ fontSize: "0.55rem", color: "var(--color-muted)", display: "block", marginBottom: "4px" }}
+        >
+          Lab Motion Override:
+        </span>
+        <div style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>
+          {(["auto", "reduced", "full-preview"] as const).map((m) => {
+            const isSelected = diag.motionMode === m;
+            return (
+              <button
+                key={m}
+                type="button"
+                onClick={() => handleMotionClick(m)}
+                style={{
+                  background: isSelected ? "var(--accent-violet)" : "rgba(255, 255, 255, 0.05)",
+                  color: isSelected ? "#030405" : "var(--color-ink)",
+                  border: "1px solid rgba(255, 255, 255, 0.15)",
+                  borderRadius: "2px",
+                  fontSize: "0.55rem",
+                  padding: "2px 5px",
+                  cursor: "pointer",
+                  fontWeight: isSelected ? 700 : 400,
+                }}
+              >
+                {m}
               </button>
             );
           })}

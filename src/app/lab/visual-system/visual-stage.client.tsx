@@ -6,6 +6,7 @@ import React, { useEffect, useMemo, useState, useSyncExternalStore } from "react
 import { RuntimeDiagnostics } from "../../../visual/diagnostics/RuntimeDiagnostics";
 import { type QualityProfile, type QualityTier } from "../../../visual/quality/quality-contract";
 import { resolveQualityProfile } from "../../../visual/quality/quality-profile";
+import type { MotionMode } from "../../../visual/state/scene-contract";
 import { useSceneStore } from "../../../visual/state/scene-store";
 import styles from "./visual-system.module.css";
 
@@ -94,13 +95,15 @@ export function VisualStageClient() {
   const runtimeStatus = useSceneStore((state) => state.runtimeStatus);
   const posterVisible = useSceneStore((state) => state.posterVisible);
   const tierOverride = useSceneStore((state) => state.tierOverride);
+  const motionMode = useSceneStore((state) => state.motionMode);
   const setStatus = useSceneStore((state) => state.setStatus);
   const setPosterVisible = useSceneStore((state) => state.setPosterVisible);
   const setQualityTier = useSceneStore((state) => state.setQualityTier);
   const setTierOverride = useSceneStore((state) => state.setTierOverride);
+  const setMotionMode = useSceneStore((state) => state.setMotionMode);
   const setCapabilities = useSceneStore((state) => state.setCapabilities);
 
-  // Check URL query param for tier override (e.g. ?tier=high, ?tier=medium)
+  // Check URL query param for tier & motion overrides on the laboratory bench
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -110,13 +113,22 @@ export function VisualStageClient() {
       setTierOverride(tierParam as QualityTier);
     }
 
+    const motionParam = params.get("motion");
+    if (motionParam && ["auto", "reduced", "full-preview"].includes(motionParam)) {
+      setMotionMode(motionParam as MotionMode);
+    }
+
     const prefersReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
     const coarsePointer = window.matchMedia?.("(pointer: coarse)").matches ?? false;
     setCapabilities(prefersReducedMotion, coarsePointer);
-  }, [setTierOverride, setCapabilities]);
+  }, [setTierOverride, setMotionMode, setCapabilities]);
 
-  // Compute effective profile (tierOverride takes precedence if active)
+  // Compute effective profile
   const activeProfile: QualityProfile = useMemo(() => {
+    // If OS prefers reduced motion, force static unless explicitly on laboratory full-preview mode
+    if (detectedProfile.tier === "static" && motionMode !== "full-preview") {
+      return STATIC_FALLBACK_PROFILE;
+    }
     if (!tierOverride) return detectedProfile;
     return {
       tier: tierOverride,
@@ -125,7 +137,7 @@ export function VisualStageClient() {
       antialias: tierOverride !== "low" && tierOverride !== "static",
       powerPreference: tierOverride === "high" ? "high-performance" : "default",
     };
-  }, [tierOverride, detectedProfile]);
+  }, [tierOverride, motionMode, detectedProfile]);
 
   // Synchronize store when profile is evaluated
   useEffect(() => {

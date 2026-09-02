@@ -80,6 +80,7 @@ export function ResearchGrid() {
           {RESEARCH_DOMAINS.map((domain) => (
             <div
               key={domain.id}
+              id={domain.id}
               className={styles.card}
               onPointerMove={handlePointerMove}
               data-testid={`research-card-${domain.id}`}

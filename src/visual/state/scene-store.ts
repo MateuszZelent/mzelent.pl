@@ -7,6 +7,7 @@ import type { DiagnosticsSnapshot, SceneId, SceneState } from "./scene-contract"
 export interface SceneStoreActions {
   readonly setStatus: (status: RuntimeStatus) => boolean;
   readonly setQualityTier: (tier: QualityTier) => void;
+  readonly setTierOverride: (override: QualityTier | null) => void;
   readonly setCapabilities: (reducedMotion: boolean, coarsePointer: boolean) => void;
   readonly setVisibilityState: (visibility: DocumentVisibilityState) => void;
   readonly setActiveSceneId: (sceneId: SceneId) => void;
@@ -23,10 +24,12 @@ export type VisualSceneStore = SceneState & SceneStoreActions;
 const initialDiagnostics: DiagnosticsSnapshot = {
   runtimeStatus: "idle",
   qualityTier: "medium",
+  tierOverride: null,
   effectiveDpr: 1.0,
   viewportWidth: 0,
   viewportHeight: 0,
   webgl2Supported: false,
+  reducedMotionDetected: false,
   canvasCount: 0,
   contextLossCount: 0,
   contextRestoreCount: 0,
@@ -45,6 +48,7 @@ const initialDiagnostics: DiagnosticsSnapshot = {
 const initialState: SceneState = {
   runtimeStatus: "idle",
   qualityTier: "medium",
+  tierOverride: null,
   reducedMotion: false,
   coarsePointer: false,
   visibilityState: "visible",
@@ -78,7 +82,18 @@ export const useSceneStore = create<VisualSceneStore>((set, get) => ({
       diagnostics: { ...state.diagnostics, qualityTier },
     })),
 
-  setCapabilities: (reducedMotion: boolean, coarsePointer: boolean) => set({ reducedMotion, coarsePointer }),
+  setTierOverride: (tierOverride: QualityTier | null) =>
+    set((state) => ({
+      tierOverride,
+      diagnostics: { ...state.diagnostics, tierOverride },
+    })),
+
+  setCapabilities: (reducedMotion: boolean, coarsePointer: boolean) =>
+    set((state) => ({
+      reducedMotion,
+      coarsePointer,
+      diagnostics: { ...state.diagnostics, reducedMotionDetected: reducedMotion },
+    })),
 
   setVisibilityState: (visibilityState: DocumentVisibilityState) =>
     set((state) => ({

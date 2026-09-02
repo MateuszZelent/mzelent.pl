@@ -13,7 +13,7 @@ import { VisualRuntime } from "./VisualRuntime";
 
 export function VisualCanvas({
   qualityProfile,
-  activeSceneId = "calibration",
+  activeSceneId = "atmosphere",
   className,
   onReady,
   onError,
@@ -45,7 +45,7 @@ export function VisualCanvas({
     <VisualRuntimeErrorBoundary onError={onError}>
       <Canvas
         className={className}
-        frameloop="demand"
+        frameloop={activeSceneId === "atmosphere" ? "always" : "demand"}
         dpr={[1, qualityProfile.dprCap]}
         gl={createRendererParameters(qualityProfile)}
         camera={{ position: [0, 0, 5], fov: 45, near: 0.1, far: 100 }}

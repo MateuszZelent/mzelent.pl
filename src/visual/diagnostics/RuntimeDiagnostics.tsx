@@ -2,6 +2,7 @@
 
 import React from "react";
 
+import type { QualityTier } from "../quality/quality-contract";
 import { useSceneStore } from "../state/scene-store";
 
 export function RuntimeDiagnostics({ className }: { readonly className?: string }) {
@@ -9,10 +10,15 @@ export function RuntimeDiagnostics({ className }: { readonly className?: string 
     process.env.NODE_ENV === "development" || process.env.NEXT_PUBLIC_ENABLE_DIAGNOSTICS === "1";
 
   const diag = useSceneStore((state) => state.diagnostics);
+  const setTierOverride = useSceneStore((state) => state.setTierOverride);
 
   if (!isEnabled) {
     return null;
   }
+
+  const handleTierClick = (tier: QualityTier | null) => {
+    setTierOverride(tier);
+  };
 
   return (
     <aside
@@ -41,11 +47,12 @@ export function RuntimeDiagnostics({ className }: { readonly className?: string 
           letterSpacing: "0.1em",
           textTransform: "uppercase",
           margin: "0 0 0.5rem",
+          fontWeight: 600,
         }}
       >
         Runtime diagnostics
       </p>
-      <dl style={{ margin: 0, fontSize: "0.6rem" }}>
+      <dl style={{ margin: "0 0 0.5rem", fontSize: "0.6rem" }}>
         <div style={{ display: "flex", justifyContent: "space-between", padding: "2px 0" }}>
           <dt>Status</dt>
           <dd style={{ color: "var(--color-ink)", fontWeight: 600 }}>{diag.runtimeStatus}</dd>
@@ -57,6 +64,12 @@ export function RuntimeDiagnostics({ className }: { readonly className?: string 
           </dd>
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", padding: "2px 0" }}>
+          <dt>OS Reduced Motion</dt>
+          <dd style={{ color: diag.reducedMotionDetected ? "var(--accent-violet)" : "var(--color-ink)" }}>
+            {diag.reducedMotionDetected ? "active (fallback)" : "off"}
+          </dd>
+        </div>
+        <div style={{ display: "flex", justifyContent: "space-between", padding: "2px 0" }}>
           <dt>WebGL2</dt>
           <dd style={{ color: "var(--color-ink)" }}>{diag.webgl2Supported ? "supported" : "unavailable"}</dd>
         </div>
@@ -65,26 +78,48 @@ export function RuntimeDiagnostics({ className }: { readonly className?: string 
           <dd style={{ color: "var(--color-ink)" }}>{diag.canvasCount}</dd>
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", padding: "2px 0" }}>
-          <dt>Frameloop</dt>
-          <dd style={{ color: "var(--color-ink)" }}>{diag.frameloop}</dd>
-        </div>
-        <div style={{ display: "flex", justifyContent: "space-between", padding: "2px 0" }}>
           <dt>Scene</dt>
           <dd style={{ color: "var(--color-ink)" }}>{diag.activeSceneId}</dd>
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", padding: "2px 0" }}>
-          <dt>Draw calls / Tris</dt>
+          <dt>Draw calls / Points</dt>
           <dd style={{ color: "var(--color-ink)" }}>
-            {diag.drawCalls} / {diag.triangles}
-          </dd>
-        </div>
-        <div style={{ display: "flex", justifyContent: "space-between", padding: "2px 0" }}>
-          <dt>Context loss / restore</dt>
-          <dd style={{ color: "var(--color-ink)" }}>
-            {diag.contextLossCount} / {diag.contextRestoreCount}
+            {diag.drawCalls} / {diag.points.toLocaleString()}
           </dd>
         </div>
       </dl>
+
+      <div style={{ borderTop: "1px solid rgba(255, 255, 255, 0.1)", paddingTop: "0.4rem" }}>
+        <span
+          style={{ fontSize: "0.55rem", color: "var(--color-muted)", display: "block", marginBottom: "4px" }}
+        >
+          Preview Tier Override:
+        </span>
+        <div style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>
+          {(["auto", "high", "medium", "low", "static"] as const).map((t) => {
+            const isSelected = t === "auto" ? diag.tierOverride === null : diag.tierOverride === t;
+            return (
+              <button
+                key={t}
+                type="button"
+                onClick={() => handleTierClick(t === "auto" ? null : t)}
+                style={{
+                  background: isSelected ? "var(--accent-cyan)" : "rgba(255, 255, 255, 0.05)",
+                  color: isSelected ? "#030405" : "var(--color-ink)",
+                  border: "1px solid rgba(255, 255, 255, 0.15)",
+                  borderRadius: "2px",
+                  fontSize: "0.55rem",
+                  padding: "2px 5px",
+                  cursor: "pointer",
+                  fontWeight: isSelected ? 700 : 400,
+                }}
+              >
+                {t}
+              </button>
+            );
+          })}
+        </div>
+      </div>
     </aside>
   );
 }

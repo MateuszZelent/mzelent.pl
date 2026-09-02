@@ -1,15 +1,17 @@
 import type { QualityTier } from "../quality/quality-contract";
 import type { RuntimeStatus } from "./runtime-status";
 
-export type SceneId = "calibration" | "none";
+export type SceneId = "atmosphere" | "calibration" | "none";
 
 export interface DiagnosticsSnapshot {
   readonly runtimeStatus: RuntimeStatus;
   readonly qualityTier: QualityTier;
+  readonly tierOverride: QualityTier | null;
   readonly effectiveDpr: number;
   readonly viewportWidth: number;
   readonly viewportHeight: number;
   readonly webgl2Supported: boolean;
+  readonly reducedMotionDetected: boolean;
   readonly canvasCount: number;
   readonly contextLossCount: number;
   readonly contextRestoreCount: number;
@@ -28,6 +30,7 @@ export interface DiagnosticsSnapshot {
 export interface SceneState {
   readonly runtimeStatus: RuntimeStatus;
   readonly qualityTier: QualityTier;
+  readonly tierOverride: QualityTier | null;
   readonly reducedMotion: boolean;
   readonly coarsePointer: boolean;
   readonly visibilityState: DocumentVisibilityState;

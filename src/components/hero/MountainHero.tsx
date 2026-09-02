@@ -30,9 +30,11 @@ export interface MountainHeroProps {
 export function MountainHero({ snowCanvas }: MountainHeroProps) {
   const osReducedMotion = useSyncExternalStore(subscribeReducedMotion, readReducedMotion, () => false);
   const motionMode = useSceneStore((state) => state.motionMode);
+  const tierOverride = useSceneStore((state) => state.tierOverride);
 
-  // Strict reduced motion compliance: only explicit "full-preview" in laboratory overrides OS reduced motion
-  const isReducedMotion = motionMode === "reduced" || (motionMode === "auto" && osReducedMotion);
+  // Strict reduced motion compliance: only explicit overrides allow previewing motion
+  const isReducedMotion =
+    motionMode === "reduced" || (motionMode === "auto" && osReducedMotion && tierOverride === null);
 
   const heroRef = useRef<HTMLElement>(null);
   const skyRef = useRef<HTMLDivElement>(null);

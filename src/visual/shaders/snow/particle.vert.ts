@@ -18,13 +18,13 @@ void main() {
   vec4 mvPosition = modelViewMatrix * vec4(particlePos, 1.0);
   gl_Position = projectionMatrix * mvPosition;
 
-  // Depth attenuation for delicate micro-snowflakes
+  // Depth attenuation for crisp, sparkling micro-snowflakes
   float depth = -mvPosition.z;
   vDepth = depth;
   
-  // Tiny point size calculation with seed variation
-  float size = uBaseSize * (0.7 + 0.6 * vSeed);
-  gl_PointSize = size * (180.0 / max(depth, 0.5)) * uPixelRatio;
-  gl_PointSize = clamp(gl_PointSize, 1.0, 7.0);
+  // Point size calculation with seed variation
+  float size = uBaseSize * (0.8 + 0.6 * vSeed);
+  gl_PointSize = size * (240.0 / max(depth, 0.5)) * uPixelRatio;
+  gl_PointSize = clamp(gl_PointSize, 1.5, 9.0);
 }
 `;

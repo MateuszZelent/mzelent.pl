@@ -82,6 +82,11 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/blog" className={styles.footerLink}>
+                  {t.nav.blog}
+                </Link>
+              </li>
+              <li>
                 <Link href="/talks" className={styles.footerLink}>
                   {t.nav.talks}
                 </Link>
@@ -110,6 +115,11 @@ export function Footer() {
               <li>
                 <Link href="/admin/scholar" className={styles.footerLink}>
                   Admin Scholar Sync
+                </Link>
+              </li>
+              <li>
+                <Link href="/admin/blog" className={styles.footerLink}>
+                  Admin Media Studio
                 </Link>
               </li>
               <li>

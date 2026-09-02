@@ -134,6 +134,50 @@ async function capture() {
   });
   console.log("Captured talks-seminars-page.png");
 
+  // 12. Navigate to /blog
+  console.log("Navigating to /blog...");
+  await page.goto("http://localhost:3154/blog", { waitUntil: "domcontentloaded" });
+  await page.screenshot({
+    path: resolve(artifactDir, "blog-parallax-gallery.png"),
+    fullPage: true,
+  });
+  console.log("Captured blog-parallax-gallery.png");
+
+  // 13. Open Lightbox on /blog
+  const firstImageFrame = page.locator("[data-testid='blog-post-skyrmion-lattice-dynamics'] [role='button']");
+  if (await firstImageFrame.count()) {
+    await firstImageFrame.click();
+    await page.waitForTimeout(400);
+    await page.screenshot({
+      path: resolve(artifactDir, "blog-lightbox-view.png"),
+    });
+    console.log("Captured blog-lightbox-view.png");
+    await page.keyboard.press("Escape");
+    await page.waitForTimeout(200);
+  }
+
+  // 14. Navigate to /admin/login
+  console.log("Navigating to /admin/login...");
+  await page.goto("http://localhost:3154/admin/login", { waitUntil: "domcontentloaded" });
+  await page.screenshot({
+    path: resolve(artifactDir, "admin-login-page.png"),
+  });
+  console.log("Captured admin-login-page.png");
+
+  // 15. Perform login and capture /admin/blog
+  const pwdInput = page.locator("#admin-password");
+  if (await pwdInput.count()) {
+    await pwdInput.fill("spintronics2026");
+    await page.getByRole("button", { name: "Authorize Access" }).click();
+    await page.waitForURL("**/admin/blog", { timeout: 5000 });
+    await page.waitForTimeout(500);
+    await page.screenshot({
+      path: resolve(artifactDir, "admin-blog-studio.png"),
+      fullPage: true,
+    });
+    console.log("Captured admin-blog-studio.png");
+  }
+
   await browser.close();
   console.log("Finished capturing visual evidence!");
 }

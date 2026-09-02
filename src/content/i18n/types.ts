@@ -9,6 +9,7 @@ export interface TranslationDictionary {
     publications: string;
     cv: string;
     talks: string;
+    blog: string;
     visualLab: string;
     activeResearch: string;
     labSandbox: string;
@@ -155,5 +156,22 @@ export interface TranslationDictionary {
     filterAll: string;
     filterInvited: string;
     abstractTitle: string;
+  };
+  blogPage: {
+    tag: string;
+    heading: string;
+    headingAccent: string;
+    lead: string;
+    backToHome: string;
+    allCategories: string;
+    categoryLab: string;
+    categorySim: string;
+    categoryConf: string;
+    categoryTheory: string;
+    categoryEquip: string;
+    adminStudioLink: string;
+    technicalSpecs: string;
+    lightboxClose: string;
+    noPosts: string;
   };
 }

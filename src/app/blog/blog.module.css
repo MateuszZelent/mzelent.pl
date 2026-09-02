@@ -1,0 +1,466 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+  position: relative;
+  overflow-x: hidden;
+}
+
+.mainContent {
+  flex: 1;
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: calc(var(--header-height, 4rem) + var(--space-8)) var(--container-gutter) var(--space-24);
+  width: 100%;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-mono-xs);
+  color: var(--accent-primary);
+  text-decoration: none;
+  margin-bottom: var(--space-6);
+  transition: opacity var(--duration-fast) ease;
+}
+
+.backLink:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+.headerArea {
+  margin-bottom: var(--space-12);
+}
+
+.tag {
+  display: inline-block;
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-mono-xs);
+  color: var(--accent-primary);
+  background: var(--accent-primary-soft);
+  border: 1px solid var(--accent-primary-glow);
+  padding: 0.2rem 0.65rem;
+  border-radius: var(--radius-pill);
+  margin-bottom: var(--space-4);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+}
+
+.title {
+  font-family: var(--font-display, sans-serif);
+  font-size: var(--text-display-md);
+  font-weight: 700;
+  line-height: var(--leading-tight);
+  color: var(--color-ink);
+  margin: 0 0 var(--space-4) 0;
+  max-width: 800px;
+}
+
+.titleAccent {
+  background: var(--gradient-text-hero);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.lead {
+  font-family: var(--font-display, sans-serif);
+  font-size: var(--text-heading-sm);
+  color: var(--color-ink-muted);
+  line-height: var(--leading-relaxed);
+  max-width: 680px;
+  margin: 0 0 var(--space-8) 0;
+}
+
+/* Category Filter Bar */
+.filterBar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  padding-bottom: var(--space-6);
+  border-bottom: 1px solid var(--color-line-subtle);
+  margin-bottom: var(--space-12);
+}
+
+.filterBtn {
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-mono-xs);
+  padding: 0.4rem 0.9rem;
+  background: var(--color-canvas-subtle);
+  border: 1px solid var(--color-line-medium);
+  border-radius: var(--radius-pill);
+  color: var(--color-ink-muted);
+  cursor: pointer;
+  transition:
+    color var(--duration-fast) ease,
+    border-color var(--duration-fast) ease,
+    background-color var(--duration-fast) ease,
+    transform var(--duration-fast) ease;
+}
+
+.filterBtn:hover {
+  color: var(--color-ink);
+  border-color: var(--accent-primary);
+}
+
+.filterBtnActive {
+  background: var(--accent-primary-soft);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+  font-weight: 600;
+  box-shadow: 0 0 12px var(--accent-primary-glow);
+}
+
+/* Vertical Parallax Gallery */
+.gallery {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  position: relative;
+}
+
+/* Decorative vertical timeline rail */
+.gallery::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--color-line-medium) 10%,
+    var(--color-line-medium) 90%,
+    transparent
+  );
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+@media (max-width: 960px) {
+  .gallery::before {
+    display: none;
+  }
+}
+
+.galleryItem {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-10);
+  align-items: center;
+  position: relative;
+}
+
+/* Alternating rows for magazine-style editorial depth */
+.galleryItem:nth-child(even) {
+  direction: rtl;
+}
+
+.galleryItem:nth-child(even) > * {
+  direction: ltr;
+}
+
+@media (max-width: 960px) {
+  .galleryItem,
+  .galleryItem:nth-child(even) {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+    direction: ltr;
+  }
+}
+
+/* Image Frame with Local Ambient Glow & Parallax Depth */
+.imageFrameWrapper {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75);
+  cursor: pointer;
+  group: "";
+}
+
+.ambientBacklight {
+  position: absolute;
+  inset: -20px;
+  background: radial-gradient(
+    circle at center,
+    var(--accent-primary-glow) 0%,
+    rgba(86, 114, 247, 0.15) 50%,
+    transparent 80%
+  );
+  filter: blur(28px);
+  opacity: 0.5;
+  transition: opacity var(--duration-normal) ease;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.imageFrameWrapper:hover .ambientBacklight {
+  opacity: 0.9;
+}
+
+.imageContainer {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-line-medium);
+  background: #030405;
+  z-index: 1;
+  transition: border-color var(--duration-normal) ease;
+}
+
+.imageFrameWrapper:hover .imageContainer {
+  border-color: var(--accent-primary);
+}
+
+.parallaxImage {
+  object-fit: cover;
+  transition:
+    transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+    filter 0.6s ease;
+  will-change: transform;
+}
+
+.imageFrameWrapper:hover .parallaxImage {
+  transform: scale(1.04);
+}
+
+.zoomBadge {
+  position: absolute;
+  bottom: var(--space-3);
+  right: var(--space-3);
+  background: rgba(3, 4, 5, 0.75);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--color-line-medium);
+  border-radius: var(--radius-pill);
+  padding: 0.25rem 0.65rem;
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-mono-xs);
+  color: var(--color-ink-muted);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  z-index: 2;
+  transition:
+    color var(--duration-fast) ease,
+    border-color var(--duration-fast) ease;
+}
+
+.imageFrameWrapper:hover .zoomBadge {
+  color: var(--accent-primary);
+  border-color: var(--accent-primary);
+}
+
+/* Editorial Story Card */
+.contentCard {
+  background: var(--color-canvas-raised);
+  border: 1px solid var(--color-line-medium);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
+  position: relative;
+  backdrop-filter: blur(12px);
+  transition:
+    border-color var(--duration-normal) ease,
+    transform var(--duration-normal) ease;
+}
+
+.contentCard:hover {
+  border-color: rgba(157, 132, 252, 0.35);
+  transform: translateY(-2px);
+}
+
+.cardMetaRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.categoryPill {
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-mono-xs);
+  font-weight: 600;
+  padding: 0.15rem 0.55rem;
+  background: var(--accent-primary-soft);
+  border: 1px solid var(--accent-primary-glow);
+  border-radius: var(--radius-pill);
+  color: var(--accent-primary);
+}
+
+.datePill {
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-mono-xs);
+  color: var(--color-ink-muted);
+}
+
+.locationPill {
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-mono-xs);
+  color: var(--color-ink-muted);
+}
+
+.postHeading {
+  font-family: var(--font-display, sans-serif);
+  font-size: var(--text-heading-md);
+  font-weight: 700;
+  line-height: var(--leading-snug);
+  color: var(--color-ink);
+  margin: 0 0 var(--space-3) 0;
+}
+
+.postDescription {
+  font-family: var(--font-display, sans-serif);
+  font-size: var(--text-body-sm);
+  line-height: var(--leading-relaxed);
+  color: var(--color-ink-muted);
+  margin: 0 0 var(--space-5) 0;
+}
+
+.specsBox {
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-canvas-subtle);
+  border: 1px solid var(--color-line-subtle);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-4);
+}
+
+.specsTitle {
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-mono-xs);
+  color: var(--accent-warm);
+  margin-bottom: var(--space-1);
+  font-weight: 600;
+}
+
+.specsList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-mono-xs);
+  color: var(--color-ink-muted);
+}
+
+.tagRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.tagPill {
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-mono-xs);
+  color: var(--color-ink-muted);
+  background: var(--color-canvas-subtle);
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-line-subtle);
+}
+
+/* Lightbox Modal */
+.lightboxOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 4, 5, 0.94);
+  backdrop-filter: blur(16px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+  cursor: zoom-out;
+  animation: fadeIn 0.2s ease forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.lightboxContent {
+  position: relative;
+  max-width: 1200px;
+  width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  cursor: default;
+}
+
+.lightboxImageWrapper {
+  position: relative;
+  width: 100%;
+  height: 65vh;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--color-line-medium);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9);
+}
+
+.lightboxDetails {
+  margin-top: var(--space-4);
+  padding: var(--space-4) var(--space-6);
+  background: var(--color-canvas-raised);
+  border: 1px solid var(--color-line-medium);
+  border-radius: var(--radius-md);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.lightboxTitle {
+  font-family: var(--font-display, sans-serif);
+  font-size: var(--text-heading-sm);
+  font-weight: 600;
+  color: var(--color-ink);
+  margin: 0;
+}
+
+.lightboxCloseBtn {
+  background: var(--color-canvas-subtle);
+  border: 1px solid var(--color-line-medium);
+  border-radius: var(--radius-sm);
+  color: var(--color-ink);
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-mono-xs);
+  padding: 0.4rem 0.8rem;
+  cursor: pointer;
+  transition: border-color var(--duration-fast) ease;
+}
+
+.lightboxCloseBtn:hover {
+  border-color: var(--accent-primary);
+}
+
+/* Reduced Motion Fallback */
+@media (prefers-reduced-motion: reduce) {
+  .parallaxImage {
+    transition: none !important;
+    transform: none !important;
+  }
+
+  .contentCard {
+    transition: none !important;
+    transform: none !important;
+  }
+
+  .ambientBacklight {
+    display: none;
+  }
+}

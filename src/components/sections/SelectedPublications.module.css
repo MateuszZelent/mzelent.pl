@@ -1,0 +1,173 @@
+.section {
+  position: relative;
+  width: 100%;
+  padding: clamp(6rem, 10vh, 9rem) var(--container-gutter);
+  background-color: var(--color-canvas);
+  z-index: 10;
+  box-sizing: border-box;
+}
+
+.container {
+  max-width: var(--container-max);
+  margin: 0 auto;
+}
+
+.sectionHeader {
+  max-width: 760px;
+  margin-bottom: var(--space-12);
+}
+
+.sectionTag {
+  display: inline-block;
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-mono-sm);
+  font-weight: 600;
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--accent-cyan);
+  margin-bottom: var(--space-3);
+}
+
+.sectionTitle {
+  font-family: var(--font-display, sans-serif);
+  font-size: var(--text-display-xl);
+  font-weight: 700;
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-ink);
+  margin: 0 0 var(--space-4) 0;
+}
+
+.sectionTitleAccent {
+  background: linear-gradient(135deg, var(--color-ink) 30%, var(--accent-cyan) 85%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.sectionLead {
+  font-family: var(--font-display, sans-serif);
+  font-size: var(--text-body-lg);
+  line-height: var(--leading-relaxed);
+  color: var(--color-ink-muted);
+  margin: 0;
+}
+
+.publicationList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.publicationCard {
+  position: relative;
+  background: var(--color-canvas-glass);
+  border: 1px solid var(--color-line-medium);
+  border-radius: var(--radius-md);
+  padding: clamp(1.75rem, 2.5vw, 2.25rem);
+  backdrop-filter: blur(12px);
+  box-sizing: border-box;
+  transition:
+    transform var(--duration-base) var(--ease-out-expo),
+    border-color var(--duration-base) var(--ease-out-expo);
+}
+
+.publicationCard:hover {
+  border-color: var(--accent-cyan-glow);
+  transform: translateX(4px);
+}
+
+.metaRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.journalPill {
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-mono-xs);
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  background: var(--accent-cyan-soft);
+  border: 1px solid rgba(87, 230, 221, 0.3);
+  border-radius: var(--radius-pill);
+  color: var(--accent-cyan);
+}
+
+.yearPill {
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-mono-xs);
+  color: var(--color-ink-muted);
+}
+
+.openAccessBadge {
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-mono-xs);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-pill);
+}
+
+.paperTitle {
+  font-family: var(--font-display, sans-serif);
+  font-size: var(--text-heading-md);
+  font-weight: 600;
+  line-height: var(--leading-snug);
+  color: var(--color-ink);
+  margin: 0 0 var(--space-2) 0;
+}
+
+.paperAuthors {
+  font-family: var(--font-display, sans-serif);
+  font-size: var(--text-body-sm);
+  color: var(--color-ink-muted);
+  margin: 0 0 var(--space-4) 0;
+}
+
+.paperAbstract {
+  font-family: var(--font-display, sans-serif);
+  font-size: var(--text-body-sm);
+  line-height: var(--leading-normal);
+  color: var(--color-ink-muted);
+  margin: 0 0 var(--space-4) 0;
+}
+
+.cardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-line-subtle);
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.doiLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-mono-sm);
+  color: var(--accent-cyan);
+  text-decoration: none;
+  transition: color var(--duration-fast) ease;
+}
+
+.doiLink:hover {
+  color: var(--color-ink);
+}
+
+.keywords {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.keyword {
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-mono-xs);
+  color: var(--color-ink-muted);
+}

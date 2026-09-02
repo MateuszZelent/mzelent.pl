@@ -19,9 +19,29 @@ export function Footer() {
           <div className={styles.brandCol}>
             <span className={styles.brandTitle}>MATEUSZ ZELENT</span>
             <p className={styles.brandDesc}>
-              Computational Physics · Micromagnetics · Nonlinear Spin-Wave Dynamics · High-Performance
-              Simulation Engineering.
+              Assistant Professor · Institute of Spintronics and Quantum Information · Faculty of Physics,
+              Adam Mickiewicz University in Poznań.
             </p>
+            <div className={styles.externalLinks}>
+              <a
+                href="https://orcid.org/0000-0002-3908-0118"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.footerExternalLink}
+                aria-label="ORCID profile: 0000-0002-3908-0118"
+              >
+                ORCID: 0000-0002-3908-0118 ↗
+              </a>
+              <a
+                href="https://github.com/MateuszZelent"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.footerExternalLink}
+                aria-label="GitHub profile: MateuszZelent"
+              >
+                GitHub ↗
+              </a>
+            </div>
           </div>
 
           <div className={styles.linksCol}>
@@ -33,6 +53,16 @@ export function Footer() {
                 </a>
               </li>
               <li>
+                <a href="#software" className={styles.footerLink}>
+                  Software & Solvers
+                </a>
+              </li>
+              <li>
+                <a href="#publications" className={styles.footerLink}>
+                  Publications
+                </a>
+              </li>
+              <li>
                 <Link href="/lab/visual-system?tier=medium" className={styles.footerLink}>
                   Visual Laboratory
                 </Link>
@@ -41,7 +71,7 @@ export function Footer() {
           </div>
 
           <div className={styles.linksCol}>
-            <span className={styles.colTitle}>Technology & Stack</span>
+            <span className={styles.colTitle}>Architecture</span>
             <ul className={styles.linkList}>
               <li>
                 <span className={styles.stackTag}>Next.js 16 App Router</span>
@@ -51,6 +81,9 @@ export function Footer() {
               </li>
               <li>
                 <span className={styles.stackTag}>GPU Ping-Pong FBO</span>
+              </li>
+              <li>
+                <span className={styles.stackTag}>Zod Content Schemas</span>
               </li>
             </ul>
           </div>

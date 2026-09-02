@@ -32,8 +32,13 @@ export function Header() {
               </a>
             </li>
             <li>
-              <a href="#simulations" className={styles.navLink}>
-                Simulations
+              <a href="#software" className={styles.navLink}>
+                Software
+              </a>
+            </li>
+            <li>
+              <a href="#publications" className={styles.navLink}>
+                Publications
               </a>
             </li>
             <li>

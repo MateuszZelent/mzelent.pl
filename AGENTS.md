@@ -19,8 +19,10 @@ The governing principle is:
 
 - **Phase 0:** Accepted
 - **Phase 1:** Accepted
-- **Phase 2:** Active
-- **Current project phase:** Phase 2 — Visual Design System
+- **Phase 2:** Accepted
+- **Phase 3:** Accepted
+- **Phase 4:** Active
+- **Current project phase:** Phase 4 — Homepage Vertical Slices
 
 Until the Phase 1 spike is accepted:
 

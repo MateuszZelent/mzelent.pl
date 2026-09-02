@@ -42,11 +42,12 @@ test.describe("Homepage — Mountain Parallax & Snow Particles", () => {
     await expect(page.getByTestId("parallax-layer-mist")).toBeVisible();
     await expect(page.getByTestId("parallax-layer-foreground")).toBeVisible();
 
-    // Verify research cards
-    await expect(page.getByTestId("research-card-skyrmions")).toBeVisible();
-    await expect(page.getByTestId("research-card-magnonics")).toBeVisible();
-    await expect(page.getByTestId("research-card-simulations")).toBeVisible();
-    await expect(page.getByTestId("research-card-instrumentation")).toBeVisible();
+    // Verify research cards and flagship software
+    await expect(page.getByTestId("research-card-topological-solitons")).toBeVisible();
+    await expect(page.getByTestId("research-card-spin-wave-optics")).toBeVisible();
+    await expect(page.getByTestId("research-card-gpu-vector-fields")).toBeVisible();
+    await expect(page.getByTestId("software-card-mag-lens-sim")).toBeVisible();
+    await expect(page.getByTestId("software-card-skyrmion-tracker-gpu")).toBeVisible();
 
     expect(consoleErrors).toEqual([]);
     expect(pageErrors).toEqual([]);

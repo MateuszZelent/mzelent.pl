@@ -2,8 +2,10 @@
 
 - **Phase 0 status:** Accepted
 - **Phase 1 status:** Accepted
-- **Phase 2 status:** Active
-- **Current project phase:** Phase 2 — Visual Design System
+- **Phase 2 status:** Accepted
+- **Phase 3 status:** Accepted
+- **Phase 4 status:** Active
+- **Current project phase:** Phase 4 — Homepage Vertical Slices
 - **Decision date:** 2026-09-02
 
 ## Gate model

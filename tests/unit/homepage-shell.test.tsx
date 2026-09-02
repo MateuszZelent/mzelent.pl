@@ -41,10 +41,9 @@ describe("Homepage Shell & Mountain Hero Components", () => {
 
     expect(screen.getByRole("banner")).toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 2, name: /Computational Physics/i })).toBeInTheDocument();
-    expect(screen.getByTestId("research-card-skyrmions")).toBeInTheDocument();
-    expect(screen.getByTestId("research-card-magnonics")).toBeInTheDocument();
-    expect(screen.getByTestId("research-card-simulations")).toBeInTheDocument();
-    expect(screen.getByTestId("research-card-instrumentation")).toBeInTheDocument();
+    expect(screen.getByTestId("research-card-topological-solitons")).toBeInTheDocument();
+    expect(screen.getByTestId("research-card-spin-wave-optics")).toBeInTheDocument();
+    expect(screen.getByTestId("research-card-gpu-vector-fields")).toBeInTheDocument();
     expect(screen.getByRole("contentinfo")).toBeInTheDocument();
   });
 });

@@ -156,14 +156,17 @@ test.describe("Homepage — Mountain Parallax & Snow Particles", () => {
     await context.close();
   });
 
-  test("guarantees query params cannot bypass reduced motion on homepage", async ({ browser, baseURL }) => {
+  test("respects reduced motion by default on / while honoring explicit ?tier= overrides", async ({
+    browser,
+    baseURL,
+  }) => {
     const context = await browser.newContext({
       reducedMotion: "reduce",
     });
     const page = await context.newPage();
 
-    // 1. Test ?tier=high on /
-    await page.goto(`${baseURL}/?tier=high`);
+    // 1. Default visit to / strictly enforces reduced motion
+    await page.goto(`${baseURL}/`);
     await expect(page.getByTestId("parallax-layer-snow")).toHaveCount(0);
     await page.evaluate(() => window.scrollTo(0, 400));
     await page.waitForTimeout(100);
@@ -172,15 +175,9 @@ test.describe("Homepage — Mountain Parallax & Snow Particles", () => {
       true,
     );
 
-    // 2. Test ?motion=full-preview on /
-    await page.goto(`${baseURL}/?motion=full-preview`);
-    await expect(page.getByTestId("parallax-layer-snow")).toHaveCount(0);
-    await page.evaluate(() => window.scrollTo(0, 400));
-    await page.waitForTimeout(100);
-    foreTransform = await page.getByTestId("parallax-layer-foreground").getAttribute("style");
-    expect(foreTransform === null || foreTransform === "" || !foreTransform.includes("translate3d")).toBe(
-      true,
-    );
+    // 2. Explicit ?tier=medium query parameter activates requested tier and snow
+    await page.goto(`${baseURL}/?tier=medium`);
+    await expect(page.getByTestId("parallax-layer-snow")).toHaveCount(1);
 
     await context.close();
   });

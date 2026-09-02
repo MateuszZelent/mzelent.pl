@@ -125,18 +125,33 @@ function useActiveProfile(): { activeProfile: QualityProfile; mounted: boolean }
   }, [setTierOverride, setMotionMode, setCapabilities]);
 
   const activeProfile: QualityProfile = useMemo(() => {
-    if (detectedProfile.tier === "static") {
+    const isDev = process.env.NODE_ENV === "development";
+
+    if (motionMode === "reduced") {
       return STATIC_FALLBACK_PROFILE;
     }
-    const targetTier = tierOverride ?? detectedProfile.tier;
+
+    if (detectedProfile.tier === "static") {
+      // In development or when explicitly requested via full-preview or tierOverride, allow previewing
+      const allowOverride = isDev || motionMode === "full-preview";
+      if (!allowOverride || (!tierOverride && motionMode !== "full-preview")) {
+        return STATIC_FALLBACK_PROFILE;
+      }
+    }
+
+    const targetTier = tierOverride ?? (detectedProfile.tier === "static" ? "medium" : detectedProfile.tier);
+    if (targetTier === "static") {
+      return STATIC_FALLBACK_PROFILE;
+    }
+
     return {
       tier: targetTier,
       dprCap: targetTier === "high" ? 1.75 : targetTier === "medium" ? 1.35 : 1.0,
       maxPixelLoad: 4_500_000,
-      antialias: targetTier !== "low" && targetTier !== "static",
+      antialias: targetTier !== "low",
       powerPreference: targetTier === "high" ? "high-performance" : "default",
     };
-  }, [tierOverride, detectedProfile]);
+  }, [tierOverride, motionMode, detectedProfile]);
 
   const runtimeStatus = useSceneStore((state) => state.runtimeStatus);
 

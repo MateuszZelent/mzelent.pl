@@ -9,8 +9,8 @@ export const CALIBRATION_CONFIG = {
   triangleBudget: 50_000,
   colors: {
     core: "#0d1b22",
-    accentCyan: "#57e6dd",
-    accentViolet: "#846cff",
+    accentCyan: "#9d84fc",
+    accentViolet: "#8b6ff9",
     ambient: "#030405",
   },
 } as const;

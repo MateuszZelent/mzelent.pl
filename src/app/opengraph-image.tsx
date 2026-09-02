@@ -22,7 +22,7 @@ export default function OpenGraphImage() {
         position: "relative",
       }}
     >
-      {/* Background ambient radial glows */}
+      {/* Background ambient radial glows in royal violet and indigo */}
       <div
         style={{
           position: "absolute",
@@ -31,7 +31,7 @@ export default function OpenGraphImage() {
           width: "600px",
           height: "600px",
           borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(87, 230, 221, 0.18) 0%, transparent 70%)",
+          background: "radial-gradient(circle, rgba(157, 132, 252, 0.20) 0%, transparent 70%)",
         }}
       />
       <div
@@ -42,7 +42,7 @@ export default function OpenGraphImage() {
           width: "700px",
           height: "700px",
           borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(132, 108, 255, 0.15) 0%, transparent 70%)",
+          background: "radial-gradient(circle, rgba(86, 114, 247, 0.16) 0%, transparent 70%)",
         }}
       />
 
@@ -64,9 +64,9 @@ export default function OpenGraphImage() {
               width: "48px",
               height: "48px",
               borderRadius: "10px",
-              border: "1.5px solid rgba(87, 230, 221, 0.6)",
-              backgroundColor: "rgba(10, 16, 24, 0.8)",
-              color: "#57e6dd",
+              border: "1.5px solid rgba(157, 132, 252, 0.6)",
+              backgroundColor: "rgba(12, 13, 24, 0.8)",
+              color: "#9d84fc",
               fontWeight: "bold",
               fontSize: "20px",
               fontFamily: "monospace",
@@ -93,9 +93,9 @@ export default function OpenGraphImage() {
             gap: "8px",
             padding: "8px 18px",
             borderRadius: "20px",
-            border: "1px solid rgba(87, 230, 221, 0.3)",
+            border: "1px solid rgba(157, 132, 252, 0.35)",
             backgroundColor: "rgba(3, 4, 5, 0.7)",
-            color: "#57e6dd",
+            color: "#9d84fc",
             fontSize: "14px",
             fontFamily: "monospace",
           }}
@@ -105,7 +105,7 @@ export default function OpenGraphImage() {
               width: "8px",
               height: "8px",
               borderRadius: "50%",
-              backgroundColor: "#57e6dd",
+              backgroundColor: "#bd68f8",
             }}
           />
           <span>MSCA Fellow · Horizon Europe</span>
@@ -157,7 +157,7 @@ export default function OpenGraphImage() {
               borderRadius: "6px",
               backgroundColor: "rgba(255, 255, 255, 0.05)",
               border: "1px solid rgba(255, 255, 255, 0.12)",
-              color: "#57e6dd",
+              color: "#9d84fc",
               fontSize: "15px",
               fontFamily: "monospace",
             }}
@@ -170,7 +170,7 @@ export default function OpenGraphImage() {
               borderRadius: "6px",
               backgroundColor: "rgba(255, 255, 255, 0.05)",
               border: "1px solid rgba(255, 255, 255, 0.12)",
-              color: "#846cff",
+              color: "#bd68f8",
               fontSize: "15px",
               fontFamily: "monospace",
             }}
@@ -183,7 +183,7 @@ export default function OpenGraphImage() {
               borderRadius: "6px",
               backgroundColor: "rgba(255, 255, 255, 0.05)",
               border: "1px solid rgba(255, 255, 255, 0.12)",
-              color: "#57e6dd",
+              color: "#5672f7",
               fontSize: "15px",
               fontFamily: "monospace",
             }}
@@ -212,7 +212,7 @@ export default function OpenGraphImage() {
           <span>•</span>
           <span>NCN</span>
         </div>
-        <div style={{ color: "#57e6dd", fontSize: "15px", fontFamily: "monospace" }}>
+        <div style={{ color: "#9d84fc", fontSize: "15px", fontFamily: "monospace" }}>
           ORCID: 0000-0002-3908-0118
         </div>
       </div>

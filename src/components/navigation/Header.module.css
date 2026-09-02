@@ -111,8 +111,8 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background-color: #22c55e;
-  box-shadow: 0 0 6px #22c55e;
+  background-color: var(--status-active);
+  box-shadow: 0 0 6px var(--status-active-glow);
 }
 
 .langSwitch {

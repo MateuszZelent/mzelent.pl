@@ -82,12 +82,12 @@
   gap: 0.4rem;
   padding: 0.3rem 0.65rem;
   background: rgba(3, 4, 5, 0.75);
-  border: 1px solid rgba(87, 230, 221, 0.3);
+  border: 1px solid var(--accent-primary-soft);
   border-radius: var(--radius-xs, 4px);
   backdrop-filter: blur(8px);
   font-family: var(--font-mono, monospace);
   font-size: 0.7rem;
-  color: var(--accent-cyan, #57e6dd);
+  color: var(--accent-primary);
   letter-spacing: 0.05em;
   text-transform: uppercase;
   z-index: 3;
@@ -97,8 +97,8 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background-color: var(--accent-cyan, #57e6dd);
-  box-shadow: 0 0 8px var(--accent-cyan, #57e6dd);
+  background-color: var(--accent-primary);
+  box-shadow: 0 0 8px var(--accent-primary-glow);
   animation: pulseGlow 2.5s infinite ease-in-out;
 }
 

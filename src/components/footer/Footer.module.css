@@ -73,7 +73,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--accent-cyan, #57e6dd);
+  color: var(--accent-primary);
 }
 
 .linkList {
@@ -97,7 +97,7 @@
 }
 
 .footerLink:focus-visible {
-  outline: 2px solid var(--accent-cyan, #57e6dd);
+  outline: 2px solid var(--accent-primary);
   outline-offset: 2px;
 }
 
@@ -139,11 +139,11 @@
 }
 
 .backToTop:hover {
-  color: var(--accent-cyan, #57e6dd);
+  color: var(--accent-primary);
 }
 
 .backToTop:focus-visible {
-  outline: 2px solid var(--accent-cyan, #57e6dd);
+  outline: 2px solid var(--accent-primary);
   outline-offset: 2px;
 }
 

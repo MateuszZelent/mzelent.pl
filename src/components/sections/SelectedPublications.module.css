@@ -39,7 +39,7 @@
 }
 
 .sectionTitleAccent {
-  background: linear-gradient(135deg, var(--color-ink) 30%, var(--accent-cyan) 85%);
+  background: var(--gradient-text-hero);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -105,8 +105,8 @@
 .openAccessBadge {
   font-family: var(--font-mono, monospace);
   font-size: var(--text-mono-xs);
-  color: #22c55e;
-  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: var(--status-active);
+  border: 1px solid var(--status-active-border);
   padding: 0.15rem 0.5rem;
   border-radius: var(--radius-pill);
 }

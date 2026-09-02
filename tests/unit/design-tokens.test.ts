@@ -27,16 +27,16 @@ describe("Phase 2 Visual Design System Tokens", () => {
     expect(tokensContent).toContain("--color-line-bright:");
   });
 
-  it("defines scientific accent palette tokens (magnetic, spin-wave, and chiral)", () => {
+  it("defines central editorial scientific accent palette tokens", () => {
     const tokensContent = fs.readFileSync(tokensPath, "utf-8");
 
-    expect(tokensContent).toContain("--accent-cyan: #57e6dd;");
-    expect(tokensContent).toContain("--accent-cyan-soft:");
-    expect(tokensContent).toContain("--accent-cyan-glow:");
-
-    expect(tokensContent).toContain("--accent-violet: #846cff;");
-    expect(tokensContent).toContain("--accent-magenta: #ef5aa8;");
-    expect(tokensContent).toContain("--accent-warm: #d5b779;");
+    expect(tokensContent).toContain("--accent-primary: #9d84fc;");
+    expect(tokensContent).toContain("--accent-indigo: #5672f7;");
+    expect(tokensContent).toContain("--accent-purple: #bd68f8;");
+    expect(tokensContent).toContain("--accent-violet: #8b6ff9;");
+    expect(tokensContent).toContain("--status-active: #9d84fc;");
+    expect(tokensContent).toContain("--gradient-accent:");
+    expect(tokensContent).toContain("--gradient-text-hero:");
   });
 
   it("defines calibrated fluid typography scale", () => {

@@ -45,8 +45,8 @@ export function ResearchGrid() {
                     alt: "Chiral Magnetic Skyrmion 3D spin texture with DMI interaction",
                     badgeText: "3D Chiral Skyrmion · Q = -1",
                     watermark: "DMI SOLITON",
-                    glowColor: "rgba(87, 230, 221, 0.55)",
-                    secondaryGlowColor: "rgba(230, 163, 87, 0.35)",
+                    glowColor: "rgba(157, 132, 252, 0.45)",
+                    secondaryGlowColor: "rgba(86, 114, 247, 0.25)",
                     flyInOffset: 90,
                     parallaxFactor: 0.22,
                   }
@@ -56,8 +56,8 @@ export function ResearchGrid() {
                       alt: "Magnonic Wavepacket and Spin Wave Optics in Graded Media",
                       badgeText: "3D Spin-Wave Wavepacket",
                       watermark: "n(r) DISPERSION",
-                      glowColor: "rgba(87, 230, 221, 0.55)",
-                      secondaryGlowColor: "rgba(230, 190, 87, 0.3)",
+                      glowColor: "rgba(189, 104, 248, 0.45)",
+                      secondaryGlowColor: "rgba(157, 132, 252, 0.25)",
                       flyInOffset: 110,
                       parallaxFactor: 0.25,
                     }
@@ -66,8 +66,8 @@ export function ResearchGrid() {
                       alt: "Magnetic Vortex Nanodisk with Core Singularity and STT Auto-Oscillation",
                       badgeText: "3D Magnetic Vortex · Core",
                       watermark: "AUTO-OSCILLATOR",
-                      glowColor: "rgba(157, 87, 230, 0.55)",
-                      secondaryGlowColor: "rgba(87, 230, 221, 0.35)",
+                      glowColor: "rgba(139, 111, 249, 0.50)",
+                      secondaryGlowColor: "rgba(189, 104, 248, 0.30)",
                       flyInOffset: 130,
                       parallaxFactor: 0.28,
                     };

@@ -30,21 +30,58 @@
   --color-line-bright: rgb(255 255 255 / 0.24);
 
   /* -------------------------------------------------------------------------- */
-  /* Scientific Accent Palette (Magnetic, Spin-Wave, and Chiral Textures)       */
+  /* Central Editorial Scientific Accent Palette                                */
+  /* Deep royal violets, indigos, purples, and mixed gradients                   */
+  /* Black and white remain dominant; colors are delicate supplementary accents */
   /* -------------------------------------------------------------------------- */
-  --accent-cyan: #57e6dd;
-  --accent-cyan-soft: rgb(87 230 221 / 0.14);
-  --accent-cyan-glow: rgb(87 230 221 / 0.28);
+  /* Primary Electric Iris / Royal Violet (Replaces generic AI cyan) */
+  --accent-primary: #9d84fc;
+  --accent-primary-soft: rgb(157 132 252 / 0.12);
+  --accent-primary-glow: rgb(157 132 252 / 0.25);
 
-  --accent-violet: #846cff;
-  --accent-violet-soft: rgb(132 108 255 / 0.14);
-  --accent-violet-glow: rgb(132 108 255 / 0.26);
+  /* Deep Royal Indigo & Midnight Navy */
+  --accent-indigo: #5672f7;
+  --accent-indigo-soft: rgb(86 114 247 / 0.12);
+  --accent-indigo-glow: rgb(86 114 247 / 0.25);
+  --accent-navy: #182245;
 
-  --accent-magenta: #ef5aa8;
-  --accent-magenta-soft: rgb(239 90 168 / 0.14);
+  /* Luminous Purple & Magenta Orchid */
+  --accent-purple: #bd68f8;
+  --accent-purple-soft: rgb(189 104 248 / 0.12);
+  --accent-purple-glow: rgb(189 104 248 / 0.25);
+
+  --accent-violet: #8b6ff9;
+  --accent-violet-soft: rgb(139 111 249 / 0.12);
+  --accent-violet-glow: rgb(139 111 249 / 0.25);
+
+  --accent-magenta: #e068b5;
+  --accent-magenta-soft: rgb(224 104 181 / 0.12);
 
   --accent-warm: #d5b779;
-  --accent-warm-soft: rgb(213 183 121 / 0.14);
+  --accent-warm-soft: rgb(213 183 121 / 0.12);
+
+  /* Central Status Tokens (Refined electric iris/violet, no generic green) */
+  --status-active: #9d84fc;
+  --status-active-soft: rgb(157 132 252 / 0.14);
+  --status-active-border: rgb(157 132 252 / 0.35);
+  --status-active-glow: rgb(157 132 252 / 0.4);
+
+  /* Sophisticated Mixed Gradients (Delicate supplementary accents) */
+  --gradient-accent: linear-gradient(135deg, #9d84fc 0%, #bd68f8 50%, #5672f7 100%);
+  --gradient-accent-soft: linear-gradient(
+    135deg,
+    rgb(157 132 252 / 0.12) 0%,
+    rgb(189 104 248 / 0.08) 50%,
+    rgb(86 114 247 / 0.12) 100%
+  );
+  --gradient-text-hero: linear-gradient(135deg, #ffffff 30%, #c4b5fd 70%, #e9d5ff 100%);
+  --gradient-border: linear-gradient(135deg, rgb(157 132 252 / 0.35), rgb(86 114 247 / 0.2));
+  --gradient-badge: linear-gradient(135deg, rgb(157 132 252 / 0.12), rgb(86 114 247 / 0.08));
+
+  /* Global alias: seamlessly redirects all existing components to the new theme */
+  --accent-cyan: var(--accent-primary);
+  --accent-cyan-soft: var(--accent-primary-soft);
+  --accent-cyan-glow: var(--accent-primary-glow);
 
   /* -------------------------------------------------------------------------- */
   /* Calibrated Fluid Typography Scale (Mobile 390px -> Desktop 1440px+)         */

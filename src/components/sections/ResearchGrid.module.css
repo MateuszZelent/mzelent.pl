@@ -24,7 +24,7 @@
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--accent-cyan, #57e6dd);
+  color: var(--accent-primary);
   margin-bottom: 1rem;
 }
 
@@ -38,7 +38,7 @@
 }
 
 .sectionTitleAccent {
-  background: linear-gradient(135deg, #ffffff 40%, #57e6dd 100%);
+  background: var(--gradient-text-hero);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -150,7 +150,7 @@
   font-family: var(--font-mono, monospace);
   font-size: 0.85rem;
   font-weight: 700;
-  color: var(--accent-cyan, #57e6dd);
+  color: var(--accent-primary);
   letter-spacing: 0.05em;
 }
 
@@ -163,8 +163,8 @@
 }
 
 .card:hover .cardIndicator {
-  background-color: var(--accent-cyan, #57e6dd);
-  box-shadow: 0 0 8px var(--accent-cyan, #57e6dd);
+  background-color: var(--accent-primary);
+  box-shadow: 0 0 8px var(--accent-primary-glow);
 }
 
 .cardTitle {

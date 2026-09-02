@@ -50,8 +50,8 @@ export const ATMOSPHERE_CONFIG = {
     pointerStrength: 0.35,
   },
   colors: {
-    cyan: "#57e6dd",
-    violet: "#846cff",
+    cyan: "#9d84fc",
+    violet: "#8b6ff9",
     highlight: "#fff5ea",
     ambient: "#030405",
   },

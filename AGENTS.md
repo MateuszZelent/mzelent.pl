@@ -23,8 +23,8 @@ The governing principle is:
 - **Phase 3:** Accepted
 - **Phase 4:** Accepted
 - **Phase 5:** Accepted
-- **Phase 6:** Active
-- **Current project phase:** Phase 6 — Production Hardening & Launch
+- **Phase 6:** Accepted
+- **Current project phase:** Production Launch Ready
 
 Until the Phase 1 spike is accepted:
 

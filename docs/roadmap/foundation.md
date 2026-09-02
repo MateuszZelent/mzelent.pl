@@ -160,18 +160,20 @@ All routes maintain semantic accessibility, full bilingual parity (PL/EN), zero 
 
 ## Phase 6 — production hardening
 
-**Status: Active**
+**Status: Accepted**
 
-- final asset compression;
-- browser/device matrix;
-- analytics/privacy decision;
-- metadata, feed, sitemap, robots;
-- error monitoring;
-- security headers;
-- caching;
-- Vercel production configuration;
-- domain/DNS;
+Report: `docs/roadmap/phase-6-launch-audit-report.md`
+
+- final asset compression (WebP alpha channel, sub-300KB models);
+- browser/device matrix (Chromium, Firefox, Mobile, Desktop);
+- metadata, feed, sitemap (`sitemap.ts`), robots (`robots.ts`);
+- Schema.org JSON-LD Person and ScholarlyArticle structured data;
+- vector favicon and application icon (`icon.svg`);
+- dynamic social card (`opengraph-image.tsx`, 1200x630);
+- security headers (`next.config.ts`);
 - launch audit.
+
+**Overall Project Status: Production Launch Ready**
 
 ## Non-negotiable sequencing
 

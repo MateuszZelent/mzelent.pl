@@ -7,6 +7,7 @@ export interface TranslationDictionary {
     grants: string;
     software: string;
     publications: string;
+    cv: string;
     visualLab: string;
     activeResearch: string;
     labSandbox: string;
@@ -83,5 +84,37 @@ export interface TranslationDictionary {
     backToHome: string;
     syncNotice: string;
     noResults: string;
+  };
+  adminScholar: {
+    badge: string;
+    heading: string;
+    headingAccent: string;
+    lead: string;
+    statusConnected: string;
+    syncTitle: string;
+    syncDesc: string;
+    syncBtn: string;
+    bibtexTitle: string;
+    bibtexDesc: string;
+    bibtexPlaceholder: string;
+    parseBtn: string;
+    stagedTitle: string;
+    commitBtn: string;
+    successParsed: string;
+    successCommitted: string;
+    noStaged: string;
+  };
+  cvPage: {
+    badge: string;
+    heading: string;
+    headingAccent: string;
+    lead: string;
+    appointmentsTitle: string;
+    educationTitle: string;
+    grantsTitle: string;
+    skillsTitle: string;
+    talksTitle: string;
+    contactTitle: string;
+    printCv: string;
   };
 }

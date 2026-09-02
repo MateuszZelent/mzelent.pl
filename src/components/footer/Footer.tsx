@@ -77,6 +77,11 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/cv" className={styles.footerLink}>
+                  {t.nav.cv}
+                </Link>
+              </li>
+              <li>
                 <Link href="/lab/visual-system?tier=medium" className={styles.footerLink}>
                   {t.nav.visualLab}
                 </Link>

@@ -38,4 +38,18 @@ test.describe("Accessibility & Semantic Integrity", () => {
     const results = await new AxeBuilder({ page }).analyze();
     expect(results.violations).toEqual([]);
   });
+
+  test("has no automated accessibility violations on the admin scholar page @a11y", async ({ page }) => {
+    await page.goto("/admin/scholar");
+
+    const results = await new AxeBuilder({ page }).analyze();
+    expect(results.violations).toEqual([]);
+  });
+
+  test("has no automated accessibility violations on the CV page @a11y", async ({ page }) => {
+    await page.goto("/cv");
+
+    const results = await new AxeBuilder({ page }).analyze();
+    expect(results.violations).toEqual([]);
+  });
 });

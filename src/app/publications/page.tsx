@@ -69,6 +69,9 @@ export default function PublicationsPage() {
           <div className={styles.scholarNotice}>
             <span className={styles.scholarDot} aria-hidden="true" />
             <span>{t.publicationsPage.syncNotice}</span>
+            <Link href="/admin/scholar" className={styles.adminLink}>
+              [Scholar Ingestion Panel →]
+            </Link>
           </div>
         </header>
 

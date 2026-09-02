@@ -67,6 +67,35 @@ async function capture() {
     console.log("Captured publications-search-filter.png");
   }
 
+  // 6. Navigate to /admin/scholar
+  console.log("Navigating to /admin/scholar...");
+  await page.goto("http://localhost:3154/admin/scholar", { waitUntil: "networkidle" });
+  await page.screenshot({
+    path: resolve(artifactDir, "admin-scholar-dashboard.png"),
+  });
+  console.log("Captured admin-scholar-dashboard.png");
+
+  // 7. Parse BibTeX and capture staged state
+  const parseBtn = page.locator("[data-testid='bibtex-parse-btn']");
+  if (await parseBtn.count()) {
+    await parseBtn.click();
+    await page.waitForTimeout(400);
+    await page.screenshot({
+      path: resolve(artifactDir, "admin-scholar-staged.png"),
+      fullPage: true,
+    });
+    console.log("Captured admin-scholar-staged.png");
+  }
+
+  // 8. Navigate to /cv
+  console.log("Navigating to /cv...");
+  await page.goto("http://localhost:3154/cv", { waitUntil: "networkidle" });
+  await page.screenshot({
+    path: resolve(artifactDir, "cv-academic-profile.png"),
+    fullPage: true,
+  });
+  console.log("Captured cv-academic-profile.png");
+
   await browser.close();
   console.log("Finished capturing visual evidence!");
 }

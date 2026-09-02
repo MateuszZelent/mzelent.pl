@@ -4,8 +4,9 @@
 - **Phase 1 status:** Accepted
 - **Phase 2 status:** Accepted
 - **Phase 3 status:** Accepted
-- **Phase 4 status:** Active
-- **Current project phase:** Phase 4 — Homepage Vertical Slices
+- **Phase 4 status:** Accepted
+- **Phase 5 status:** Active
+- **Current project phase:** Phase 5 — Detail Routes & Administration
 - **Decision date:** 2026-09-02
 
 ## Gate model

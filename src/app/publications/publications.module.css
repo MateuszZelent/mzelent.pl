@@ -83,6 +83,21 @@
   font-family: var(--font-mono, monospace);
   font-size: var(--text-mono-xs);
   color: var(--color-ink-muted);
+  flex-wrap: wrap;
+}
+
+.adminLink {
+  margin-left: var(--space-3);
+  color: var(--accent-cyan);
+  text-decoration: none;
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-mono-xs);
+  transition: color var(--duration-fast) ease;
+}
+
+.adminLink:hover {
+  color: var(--color-ink);
+  text-decoration: underline;
 }
 
 .scholarDot {

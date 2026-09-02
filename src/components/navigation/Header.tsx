@@ -52,6 +52,11 @@ export function Header() {
               </Link>
             </li>
             <li>
+              <Link href="/cv" className={styles.navLink}>
+                {t.nav.cv}
+              </Link>
+            </li>
+            <li>
               <Link href="/lab/visual-system?tier=medium" className={styles.navLink}>
                 {t.nav.visualLab}
               </Link>

@@ -11,9 +11,9 @@
 
 .scrolled {
   padding: 0.85rem clamp(1.5rem, 5vw, 6rem);
-  background: rgba(3, 4, 5, 0.75);
+  background: var(--color-canvas-glass);
   backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid var(--color-line-subtle);
 }
 
 .headerInner {
@@ -21,16 +21,16 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  max-width: 1440px;
+  max-width: var(--container-max);
   margin: 0 auto;
 }
 
 .brand {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: var(--space-2);
   text-decoration: none;
-  color: var(--color-ink, #ffffff);
+  color: var(--color-ink);
 }
 
 .brandMark {
@@ -39,20 +39,20 @@
   justify-content: center;
   width: 28px;
   height: 28px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 4px;
+  background: var(--color-canvas-glass);
+  border: 1px solid var(--color-line-medium);
+  border-radius: var(--radius-xs);
   font-family: var(--font-mono, monospace);
-  font-size: 0.75rem;
+  font-size: var(--text-mono-sm);
   font-weight: 700;
-  color: var(--accent-cyan, #57e6dd);
+  color: var(--accent-cyan);
 }
 
 .brandText {
   font-family: var(--font-mono, monospace);
-  font-size: 0.9rem;
+  font-size: var(--text-mono-base);
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: var(--tracking-wide);
 }
 
 .nav {
@@ -63,46 +63,48 @@
 .navList {
   display: flex;
   align-items: center;
-  gap: 2rem;
+  gap: var(--space-8);
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
 .navLink {
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--color-ink-muted);
   text-decoration: none;
-  font-size: 0.88rem;
+  font-family: var(--font-display, sans-serif);
+  font-size: var(--text-body-sm);
   font-weight: 500;
-  letter-spacing: 0.02em;
-  transition: color 0.2s ease;
+  letter-spacing: var(--tracking-normal);
+  transition: color var(--duration-fast) ease;
 }
 
 .navLink:hover {
-  color: var(--accent-cyan, #57e6dd);
+  color: var(--accent-cyan);
 }
 
 .navLink:focus-visible {
-  outline: 2px solid var(--accent-cyan, #57e6dd);
+  outline: 2px solid var(--accent-cyan);
   outline-offset: 4px;
 }
 
 .headerRight {
   display: flex;
   align-items: center;
-  gap: 1.25rem;
+  gap: var(--space-5);
 }
 
 .statusIndicator {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: var(--space-2);
   padding: 0.25rem 0.65rem;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.7);
+  background: var(--color-canvas-glass);
+  border: 1px solid var(--color-line-subtle);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-mono-xs);
+  color: var(--color-ink-muted);
 }
 
 .statusDot {
@@ -117,26 +119,26 @@
   display: inline-flex;
   align-items: center;
   padding: 0.45rem 0.9rem;
-  background: rgba(87, 230, 221, 0.08);
+  background: var(--accent-cyan-soft);
   border: 1px solid rgba(87, 230, 221, 0.3);
-  border-radius: 4px;
-  color: var(--accent-cyan, #57e6dd);
+  border-radius: var(--radius-sm);
+  color: var(--accent-cyan);
   text-decoration: none;
   font-family: var(--font-mono, monospace);
-  font-size: 0.75rem;
+  font-size: var(--text-mono-sm);
   font-weight: 600;
-  letter-spacing: 0.04em;
-  transition: all 0.2s ease;
+  letter-spacing: var(--tracking-wide);
+  transition: all var(--duration-fast) ease;
 }
 
 .labButton:hover {
-  background: rgba(87, 230, 221, 0.2);
-  border-color: var(--accent-cyan, #57e6dd);
+  background: rgba(87, 230, 221, 0.22);
+  border-color: var(--accent-cyan);
   transform: translateY(-1px);
 }
 
 .labButton:focus-visible {
-  outline: 2px solid var(--accent-cyan, #57e6dd);
+  outline: 2px solid var(--accent-cyan);
   outline-offset: 2px;
 }
 

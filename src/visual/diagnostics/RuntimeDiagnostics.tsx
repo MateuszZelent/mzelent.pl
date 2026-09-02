@@ -37,6 +37,13 @@ export function RuntimeDiagnostics({
   const setTierOverride = useSceneStore((state) => state.setTierOverride);
   const setMotionMode = useSceneStore((state) => state.setMotionMode);
 
+  const [collapsed, setCollapsed] = React.useState(() => {
+    if (typeof window !== "undefined" && window.innerWidth < 640) {
+      return true;
+    }
+    return false;
+  });
+
   if (!isEnabled) {
     return null;
   }
@@ -48,6 +55,57 @@ export function RuntimeDiagnostics({
   const handleMotionClick = (mode: MotionMode) => {
     setMotionMode(mode);
   };
+
+  if (collapsed) {
+    return (
+      <aside
+        className={className}
+        style={{
+          ...style,
+          padding: "0.35rem 0.65rem",
+          cursor: "pointer",
+          width: "auto",
+          maxWidth: "none",
+        }}
+        onClick={() => setCollapsed(false)}
+        aria-label="Runtime diagnostics"
+        data-testid="runtime-diagnostics"
+        data-status={diag.runtimeStatus}
+        data-tier={diag.qualityTier}
+        data-motion-mode={diag.motionMode}
+        data-dpr={diag.effectiveDpr}
+        data-canvas-count={diag.canvasCount}
+        data-webgl2={diag.webgl2Supported}
+        data-draw-calls={diag.drawCalls}
+        data-triangles={diag.triangles}
+        data-points={diag.points}
+        data-geometries={diag.geometries}
+        data-textures={diag.textures}
+        data-context-loss={diag.contextLossCount}
+        data-context-restore={diag.contextRestoreCount}
+        data-frameloop={diag.frameloop}
+        data-scene={diag.activeSceneId}
+        data-first-frame={diag.firstFrameCommitted}
+        data-p50={diag.p50Ms}
+        data-p95={diag.p95Ms}
+        data-first-frame-time={diag.firstFrameTimeMs}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "0.4rem",
+            fontSize: "0.68rem",
+            color: "var(--accent-cyan)",
+          }}
+        >
+          <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--accent-cyan)" }} />
+          <span>HUD ({diag.qualityTier})</span>
+          <span style={{ opacity: 0.6, marginLeft: "auto" }}>+</span>
+        </div>
+      </aside>
+    );
+  }
 
   return (
     <aside
@@ -75,17 +133,42 @@ export function RuntimeDiagnostics({
       data-p95={diag.p95Ms}
       data-first-frame-time={diag.firstFrameTimeMs}
     >
-      <p
+      <div
         style={{
-          color: "var(--accent-cyan)",
-          letterSpacing: "0.1em",
-          textTransform: "uppercase",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
           margin: "0 0 0.5rem",
-          fontWeight: 600,
         }}
       >
-        Runtime diagnostics
-      </p>
+        <p
+          style={{
+            color: "var(--accent-cyan)",
+            letterSpacing: "0.1em",
+            textTransform: "uppercase",
+            margin: 0,
+            fontWeight: 600,
+            fontSize: "0.72rem",
+          }}
+        >
+          Runtime diagnostics
+        </p>
+        <button
+          type="button"
+          onClick={() => setCollapsed(true)}
+          style={{
+            background: "none",
+            border: "none",
+            color: "var(--color-ink-muted)",
+            cursor: "pointer",
+            fontSize: "0.8rem",
+            padding: "0 0.2rem",
+          }}
+          aria-label="Collapse diagnostics"
+        >
+          &minus;
+        </button>
+      </div>
       <dl style={{ margin: "0 0 0.5rem", fontSize: "0.6rem" }}>
         <div style={{ display: "flex", justifyContent: "space-between", padding: "2px 0" }}>
           <dt>Status</dt>

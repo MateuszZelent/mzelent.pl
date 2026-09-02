@@ -1,7 +1,7 @@
 import type { QualityTier } from "../quality/quality-contract";
 import type { RuntimeStatus } from "./runtime-status";
 
-export type SceneId = "calibration" | "none";
+export type SceneId = "atmosphere" | "calibration" | "none";
 
 export interface DiagnosticsSnapshot {
   readonly runtimeStatus: RuntimeStatus;

@@ -160,6 +160,48 @@ test("falls back gracefully when WebGL2 is blocked @visual", async ({ browser, b
   await context.close();
 });
 
+test("reacts smoothly to pointer movement across particle atmosphere", async ({ page }) => {
+  const consoleErrors: string[] = [];
+  const pageErrors: string[] = [];
+
+  page.on("console", (message) => {
+    if (message.type() === "error") {
+      const text = message.text();
+      if (!text.includes("WebGL creation failed")) {
+        consoleErrors.push(text);
+      }
+    }
+  });
+  page.on("pageerror", (error) => {
+    pageErrors.push(error.message);
+  });
+
+  await page.goto("/lab/visual-system");
+
+  const isWebGL2Supported = await page.evaluate(() => {
+    const canvas = document.createElement("canvas");
+    return Boolean(canvas.getContext("webgl2"));
+  });
+
+  if (isWebGL2Supported) {
+    await expect(page.locator("canvas")).toHaveCount(1, { timeout: 10_000 });
+
+    // Simulate multi-point mouse trajectory
+    await page.mouse.move(200, 200);
+    await page.waitForTimeout(100);
+    await page.mouse.move(400, 300);
+    await page.waitForTimeout(100);
+    await page.mouse.move(600, 450);
+    await page.waitForTimeout(100);
+
+    // Canvas must remain exactly 1 and no errors logged
+    await expect(page.locator("canvas")).toHaveCount(1);
+  }
+
+  expect(consoleErrors).toEqual([]);
+  expect(pageErrors).toEqual([]);
+});
+
 test("handles WebGL context loss and restoration gracefully", async ({ page }) => {
   const consoleErrors: string[] = [];
   const pageErrors: string[] = [];
@@ -417,11 +459,11 @@ test("captures the ready visual fixture @visual", async ({ page }, testInfo) => 
     qualityTier: isWebGL2Supported ? "medium" : "static",
     webglStatus: isWebGL2Supported ? "ready" : "static",
     canvasCount: isWebGL2Supported ? 1 : 0,
-    drawCalls: isWebGL2Supported ? 3 : 0,
-    triangles: isWebGL2Supported ? 576 : 0,
-    points: 0,
-    geometries: isWebGL2Supported ? 3 : 0,
-    textures: 0,
+    drawCalls: isWebGL2Supported ? 1 : 0,
+    triangles: 0,
+    points: isWebGL2Supported ? 24000 : 0,
+    geometries: isWebGL2Supported ? 1 : 0,
+    textures: isWebGL2Supported ? 2 : 0,
     contextLossCount: 0,
     restorationCount: 0,
     firstFrameTimeMs: 45,

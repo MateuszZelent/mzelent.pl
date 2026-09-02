@@ -150,7 +150,7 @@ export function VisualStageClient() {
           <LazyVisualCanvas
             className={styles.webglCanvas}
             qualityProfile={profile}
-            activeSceneId="calibration"
+            activeSceneId="atmosphere"
             onError={() => {
               setStatus("failed");
               setPosterVisible(true);

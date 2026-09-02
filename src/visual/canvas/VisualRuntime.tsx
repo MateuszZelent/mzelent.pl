@@ -5,6 +5,7 @@ import React, { useEffect } from "react";
 
 import { attachVisibilityController } from "../lifecycle/visibility-controller";
 import type { QualityProfile } from "../quality/quality-contract";
+import { AtmosphereScene } from "../scenes/atmosphere/AtmosphereScene";
 import { CalibrationScene } from "../scenes/calibration/CalibrationScene";
 import type { SceneId } from "../state/scene-contract";
 import { useSceneStore } from "../state/scene-store";
@@ -15,7 +16,7 @@ interface VisualRuntimeProps {
   readonly activeSceneId?: SceneId;
 }
 
-export function VisualRuntime({ qualityProfile, activeSceneId = "calibration" }: VisualRuntimeProps) {
+export function VisualRuntime({ qualityProfile, activeSceneId = "atmosphere" }: VisualRuntimeProps) {
   const gl = useThree((state) => state.gl);
   const size = useThree((state) => state.size);
   const viewport = useThree((state) => state.viewport);
@@ -26,6 +27,8 @@ export function VisualRuntime({ qualityProfile, activeSceneId = "calibration" }:
     configureRenderer(gl);
 
     const isWebGL2 = gl.capabilities.isWebGL2;
+    const frameloop = activeSceneId === "atmosphere" ? "always" : "demand";
+
     updateDiagnostics({
       webgl2Supported: isWebGL2,
       canvasCount: 1,
@@ -33,7 +36,7 @@ export function VisualRuntime({ qualityProfile, activeSceneId = "calibration" }:
       effectiveDpr: gl.getPixelRatio(),
       viewportWidth: size.width,
       viewportHeight: size.height,
-      frameloop: "demand",
+      frameloop,
       activeSceneId,
     });
 
@@ -66,5 +69,10 @@ export function VisualRuntime({ qualityProfile, activeSceneId = "calibration" }:
     return null;
   }
 
-  return <>{activeSceneId === "calibration" && <CalibrationScene />}</>;
+  return (
+    <>
+      {activeSceneId === "atmosphere" && <AtmosphereScene qualityProfile={qualityProfile} />}
+      {activeSceneId === "calibration" && <CalibrationScene />}
+    </>
+  );
 }

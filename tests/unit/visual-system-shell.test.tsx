@@ -11,15 +11,13 @@ describe("Visual System Laboratory shell", () => {
     expect(screen.getByRole("heading", { level: 1, name: "Visual System Laboratory" })).toBeInTheDocument();
     expect(screen.getAllByRole("heading", { level: 2 })).toHaveLength(3);
     expect(screen.getByTestId("static-poster")).toBeVisible();
-    expect(screen.getByTestId("canvas-slot")).toHaveAttribute("data-canvas-slot", "reserved");
     expect(screen.getByTestId("fallback-note")).toHaveTextContent("complete fallback");
     expect(screen.queryByRole("img", { name: /portfolio/i })).not.toBeInTheDocument();
   });
 
-  it("does not introduce the WebGL runtime in the scaffold", () => {
+  it("keeps navigation, hero meta and skip link accessible", () => {
     render(<VisualSystemPage />);
 
-    expect(document.querySelector("canvas")).not.toBeInTheDocument();
     expect(document.getElementById("laboratory-shell")).toHaveAttribute("tabindex", "-1");
     expect(screen.getByRole("list", { name: "Current shell capabilities" })).toBeInTheDocument();
     expect(screen.getByRole("navigation", { name: "Laboratory sections" })).toBeInTheDocument();

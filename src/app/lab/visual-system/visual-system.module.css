@@ -232,7 +232,22 @@
   inset: 0;
   overflow: hidden;
   position: absolute;
+  transition: opacity 400ms ease-out;
   z-index: 1;
+}
+
+.scenePosterHidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.webglCanvas {
+  display: block;
+  height: 100% !important;
+  inset: 0;
+  position: absolute !important;
+  width: 100% !important;
+  z-index: 0;
 }
 
 .scenePoster::before,
@@ -698,7 +713,8 @@
   .skipLink,
   .navList a,
   .footer a,
-  .wordmark {
+  .wordmark,
+  .scenePoster {
     transition-duration: 0.01ms;
   }
 }

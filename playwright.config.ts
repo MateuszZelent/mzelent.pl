@@ -1,6 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const useProductionServer = process.env.PLAYWRIGHT_USE_PRODUCTION === "1";
+const useProductionServer = process.env.PLAYWRIGHT_USE_DEV !== "1";
 
 export default defineConfig({
   expect: {
@@ -21,14 +21,36 @@ export default defineConfig({
     command: useProductionServer
       ? "./node_modules/.bin/next start --port 3154"
       : "./node_modules/.bin/next dev --turbopack --hostname 127.0.0.1 --port 3154",
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: true,
     timeout: 120_000,
     url: "http://127.0.0.1:3154/lab/visual-system",
   },
   projects: [
     {
       name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
+      use: {
+        ...devices["Desktop Chrome"],
+        launchOptions: {
+          args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-webgl"],
+        },
+      },
+    },
+    {
+      name: "firefox",
+      use: {
+        ...devices["Desktop Firefox"],
+        launchOptions: {
+          firefoxUserPrefs: {
+            "webgl.force-enabled": true,
+            "webgl.disabled": false,
+            "webgl.enable-webgl2": true,
+          },
+        },
+      },
+    },
+    {
+      name: "webkit",
+      use: { ...devices["Desktop Safari"] },
     },
   ],
 });

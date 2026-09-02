@@ -138,7 +138,7 @@ test.describe("Homepage — Mountain Parallax & Snow Particles", () => {
     await page.waitForTimeout(100);
 
     const foreTransform = await page.getByTestId("parallax-layer-foreground").getAttribute("style");
-    expect(foreTransform).toContain("translate3d(0, 0px, 0)");
+    expect(foreTransform === null || foreTransform.includes("none") || foreTransform === "").toBe(true);
 
     expect(consoleErrors).toEqual([]);
     expect(pageErrors).toEqual([]);

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import React, { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import React, { useEffect, useRef, useSyncExternalStore } from "react";
 
 import styles from "./MountainHero.module.css";
 
@@ -27,50 +27,113 @@ export interface MountainHeroProps {
 }
 
 export function MountainHero({ snowCanvas }: MountainHeroProps) {
-  const [scrollY, setScrollY] = useState(0);
   const reducedMotion = useSyncExternalStore(subscribeReducedMotion, readReducedMotion, () => false);
   const heroRef = useRef<HTMLElement>(null);
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
+  const skyRef = useRef<HTMLDivElement>(null);
+  const midRef = useRef<HTMLDivElement>(null);
+  const mistRef = useRef<HTMLDivElement>(null);
+  const snowRef = useRef<HTMLDivElement>(null);
+  const foreRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
 
-    let rafId: number | null = null;
+  useEffect(() => {
+    if (typeof window === "undefined" || reducedMotion) return;
+
+    let targetScrollY = window.scrollY || 0;
+    let currentScrollY = targetScrollY;
+
+    let targetMouseX = 0;
+    let targetMouseY = 0;
+    let currentMouseX = 0;
+    let currentMouseY = 0;
+
     const handleScroll = () => {
-      if (rafId !== null) return;
-      rafId = window.requestAnimationFrame(() => {
-        setScrollY(window.scrollY || window.pageYOffset || 0);
-        rafId = null;
-      });
+      targetScrollY = window.scrollY || 0;
+    };
+
+    const handlePointerMove = (e: MouseEvent) => {
+      const halfW = window.innerWidth / 2;
+      const halfH = window.innerHeight / 2;
+      targetMouseX = (e.clientX - halfW) / halfW;
+      targetMouseY = (e.clientY - halfH) / halfH;
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("mousemove", handlePointerMove, { passive: true });
+
+    let rafId: number;
+    const updateTransforms = () => {
+      // Smooth cinematic interpolation (lerp)
+      currentScrollY += (targetScrollY - currentScrollY) * 0.12;
+      currentMouseX += (targetMouseX - currentMouseX) * 0.06;
+      currentMouseY += (targetMouseY - currentMouseY) * 0.06;
+
+      const scroll = currentScrollY;
+      const mx = currentMouseX;
+      const my = currentMouseY;
+
+      // 1. Sky layer: Sinks slowly with scroll, subtle counter-mouse shift
+      if (skyRef.current) {
+        const x = mx * 10;
+        const y = scroll * 0.42 + my * 6;
+        skyRef.current.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) scale(1.06)`;
+      }
+
+      // 2. Midground Peaks: Sinks moderately, separating from foreground
+      if (midRef.current) {
+        const x = mx * -14;
+        const y = scroll * 0.26 + my * -8;
+        midRef.current.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) scale(1.04)`;
+      }
+
+      // 3. Mist layer: Ambient float + scroll drift
+      if (mistRef.current) {
+        const x = mx * -22;
+        const y = scroll * 0.14 + my * -12;
+        mistRef.current.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) scale(1.03)`;
+      }
+
+      // 3.5. Snow canvas: Drifts smoothly with the midground volume
+      if (snowRef.current) {
+        const x = mx * -16;
+        const y = scroll * 0.2 + my * -10;
+        snowRef.current.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0)`;
+      }
+
+      // 4. Foreground Rocky Ridge: Moves RAPIDLY UPWARD and ZOOMS forward (NVIDIA 3D push!)
+      if (foreRef.current) {
+        const x = mx * -38;
+        const y = -scroll * 0.38 + my * -22;
+        const scale = (1.05 + scroll * 0.00035).toFixed(4);
+        foreRef.current.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) scale(${scale})`;
+      }
+
+      // 5. Editorial Content: Lifts up and smoothly fades out
+      if (contentRef.current) {
+        const x = mx * -18;
+        const y = -scroll * 0.45 + my * -12;
+        const opacity = Math.max(0, 1 - scroll / 550);
+        contentRef.current.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0)`;
+        contentRef.current.style.opacity = opacity.toFixed(3);
+      }
+
+      rafId = requestAnimationFrame(updateTransforms);
+    };
+
+    rafId = requestAnimationFrame(updateTransforms);
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
-      if (rafId !== null) {
-        window.cancelAnimationFrame(rafId);
-      }
+      window.removeEventListener("mousemove", handlePointerMove);
+      cancelAnimationFrame(rafId);
     };
-  }, []);
-
-  // Compute multi-plane 2.5D parallax transforms
-  const isParallaxActive = !reducedMotion;
-  const skyY = isParallaxActive ? scrollY * 0.08 : 0;
-  const midY = isParallaxActive ? scrollY * 0.22 : 0;
-  const mistY = isParallaxActive ? scrollY * 0.36 : 0;
-  const foreY = isParallaxActive ? scrollY * 0.68 : 0;
-  const contentY = isParallaxActive ? scrollY * 0.38 : 0;
-  const contentOpacity = isParallaxActive ? Math.max(0, 1 - scrollY / 650) : 1;
+  }, [reducedMotion]);
 
   return (
     <section ref={heroRef} className={styles.heroSection} aria-label="Hero Introduction">
       {/* Layer 1: Atmospheric Sky & Horizon */}
-      <div
-        className={styles.layerSky}
-        style={{ transform: `translate3d(0, ${skyY}px, 0)` }}
-        aria-hidden="true"
-        data-testid="parallax-layer-sky"
-      >
+      <div ref={skyRef} className={styles.layerSky} aria-hidden="true" data-testid="parallax-layer-sky">
         <Image
           src="/assets/images/mountains/sky-bg.webp"
           alt=""
@@ -83,8 +146,8 @@ export function MountainHero({ snowCanvas }: MountainHeroProps) {
 
       {/* Layer 2: Midground Alpine Mountain Peaks */}
       <div
+        ref={midRef}
         className={styles.layerMidground}
-        style={{ transform: `translate3d(0, ${midY}px, 0)` }}
         aria-hidden="true"
         data-testid="parallax-layer-midground"
       >
@@ -99,12 +162,7 @@ export function MountainHero({ snowCanvas }: MountainHeroProps) {
       </div>
 
       {/* Layer 3: Rolling Atmospheric Alpine Mist */}
-      <div
-        className={styles.layerMist}
-        style={{ transform: `translate3d(0, ${mistY}px, 0)` }}
-        aria-hidden="true"
-        data-testid="parallax-layer-mist"
-      >
+      <div ref={mistRef} className={styles.layerMist} aria-hidden="true" data-testid="parallax-layer-mist">
         <Image
           src="/assets/images/mountains/mist-clouds.webp"
           alt=""
@@ -116,20 +174,15 @@ export function MountainHero({ snowCanvas }: MountainHeroProps) {
 
       {/* Layer 3.5: GPU Snow Canvas (Falls behind the foreground mountain) */}
       {snowCanvas && (
-        <div
-          className={styles.layerSnow}
-          style={{ transform: `translate3d(0, ${midY * 0.5}px, 0)` }}
-          aria-hidden="true"
-          data-testid="parallax-layer-snow"
-        >
+        <div ref={snowRef} className={styles.layerSnow} aria-hidden="true" data-testid="parallax-layer-snow">
           {snowCanvas}
         </div>
       )}
 
       {/* Layer 4: Foreground Rocky Ridge & Crags (Opaque rocks sit in FRONT of falling snow) */}
       <div
+        ref={foreRef}
         className={styles.layerForeground}
-        style={{ transform: `translate3d(0, ${foreY}px, 0)` }}
         aria-hidden="true"
         data-testid="parallax-layer-foreground"
       >
@@ -147,13 +200,7 @@ export function MountainHero({ snowCanvas }: MountainHeroProps) {
       <div className={styles.bottomVignette} aria-hidden="true" />
 
       {/* Layer 5: Editorial Content & Typography */}
-      <div
-        className={styles.contentContainer}
-        style={{
-          transform: `translate3d(0, ${contentY}px, 0)`,
-          opacity: contentOpacity,
-        }}
-      >
+      <div ref={contentRef} className={styles.contentContainer}>
         <div className={styles.heroBadge}>
           <span className={styles.badgePulse} aria-hidden="true" />
           <span>Scientific Portfolio & Visual Laboratory</span>

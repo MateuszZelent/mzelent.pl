@@ -27,6 +27,9 @@ export interface DiagnosticsSnapshot {
   readonly activeSceneId: SceneId;
   readonly posterVisible: boolean;
   readonly firstFrameCommitted: boolean;
+  readonly p50Ms: number;
+  readonly p95Ms: number;
+  readonly firstFrameTimeMs: number;
 }
 
 export interface SceneState {

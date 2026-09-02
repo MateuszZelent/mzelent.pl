@@ -45,6 +45,9 @@ const initialDiagnostics: DiagnosticsSnapshot = {
   activeSceneId: "none",
   posterVisible: true,
   firstFrameCommitted: false,
+  p50Ms: 0,
+  p95Ms: 0,
+  firstFrameTimeMs: 0,
 };
 
 const initialState: SceneState = {
@@ -122,7 +125,9 @@ export const useSceneStore = create<VisualSceneStore>((set, get) => ({
       diagnostics: { ...state.diagnostics, posterVisible },
     })),
 
-  recordFirstFrame: () =>
+  recordFirstFrame: (timestamp?: number) => {
+    const firstFrameTimeMs =
+      timestamp ?? (typeof performance !== "undefined" ? Math.round(performance.now()) : 0);
     set((state) => ({
       firstFrameCommitted: true,
       runtimeStatus: "ready",
@@ -130,8 +135,10 @@ export const useSceneStore = create<VisualSceneStore>((set, get) => ({
         ...state.diagnostics,
         firstFrameCommitted: true,
         runtimeStatus: "ready",
+        firstFrameTimeMs,
       },
-    })),
+    }));
+  },
 
   recordContextLoss: () =>
     set((state) => {

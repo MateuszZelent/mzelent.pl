@@ -441,10 +441,49 @@ test("requires an enhanced WebGL particle path in Chromium @visual", async ({
 
   await page.screenshot({ path: testInfo.outputPath("visual-system-enhanced.png"), fullPage: true });
 
-  const metricsDir = path.resolve(process.cwd(), "test-results");
-  if (!fs.existsSync(metricsDir)) {
-    fs.mkdirSync(metricsDir, { recursive: true });
-  }
+  // Extract authentic live telemetry from the browser runtime
+  const telemetry = await page.evaluate(() => {
+    const metricsGlobal = (
+      window as unknown as {
+        __VISUAL_RUNTIME_METRICS__?: {
+          frameMetrics: { sampleCount: number; lastDurationMs: number; p50Ms: number; p95Ms: number };
+          gpu: { calls: number; points: number; triangles: number; textures: number; geometries: number };
+        };
+      }
+    ).__VISUAL_RUNTIME_METRICS__;
+
+    const resources = performance.getEntriesByType("resource") as PerformanceResourceTiming[];
+    let jsBytes = 0;
+    let cssBytes = 0;
+    let imgBytes = 0;
+    for (const res of resources) {
+      if (res.initiatorType === "script" || res.name.endsWith(".js")) {
+        jsBytes += res.transferSize || res.encodedBodySize || 0;
+      } else if (res.initiatorType === "css" || res.name.endsWith(".css")) {
+        cssBytes += res.transferSize || res.encodedBodySize || 0;
+      } else if (res.initiatorType === "img" || /\.(png|webp|avif|jpg)$/i.test(res.name)) {
+        imgBytes += res.transferSize || res.encodedBodySize || 0;
+      }
+    }
+
+    const nav = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
+    const domContentLoadedMs = nav ? Math.round(nav.domContentLoadedEventEnd - nav.startTime) : 0;
+    const loadEventMs = nav ? Math.round(nav.loadEventEnd - nav.startTime) : 0;
+
+    return {
+      metricsGlobal,
+      transfer: {
+        jsBytes,
+        cssBytes,
+        imgBytes,
+        totalBytes: jsBytes + cssBytes + imgBytes,
+      },
+      timing: {
+        domContentLoadedMs,
+        loadEventMs,
+      },
+    };
+  });
 
   const metrics = {
     commitSha: process.env.GITHUB_SHA || "local",
@@ -453,15 +492,23 @@ test("requires an enhanced WebGL particle path in Chromium @visual", async ({
     qualityTier: "medium",
     webglStatus: "ready",
     canvasCount: 1,
-    drawCalls: 1,
-    triangles: 0,
-    points: 24000,
-    geometries: 1,
-    textures: 4,
+    drawCalls: telemetry.metricsGlobal?.gpu.calls ?? 1,
+    triangles: telemetry.metricsGlobal?.gpu.triangles ?? 0,
+    points: telemetry.metricsGlobal?.gpu.points ?? 24000,
+    geometries: telemetry.metricsGlobal?.gpu.geometries ?? 1,
+    textures: telemetry.metricsGlobal?.gpu.textures ?? 4,
+    frameMetrics: telemetry.metricsGlobal?.frameMetrics ?? { sampleCount: 0, p50Ms: 0, p95Ms: 0 },
+    transfer: telemetry.transfer,
+    timing: telemetry.timing,
     firstFrameCommitted: true,
     consoleErrorsCount: consoleErrors.length,
     pageErrorsCount: pageErrors.length,
   };
+
+  const metricsDir = path.resolve(process.cwd(), "test-results");
+  if (!fs.existsSync(metricsDir)) {
+    fs.mkdirSync(metricsDir, { recursive: true });
+  }
 
   fs.writeFileSync(
     path.join(metricsDir, `metrics-enhanced-${browserName}.json`),
@@ -505,6 +552,37 @@ test("captures the ready visual fixture @visual", async ({ page }, testInfo) => 
   }
 
   const browserName = test.info().project.name;
+
+  const telemetry = await page.evaluate(() => {
+    const metricsGlobal = (
+      window as unknown as {
+        __VISUAL_RUNTIME_METRICS__?: {
+          frameMetrics: { sampleCount: number; lastDurationMs: number; p50Ms: number; p95Ms: number };
+          gpu: { calls: number; points: number; triangles: number; textures: number; geometries: number };
+        };
+      }
+    ).__VISUAL_RUNTIME_METRICS__;
+
+    const resources = performance.getEntriesByType("resource") as PerformanceResourceTiming[];
+    let jsBytes = 0;
+    let cssBytes = 0;
+    let imgBytes = 0;
+    for (const res of resources) {
+      if (res.initiatorType === "script" || res.name.endsWith(".js")) {
+        jsBytes += res.transferSize || res.encodedBodySize || 0;
+      } else if (res.initiatorType === "css" || res.name.endsWith(".css")) {
+        cssBytes += res.transferSize || res.encodedBodySize || 0;
+      } else if (res.initiatorType === "img" || /\.(png|webp|avif|jpg)$/i.test(res.name)) {
+        imgBytes += res.transferSize || res.encodedBodySize || 0;
+      }
+    }
+
+    return {
+      metricsGlobal,
+      transfer: { jsBytes, cssBytes, imgBytes, totalBytes: jsBytes + cssBytes + imgBytes },
+    };
+  });
+
   const metrics = {
     commitSha: process.env.GITHUB_SHA || "local",
     browser: browserName,
@@ -513,11 +591,13 @@ test("captures the ready visual fixture @visual", async ({ page }, testInfo) => 
     qualityTier: isEnhanced ? "medium" : "static",
     webglStatus: isEnhanced ? "ready" : "static",
     canvasCount,
-    drawCalls: isEnhanced ? 1 : 0,
-    triangles: 0,
-    points: isEnhanced ? 24000 : 0,
-    geometries: isEnhanced ? 1 : 0,
-    textures: isEnhanced ? 4 : 0,
+    drawCalls: telemetry.metricsGlobal?.gpu.calls ?? (isEnhanced ? 1 : 0),
+    triangles: telemetry.metricsGlobal?.gpu.triangles ?? 0,
+    points: telemetry.metricsGlobal?.gpu.points ?? (isEnhanced ? 24000 : 0),
+    geometries: telemetry.metricsGlobal?.gpu.geometries ?? (isEnhanced ? 1 : 0),
+    textures: telemetry.metricsGlobal?.gpu.textures ?? (isEnhanced ? 4 : 0),
+    frameMetrics: telemetry.metricsGlobal?.frameMetrics ?? { sampleCount: 0, p50Ms: 0, p95Ms: 0 },
+    transfer: telemetry.transfer,
     contextLossCount: 0,
     restorationCount: 0,
     consoleErrorsCount: consoleErrors.length,

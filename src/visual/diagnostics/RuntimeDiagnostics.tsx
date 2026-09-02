@@ -71,6 +71,9 @@ export function RuntimeDiagnostics({
       data-frameloop={diag.frameloop}
       data-scene={diag.activeSceneId}
       data-first-frame={diag.firstFrameCommitted}
+      data-p50={diag.p50Ms}
+      data-p95={diag.p95Ms}
+      data-first-frame-time={diag.firstFrameTimeMs}
     >
       <p
         style={{
@@ -120,6 +123,12 @@ export function RuntimeDiagnostics({
           <dt>Draw calls / Points</dt>
           <dd style={{ color: "var(--color-ink)" }}>
             {diag.drawCalls} / {diag.points.toLocaleString()}
+          </dd>
+        </div>
+        <div style={{ display: "flex", justifyContent: "space-between", padding: "2px 0" }}>
+          <dt>Frame p50 / p95</dt>
+          <dd style={{ color: "var(--color-ink)" }}>
+            {diag.p50Ms > 0 ? `${diag.p50Ms}ms / ${diag.p95Ms}ms` : "measuring..."}
           </dd>
         </div>
       </dl>

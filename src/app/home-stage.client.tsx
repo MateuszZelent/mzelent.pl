@@ -97,24 +97,46 @@ function useActiveProfile(): { activeProfile: QualityProfile; mounted: boolean }
     () => false,
   );
 
+  const tierOverride = useSceneStore((state) => state.tierOverride);
+  const motionMode = useSceneStore((state) => state.motionMode);
   const setStatus = useSceneStore((state) => state.setStatus);
   const setQualityTier = useSceneStore((state) => state.setQualityTier);
+  const setTierOverride = useSceneStore((state) => state.setTierOverride);
+  const setMotionMode = useSceneStore((state) => state.setMotionMode);
   const setCapabilities = useSceneStore((state) => state.setCapabilities);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+
+    const params = new URLSearchParams(window.location.search);
+    const tierParam = params.get("tier");
+    if (tierParam && ["high", "medium", "low", "static"].includes(tierParam)) {
+      setTierOverride(tierParam as import("../visual/quality/quality-contract").QualityTier);
+    }
+
+    const motionParam = params.get("motion");
+    if (motionParam && ["auto", "reduced", "full-preview"].includes(motionParam)) {
+      setMotionMode(motionParam as import("../visual/state/scene-contract").MotionMode);
+    }
+
     const prefersReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
     const coarsePointer = window.matchMedia?.("(pointer: coarse)").matches ?? false;
     setCapabilities(prefersReducedMotion, coarsePointer);
-  }, [setCapabilities]);
+  }, [setTierOverride, setMotionMode, setCapabilities]);
 
-  // Public homepage strictly enforces detectedProfile with zero URL or global override bypasses
   const activeProfile: QualityProfile = useMemo(() => {
     if (detectedProfile.tier === "static") {
       return STATIC_FALLBACK_PROFILE;
     }
-    return detectedProfile;
-  }, [detectedProfile]);
+    const targetTier = tierOverride ?? detectedProfile.tier;
+    return {
+      tier: targetTier,
+      dprCap: targetTier === "high" ? 1.75 : targetTier === "medium" ? 1.35 : 1.0,
+      maxPixelLoad: 4_500_000,
+      antialias: targetTier !== "low" && targetTier !== "static",
+      powerPreference: targetTier === "high" ? "high-performance" : "default",
+    };
+  }, [tierOverride, detectedProfile]);
 
   const runtimeStatus = useSceneStore((state) => state.runtimeStatus);
 

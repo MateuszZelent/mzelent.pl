@@ -7,6 +7,7 @@ import { attachVisibilityController } from "../lifecycle/visibility-controller";
 import type { QualityProfile } from "../quality/quality-contract";
 import { AtmosphereScene } from "../scenes/atmosphere/AtmosphereScene";
 import { CalibrationScene } from "../scenes/calibration/CalibrationScene";
+import { SnowScene } from "../scenes/snow/SnowScene";
 import type { SceneId } from "../state/scene-contract";
 import { useSceneStore } from "../state/scene-store";
 import { configureRenderer } from "./renderer-config";
@@ -16,7 +17,7 @@ interface VisualRuntimeProps {
   readonly activeSceneId?: SceneId;
 }
 
-export function VisualRuntime({ qualityProfile, activeSceneId = "atmosphere" }: VisualRuntimeProps) {
+export function VisualRuntime({ qualityProfile, activeSceneId = "snow" }: VisualRuntimeProps) {
   const gl = useThree((state) => state.gl);
   const size = useThree((state) => state.size);
   const viewport = useThree((state) => state.viewport);
@@ -27,7 +28,7 @@ export function VisualRuntime({ qualityProfile, activeSceneId = "atmosphere" }: 
     configureRenderer(gl);
 
     const isWebGL2 = gl.capabilities.isWebGL2;
-    const frameloop = activeSceneId === "atmosphere" ? "always" : "demand";
+    const frameloop = activeSceneId === "atmosphere" || activeSceneId === "snow" ? "always" : "demand";
 
     updateDiagnostics({
       webgl2Supported: isWebGL2,
@@ -71,6 +72,7 @@ export function VisualRuntime({ qualityProfile, activeSceneId = "atmosphere" }: 
 
   return (
     <>
+      {activeSceneId === "snow" && <SnowScene qualityProfile={qualityProfile} />}
       {activeSceneId === "atmosphere" && <AtmosphereScene qualityProfile={qualityProfile} />}
       {activeSceneId === "calibration" && <CalibrationScene />}
     </>

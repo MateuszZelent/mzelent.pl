@@ -5,7 +5,13 @@ import React from "react";
 import type { QualityTier } from "../quality/quality-contract";
 import { useSceneStore } from "../state/scene-store";
 
-export function RuntimeDiagnostics({ className }: { readonly className?: string }) {
+export function RuntimeDiagnostics({
+  className,
+  style,
+}: {
+  readonly className?: string;
+  readonly style?: React.CSSProperties;
+}) {
   const isEnabled =
     process.env.NODE_ENV === "development" || process.env.NEXT_PUBLIC_ENABLE_DIAGNOSTICS === "1";
 
@@ -23,6 +29,7 @@ export function RuntimeDiagnostics({ className }: { readonly className?: string 
   return (
     <aside
       className={className}
+      style={style}
       aria-label="Runtime diagnostics"
       data-testid="runtime-diagnostics"
       data-status={diag.runtimeStatus}

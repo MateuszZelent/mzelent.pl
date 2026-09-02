@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useRef, useSyncExternalStore } from "react";
 
+import { useSceneStore } from "../../visual/state/scene-store";
 import styles from "./MountainHero.module.css";
 
 function readReducedMotion(): boolean {
@@ -27,9 +28,13 @@ export interface MountainHeroProps {
 }
 
 export function MountainHero({ snowCanvas }: MountainHeroProps) {
-  const reducedMotion = useSyncExternalStore(subscribeReducedMotion, readReducedMotion, () => false);
-  const heroRef = useRef<HTMLElement>(null);
+  const osReducedMotion = useSyncExternalStore(subscribeReducedMotion, readReducedMotion, () => false);
+  const tierOverride = useSceneStore((state) => state.tierOverride);
 
+  // If user is previewing an active tier (high, medium, low) or didn't request reduced motion, enable parallax!
+  const isReducedMotion = tierOverride === "static" ? true : tierOverride ? false : osReducedMotion;
+
+  const heroRef = useRef<HTMLElement>(null);
   const skyRef = useRef<HTMLDivElement>(null);
   const midRef = useRef<HTMLDivElement>(null);
   const mistRef = useRef<HTMLDivElement>(null);
@@ -38,7 +43,7 @@ export function MountainHero({ snowCanvas }: MountainHeroProps) {
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (typeof window === "undefined" || reducedMotion) return;
+    if (typeof window === "undefined" || isReducedMotion) return;
 
     let targetScrollY = window.scrollY || 0;
     let currentScrollY = targetScrollY;
@@ -128,10 +133,14 @@ export function MountainHero({ snowCanvas }: MountainHeroProps) {
       window.removeEventListener("mousemove", handlePointerMove);
       cancelAnimationFrame(rafId);
     };
-  }, [reducedMotion]);
+  }, [isReducedMotion]);
 
   return (
-    <section ref={heroRef} className={styles.heroSection} aria-label="Hero Introduction">
+    <section
+      ref={heroRef}
+      className={`${styles.heroSection} ${isReducedMotion ? styles.reducedMotion : ""}`}
+      aria-label="Hero Introduction"
+    >
       {/* Layer 1: Atmospheric Sky & Horizon */}
       <div ref={skyRef} className={styles.layerSky} aria-hidden="true" data-testid="parallax-layer-sky">
         <Image

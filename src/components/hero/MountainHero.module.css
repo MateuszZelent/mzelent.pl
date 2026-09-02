@@ -280,18 +280,16 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .animatedMist {
-    animation: none;
-  }
+.reducedMotion .animatedMist {
+  animation: none;
+}
 
-  .layerSky,
-  .layerMidground,
-  .layerMist,
-  .layerSnow,
-  .layerForeground,
-  .contentContainer {
-    transform: none !important;
-    opacity: 1 !important;
-  }
+.reducedMotion .layerSky,
+.reducedMotion .layerMidground,
+.reducedMotion .layerMist,
+.reducedMotion .layerSnow,
+.reducedMotion .layerForeground,
+.reducedMotion .contentContainer {
+  transform: none !important;
+  opacity: 1 !important;
 }

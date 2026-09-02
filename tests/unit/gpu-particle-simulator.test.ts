@@ -1,10 +1,20 @@
-import { describe, expect, it } from "vitest";
+import * as THREE from "three";
+import { describe, expect, it, vi } from "vitest";
 
 import { PointerTracker } from "../../src/visual/interaction/pointer-tracker";
 import {
   ATMOSPHERE_CONFIG,
   PARTICLE_TIER_CONFIGS,
 } from "../../src/visual/scenes/atmosphere/atmosphere-config";
+import { GpuParticleSimulator } from "../../src/visual/simulation/gpu-particle-simulator";
+
+function createMockRenderer(): THREE.WebGLRenderer {
+  return {
+    getRenderTarget: vi.fn().mockReturnValue(null),
+    setRenderTarget: vi.fn(),
+    render: vi.fn(),
+  } as unknown as THREE.WebGLRenderer;
+}
 
 describe("atmosphere configuration & tier budgets", () => {
   it("defines exact particle counts and texture dimensions per tier", () => {
@@ -40,6 +50,55 @@ describe("atmosphere configuration & tier budgets", () => {
     expect(ATMOSPHERE_CONFIG.simulation.pointerRadius).toBeGreaterThan(0.2);
     expect(ATMOSPHERE_CONFIG.colors.cyan).toMatch(/^#[0-9a-fA-F]{6}$/);
     expect(ATMOSPHERE_CONFIG.colors.violet).toMatch(/^#[0-9a-fA-F]{6}$/);
+  });
+});
+
+describe("GpuParticleSimulator stateful velocity double-buffering", () => {
+  it("initializes 4 double-buffered FBO targets and seeds initial state", () => {
+    const mockRenderer = createMockRenderer();
+    const simulator = new GpuParticleSimulator(mockRenderer, "medium");
+
+    expect(simulator.config.count).toBe(24_000);
+    expect(simulator.getCurrentTexture()).toBeDefined();
+    expect(simulator.getCurrentVelocityTexture()).toBeDefined();
+
+    // Initial render pass occurred to seed targetVelA and targetPosA
+    expect(mockRenderer.render).toHaveBeenCalled();
+
+    simulator.dispose();
+  });
+
+  it("executes two-pass simulation compute and ping-pongs render targets", () => {
+    const mockRenderer = createMockRenderer();
+    const simulator = new GpuParticleSimulator(mockRenderer, "low");
+
+    const initialPosTexture = simulator.getCurrentTexture();
+    const initialVelTexture = simulator.getCurrentVelocityTexture();
+
+    const outputPosTexture = simulator.step(
+      1.0,
+      0.016,
+      new THREE.Vector3(0.5, 0.5, 1.0),
+      new THREE.Vector2(0.1, -0.2),
+    );
+
+    // Verify output texture is returned and targets swapped
+    expect(outputPosTexture).toBeDefined();
+    expect(simulator.getCurrentTexture()).toBeDefined();
+    expect(simulator.getCurrentVelocityTexture()).toBeDefined();
+
+    // Position and velocity textures must swap
+    expect(simulator.getCurrentTexture()).not.toBe(initialPosTexture);
+    expect(simulator.getCurrentVelocityTexture()).not.toBe(initialVelTexture);
+
+    simulator.dispose();
+  });
+
+  it("disposes all 4 render targets, materials, and textures cleanly", () => {
+    const mockRenderer = createMockRenderer();
+    const simulator = new GpuParticleSimulator(mockRenderer, "high");
+
+    expect(() => simulator.dispose()).not.toThrow();
   });
 });
 

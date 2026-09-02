@@ -8,22 +8,34 @@ import {
 } from "../scenes/atmosphere/atmosphere-config";
 import { simulationFragmentShader } from "../shaders/atmosphere/simulation.frag";
 import { simulationVertexShader } from "../shaders/atmosphere/simulation.vert";
+import { velocityFragmentShader } from "../shaders/atmosphere/velocity.frag";
 
 export class GpuParticleSimulator {
   readonly config: ParticleTierConfig;
   private readonly renderer: THREE.WebGLRenderer;
-  private targetA: THREE.WebGLRenderTarget;
-  private targetB: THREE.WebGLRenderTarget;
-  private readTarget: THREE.WebGLRenderTarget;
-  private writeTarget: THREE.WebGLRenderTarget;
+
+  // Double-buffered render targets for Position (xyz = position, w = energy)
+  private targetPosA: THREE.WebGLRenderTarget;
+  private targetPosB: THREE.WebGLRenderTarget;
+  private readTargetPos: THREE.WebGLRenderTarget;
+  private writeTargetPos: THREE.WebGLRenderTarget;
+
+  // Double-buffered render targets for Velocity (xyz = velocity, w = age)
+  private targetVelA: THREE.WebGLRenderTarget;
+  private targetVelB: THREE.WebGLRenderTarget;
+  private readTargetVel: THREE.WebGLRenderTarget;
+  private writeTargetVel: THREE.WebGLRenderTarget;
 
   private readonly initialPositionTexture: THREE.DataTexture;
   private readonly initialVelocityTexture: THREE.DataTexture;
 
-  private readonly simScene: THREE.Scene;
+  private readonly simSceneVel: THREE.Scene;
+  private readonly simScenePos: THREE.Scene;
   private readonly simCamera: THREE.OrthographicCamera;
-  private readonly simMaterial: THREE.ShaderMaterial;
-  private readonly quadMesh: THREE.Mesh;
+  private readonly simMaterialVel: THREE.ShaderMaterial;
+  private readonly simMaterialPos: THREE.ShaderMaterial;
+  private readonly quadMeshVel: THREE.Mesh;
+  private readonly quadMeshPos: THREE.Mesh;
 
   constructor(renderer: THREE.WebGLRenderer, tier: QualityTier) {
     this.renderer = renderer;
@@ -54,7 +66,7 @@ export class GpuParticleSimulator {
       initialVelocities[idx + 0] = 0.0;
       initialVelocities[idx + 1] = 0.0;
       initialVelocities[idx + 2] = 0.0;
-      initialVelocities[idx + 3] = 0.0;
+      initialVelocities[idx + 3] = 0.0; // Initial age
     }
 
     this.initialPositionTexture = new THREE.DataTexture(
@@ -75,7 +87,7 @@ export class GpuParticleSimulator {
     );
     this.initialVelocityTexture.needsUpdate = true;
 
-    // Create double-buffered FBO render targets
+    // Create double-buffered FBO render targets with float precision
     const fboOptions: THREE.RenderTargetOptions = {
       format: THREE.RGBAFormat,
       type: THREE.FloatType,
@@ -85,18 +97,23 @@ export class GpuParticleSimulator {
       depthBuffer: false,
     };
 
-    this.targetA = new THREE.WebGLRenderTarget(textureWidth, textureHeight, fboOptions);
-    this.targetB = new THREE.WebGLRenderTarget(textureWidth, textureHeight, fboOptions);
-    this.readTarget = this.targetA;
-    this.writeTarget = this.targetB;
+    this.targetPosA = new THREE.WebGLRenderTarget(textureWidth, textureHeight, fboOptions);
+    this.targetPosB = new THREE.WebGLRenderTarget(textureWidth, textureHeight, fboOptions);
+    this.readTargetPos = this.targetPosA;
+    this.writeTargetPos = this.targetPosB;
 
-    // Fullscreen quad orthographic pass
+    this.targetVelA = new THREE.WebGLRenderTarget(textureWidth, textureHeight, fboOptions);
+    this.targetVelB = new THREE.WebGLRenderTarget(textureWidth, textureHeight, fboOptions);
+    this.readTargetVel = this.targetVelA;
+    this.writeTargetVel = this.targetVelB;
+
+    // Fullscreen quad orthographic passes
     this.simCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-    this.simScene = new THREE.Scene();
 
-    this.simMaterial = new THREE.ShaderMaterial({
+    // 1. Velocity simulation pass setup
+    this.simMaterialVel = new THREE.ShaderMaterial({
       vertexShader: simulationVertexShader,
-      fragmentShader: simulationFragmentShader,
+      fragmentShader: velocityFragmentShader,
       uniforms: {
         uPositions: { value: this.initialPositionTexture },
         uVelocities: { value: this.initialVelocityTexture },
@@ -117,50 +134,104 @@ export class GpuParticleSimulator {
       depthWrite: false,
     });
 
-    const quadGeo = new THREE.PlaneGeometry(2, 2);
-    this.quadMesh = new THREE.Mesh(quadGeo, this.simMaterial);
-    this.simScene.add(this.quadMesh);
+    this.simSceneVel = new THREE.Scene();
+    this.quadMeshVel = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), this.simMaterialVel);
+    this.simSceneVel.add(this.quadMeshVel);
 
-    // Initial render pass to seed targetA
+    // 2. Position simulation pass setup
+    this.simMaterialPos = new THREE.ShaderMaterial({
+      vertexShader: simulationVertexShader,
+      fragmentShader: simulationFragmentShader,
+      uniforms: {
+        uPositions: { value: this.initialPositionTexture },
+        uVelocities: { value: this.initialVelocityTexture },
+        uInitialPositions: { value: this.initialPositionTexture },
+        uTime: { value: 0.0 },
+        uDelta: { value: 0.016 },
+        uPointer: { value: new THREE.Vector3(0, 0, 0) },
+        uBounds: { value: new THREE.Vector3(bounds.x, bounds.y, bounds.z) },
+        uPointerRadius: { value: ATMOSPHERE_CONFIG.simulation.pointerRadius },
+      },
+      depthTest: false,
+      depthWrite: false,
+    });
+
+    this.simScenePos = new THREE.Scene();
+    this.quadMeshPos = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), this.simMaterialPos);
+    this.simScenePos.add(this.quadMeshPos);
+
+    // Initial render passes to seed targetPosA and targetVelA
     const prevRenderTarget = this.renderer.getRenderTarget();
-    this.renderer.setRenderTarget(this.targetA);
-    this.renderer.render(this.simScene, this.simCamera);
+
+    this.renderer.setRenderTarget(this.targetVelA);
+    this.renderer.render(this.simSceneVel, this.simCamera);
+
+    this.renderer.setRenderTarget(this.targetPosA);
+    this.renderer.render(this.simScenePos, this.simCamera);
+
     this.renderer.setRenderTarget(prevRenderTarget);
   }
 
   step(time: number, delta: number, pointer: THREE.Vector3, pointerVelocity: THREE.Vector2): THREE.Texture {
-    // Update simulation uniforms
-    this.simMaterial.uniforms.uPositions.value = this.readTarget.texture;
-    this.simMaterial.uniforms.uTime.value = time;
-    this.simMaterial.uniforms.uDelta.value = Math.min(delta, 0.05);
-    this.simMaterial.uniforms.uPointer.value.copy(pointer);
-    this.simMaterial.uniforms.uPointerVelocity.value.copy(pointerVelocity);
+    const clampedDelta = Math.min(delta, 0.05);
 
-    // Perform FBO compute step
+    // === Pass 1: Compute updated velocity ===
+    this.simMaterialVel.uniforms.uPositions.value = this.readTargetPos.texture;
+    this.simMaterialVel.uniforms.uVelocities.value = this.readTargetVel.texture;
+    this.simMaterialVel.uniforms.uTime.value = time;
+    this.simMaterialVel.uniforms.uDelta.value = clampedDelta;
+    this.simMaterialVel.uniforms.uPointer.value.copy(pointer);
+    this.simMaterialVel.uniforms.uPointerVelocity.value.copy(pointerVelocity);
+
     const prevRenderTarget = this.renderer.getRenderTarget();
-    this.renderer.setRenderTarget(this.writeTarget);
-    this.renderer.render(this.simScene, this.simCamera);
+
+    this.renderer.setRenderTarget(this.writeTargetVel);
+    this.renderer.render(this.simSceneVel, this.simCamera);
+
+    // === Pass 2: Compute updated position using new velocity ===
+    this.simMaterialPos.uniforms.uPositions.value = this.readTargetPos.texture;
+    this.simMaterialPos.uniforms.uVelocities.value = this.writeTargetVel.texture;
+    this.simMaterialPos.uniforms.uTime.value = time;
+    this.simMaterialPos.uniforms.uDelta.value = clampedDelta;
+    this.simMaterialPos.uniforms.uPointer.value.copy(pointer);
+
+    this.renderer.setRenderTarget(this.writeTargetPos);
+    this.renderer.render(this.simScenePos, this.simCamera);
+
     this.renderer.setRenderTarget(prevRenderTarget);
 
-    // Swap buffers
-    const outputTexture = this.writeTarget.texture;
-    const temp = this.readTarget;
-    this.readTarget = this.writeTarget;
-    this.writeTarget = temp;
+    // === Buffer Swaps (Ping-Pong) ===
+    const outputPosTexture = this.writeTargetPos.texture;
 
-    return outputTexture;
+    const tempPos = this.readTargetPos;
+    this.readTargetPos = this.writeTargetPos;
+    this.writeTargetPos = tempPos;
+
+    const tempVel = this.readTargetVel;
+    this.readTargetVel = this.writeTargetVel;
+    this.writeTargetVel = tempVel;
+
+    return outputPosTexture;
   }
 
   getCurrentTexture(): THREE.Texture {
-    return this.readTarget.texture;
+    return this.readTargetPos.texture;
+  }
+
+  getCurrentVelocityTexture(): THREE.Texture {
+    return this.readTargetVel.texture;
   }
 
   dispose(): void {
-    this.targetA.dispose();
-    this.targetB.dispose();
+    this.targetPosA.dispose();
+    this.targetPosB.dispose();
+    this.targetVelA.dispose();
+    this.targetVelB.dispose();
     this.initialPositionTexture.dispose();
     this.initialVelocityTexture.dispose();
-    this.simMaterial.dispose();
-    this.quadMesh.geometry.dispose();
+    this.simMaterialVel.dispose();
+    this.simMaterialPos.dispose();
+    this.quadMeshVel.geometry.dispose();
+    this.quadMeshPos.geometry.dispose();
   }
 }

@@ -32,19 +32,19 @@ export function Header() {
         <nav className={styles.nav} aria-label="Main Navigation">
           <ul className={styles.navList}>
             <li>
-              <a href="#research" className={styles.navLink}>
+              <Link href="/#research" className={styles.navLink}>
                 {t.nav.research}
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#grants" className={styles.navLink}>
+              <Link href="/#grants" className={styles.navLink}>
                 {t.nav.grants}
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#software" className={styles.navLink}>
+              <Link href="/#software" className={styles.navLink}>
                 {t.nav.software}
-              </a>
+              </Link>
             </li>
             <li>
               <Link href="/publications" className={styles.navLink}>

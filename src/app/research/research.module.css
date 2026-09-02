@@ -1,0 +1,188 @@
+.pageContainer {
+  min-height: 100vh;
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+  display: flex;
+  flex-direction: column;
+}
+
+.mainContent {
+  flex-grow: 1;
+  padding: clamp(7rem, 12vh, 10rem) var(--container-gutter) clamp(4rem, 8vh, 6rem) var(--container-gutter);
+  max-width: var(--container-max);
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-mono-sm);
+  color: var(--accent-cyan);
+  text-decoration: none;
+  margin-bottom: var(--space-6);
+  transition: color var(--duration-fast) ease;
+}
+
+.backLink:hover {
+  color: var(--color-ink);
+}
+
+.headerArea {
+  margin-bottom: var(--space-12);
+  border-bottom: 1px solid var(--color-line-medium);
+  padding-bottom: var(--space-8);
+}
+
+.badge {
+  display: inline-block;
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-mono-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+  color: var(--accent-warm);
+  background: rgba(230, 180, 80, 0.12);
+  border: 1px solid rgba(230, 180, 80, 0.3);
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-3);
+}
+
+.title {
+  font-family: var(--font-display, sans-serif);
+  font-size: var(--text-display-xl);
+  font-weight: 700;
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-ink);
+  margin: 0 0 var(--space-3) 0;
+}
+
+.titleAccent {
+  background: linear-gradient(135deg, var(--color-ink) 30%, var(--accent-cyan) 85%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.lead {
+  font-family: var(--font-display, sans-serif);
+  font-size: var(--text-body-lg);
+  line-height: var(--leading-relaxed);
+  color: var(--color-ink-muted);
+  max-width: 860px;
+  margin: 0;
+}
+
+.domainSections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.domainCard {
+  background: var(--color-canvas-glass);
+  border: 1px solid var(--color-line-medium);
+  border-radius: var(--radius-md);
+  padding: clamp(1.5rem, 4vw, 3rem);
+  backdrop-filter: blur(12px);
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: var(--space-8);
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .domainCard {
+    grid-template-columns: 1fr;
+  }
+}
+
+.domainContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.domainIndex {
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-mono-xs);
+  color: var(--accent-cyan);
+  letter-spacing: var(--tracking-wider);
+}
+
+.domainHeading {
+  font-family: var(--font-display, sans-serif);
+  font-size: var(--text-heading-md);
+  font-weight: 700;
+  color: var(--color-ink);
+  margin: 0;
+}
+
+.domainDesc {
+  font-family: var(--font-display, sans-serif);
+  font-size: var(--text-body-base);
+  line-height: var(--leading-relaxed);
+  color: var(--color-ink-muted);
+  margin: 0;
+}
+
+.equationBlock {
+  background: var(--color-canvas-subtle);
+  border: 1px solid var(--color-line-medium);
+  border-left: 3px solid var(--accent-warm);
+  border-radius: var(--radius-xs);
+  padding: 0.75rem 1rem;
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-mono-xs);
+  color: var(--accent-warm);
+  overflow-x: auto;
+}
+
+.interactiveDiagram {
+  background: rgba(3, 4, 5, 0.75);
+  border: 1px solid var(--color-line-medium);
+  border-radius: var(--radius-sm);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 240px;
+}
+
+.diagramCaption {
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-mono-xs);
+  color: var(--color-ink-muted);
+  margin-top: var(--space-3);
+  text-align: center;
+}
+
+.linkGroup {
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  margin-top: var(--space-2);
+}
+
+.actionLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-mono-xs);
+  color: var(--accent-cyan);
+  text-decoration: none;
+  border-bottom: 1px dashed var(--accent-cyan);
+  transition: all var(--duration-fast) ease;
+}
+
+.actionLink:hover {
+  color: var(--color-ink);
+  border-bottom-style: solid;
+}

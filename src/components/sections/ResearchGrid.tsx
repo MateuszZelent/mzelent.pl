@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import React, { useRef } from "react";
 
 import { researchDomains } from "../../content";
@@ -8,7 +9,7 @@ import styles from "./ResearchGrid.module.css";
 
 export function ResearchGrid() {
   const containerRef = useRef<HTMLElement>(null);
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
 
   const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     const card = e.currentTarget;
@@ -73,6 +74,14 @@ export function ResearchGrid() {
               </div>
             </div>
           ))}
+        </div>
+
+        <div className={styles.detailAction}>
+          <Link href="/research" className={styles.detailLink}>
+            {language === "pl"
+              ? "Zobacz szczegółowy opis osi badawczych i formalizm teoretyczny →"
+              : "Explore detailed research axes and theoretical formalism →"}
+          </Link>
         </div>
       </div>
     </section>

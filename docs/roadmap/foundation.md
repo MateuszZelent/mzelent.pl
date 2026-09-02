@@ -144,17 +144,23 @@ Each slice uses reference audit → implementation → quality gate.
 
 ## Phase 5 — detail routes
 
+**Status: Accepted**
+
+Report: `docs/roadmap/phase-5-detail-routes-report.md`
+
 - research;
 - software;
 - publications;
 - funded projects;
 - talks;
-- notes/blog;
+- admin/scholar;
 - about/CV/contact.
 
-Maintain semantic accessibility and avoid forcing the full visual engine onto reading-heavy routes.
+All routes maintain semantic accessibility, full bilingual parity (PL/EN), zero axe-core violations, and strict typed schemas.
 
 ## Phase 6 — production hardening
+
+**Status: Active**
 
 - final asset compression;
 - browser/device matrix;

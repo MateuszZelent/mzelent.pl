@@ -1,13 +1,14 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 
 import { software } from "../../content";
 import { useTranslation } from "../../content/i18n/i18n-context";
 import styles from "./SoftwareShowcase.module.css";
 
 export function SoftwareShowcase() {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
 
   return (
     <section id="software" className={styles.section} aria-label={t.software.title}>
@@ -72,6 +73,14 @@ export function SoftwareShowcase() {
               </div>
             </article>
           ))}
+        </div>
+
+        <div className={styles.detailAction}>
+          <Link href="/software" className={styles.detailLink}>
+            {language === "pl"
+              ? "Zobacz pełną dokumentację pakietów obliczeniowych i benchmarki →"
+              : "View complete computational package documentation and benchmarks →"}
+          </Link>
         </div>
       </div>
     </section>

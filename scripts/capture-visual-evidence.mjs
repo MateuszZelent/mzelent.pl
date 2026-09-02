@@ -96,6 +96,33 @@ async function capture() {
   });
   console.log("Captured cv-academic-profile.png");
 
+  // 9. Navigate to /research
+  console.log("Navigating to /research...");
+  await page.goto("http://localhost:3154/research", { waitUntil: "networkidle" });
+  await page.screenshot({
+    path: resolve(artifactDir, "research-detail-axes.png"),
+    fullPage: true,
+  });
+  console.log("Captured research-detail-axes.png");
+
+  // 10. Navigate to /software
+  console.log("Navigating to /software...");
+  await page.goto("http://localhost:3154/software", { waitUntil: "networkidle" });
+  await page.screenshot({
+    path: resolve(artifactDir, "software-packages-page.png"),
+    fullPage: true,
+  });
+  console.log("Captured software-packages-page.png");
+
+  // 11. Navigate to /talks
+  console.log("Navigating to /talks...");
+  await page.goto("http://localhost:3154/talks", { waitUntil: "networkidle" });
+  await page.screenshot({
+    path: resolve(artifactDir, "talks-seminars-page.png"),
+    fullPage: true,
+  });
+  console.log("Captured talks-seminars-page.png");
+
   await browser.close();
   console.log("Finished capturing visual evidence!");
 }

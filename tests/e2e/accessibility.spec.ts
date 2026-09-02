@@ -52,4 +52,25 @@ test.describe("Accessibility & Semantic Integrity", () => {
     const results = await new AxeBuilder({ page }).analyze();
     expect(results.violations).toEqual([]);
   });
+
+  test("has no automated accessibility violations on the research page @a11y", async ({ page }) => {
+    await page.goto("/research");
+
+    const results = await new AxeBuilder({ page }).analyze();
+    expect(results.violations).toEqual([]);
+  });
+
+  test("has no automated accessibility violations on the software page @a11y", async ({ page }) => {
+    await page.goto("/software");
+
+    const results = await new AxeBuilder({ page }).analyze();
+    expect(results.violations).toEqual([]);
+  });
+
+  test("has no automated accessibility violations on the talks page @a11y", async ({ page }) => {
+    await page.goto("/talks");
+
+    const results = await new AxeBuilder({ page }).analyze();
+    expect(results.violations).toEqual([]);
+  });
 });

@@ -8,6 +8,7 @@ export const dictionaryPl: TranslationDictionary = {
     software: "Oprogramowanie",
     publications: "Publikacje",
     cv: "CV",
+    talks: "Wystąpienia",
     visualLab: "Laboratorium Wizualne",
     activeResearch: "Aktywne Badania",
     labSandbox: "Piaskownica Lab",
@@ -121,5 +122,46 @@ export const dictionaryPl: TranslationDictionary = {
     talksTitle: "Wybrane Wystąpienia Konferencyjne",
     contactTitle: "Dane Kontaktowe & Identyfikatory",
     printCv: "Drukuj / Zapisz jako PDF",
+  },
+  researchPage: {
+    badge: "Obszary Badań Naukowych",
+    heading: "Fizyka Teoretyczna",
+    headingAccent: "i Nanomagnonika Obliczeniowa",
+    lead: "Badania nad nieliniowymi zjawiskami falowymi, chiralnymi teksturami magnetycznymi oraz implementacją układów neuromorficznych na bazie magnoniki.",
+    domain1Title: "Topologiczne Solitony & Chiralne Skyrmiony",
+    domain1Desc:
+      "Badania stabilności i dynamiki chiralnych skyrmionów magnetycznych w cienkich warstwach i nanosiatkach. Analiza oddziaływania Dzyaloshinskiego-Moriyi (DMI) oraz sprzężenia geometrii krzywoliniowej z transportem solitonów.",
+    domain1Math:
+      "E_DMI = \\int d^3r \\, D \\cdot [m_z (\\nabla \\cdot \\mathbf{m}) - (\\mathbf{m} \\cdot \\nabla) m_z]",
+    domain2Title: "Optyka Fal Spinowych & Media Gradientowe",
+    domain2Desc:
+      "Projektowanie soczewek magnonicznych, pryzmatów i falowodów o przestrzennie modulowanym współczynniku załamania. Realizacja analogii optycznych, takich jak prawo Snella dla magnonów, wiązki bezdyfrakcyjne (Airy, Bessel) i kaustyki magnoniczne.",
+    domain2Math:
+      "n(\\mathbf{r}) = \\frac{k(\\mathbf{r})}{k_0} = \\sqrt{\\frac{\\omega - \\gamma \\mu_0 H_{eff}(\\mathbf{r})}{\\gamma D_{ex}}}",
+    domain3Title: "Symulacje GPU & Neuromorficzne Rezerwuary MSCA",
+    domain3Desc:
+      "Rozwój wysokowydajnych solwerów mikromagnetycznych wykorzystujących akcelerację CUDA (Mumax3, Boris). Badania auto-oscylatorów spin-torque w ramach grantu MSCA 'CNMA' dla biopodobnego rozpoznawania wzorców.",
+    domain3Math:
+      "\\frac{\\partial \\mathbf{m}}{\\partial t} = -\\gamma \\mathbf{m} \\times \\mathbf{H}_{eff} + \\alpha \\mathbf{m} \\times \\frac{\\partial \\mathbf{m}}{\\partial t} + \\mathbf{\\tau}_{STT}",
+    backToHome: "← Strona Główna",
+  },
+  softwarePage: {
+    badge: "Oprogramowanie Open-Source",
+    heading: "Pakiety Obliczeniowe",
+    headingAccent: "i Narzędzia Naukowe",
+    lead: "Autorskie pakiety do modelowania zjawisk magnonicznych, śledzenia trajektorii solitonów oraz przetwarzania symulacji GPU.",
+    quickstart: "Szybki start & Instalacja",
+    techStack: "Stos technologiczny & Wymagania",
+    keyFeatures: "Główne możliwości",
+    license: "Licencja Open-Source",
+  },
+  talksPage: {
+    badge: "Działalność Konferencyjna",
+    heading: "Wykłady i Seminaria",
+    headingAccent: "Międzynarodowe",
+    lead: "Prezentacje zaproszone (Invited Talks), referaty konferencyjne oraz seminaria naukowe w wiodących ośrodkach magnetyzmu i spintroniki.",
+    filterAll: "Wszystkie wystąpienia",
+    filterInvited: "Tylko zaproszone (Invited)",
+    abstractTitle: "Abstrakt wystąpienia",
   },
 };

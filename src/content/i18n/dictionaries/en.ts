@@ -8,6 +8,7 @@ export const dictionaryEn: TranslationDictionary = {
     software: "Software",
     publications: "Publications",
     cv: "CV",
+    talks: "Talks & Seminars",
     visualLab: "Visual Lab",
     activeResearch: "Active Research",
     labSandbox: "Lab Sandbox",
@@ -120,5 +121,46 @@ export const dictionaryEn: TranslationDictionary = {
     talksTitle: "Selected Invited Lectures & Presentations",
     contactTitle: "Contact Information & Academic Identifiers",
     printCv: "Print / Save as PDF",
+  },
+  researchPage: {
+    badge: "Scientific Research Axes",
+    heading: "Theoretical Physics",
+    headingAccent: "& Computational Nanomagnonics",
+    lead: "Fundamental investigations of nonlinear wave phenomena, chiral magnetic textures, and magnonic implementations of reservoir computing architectures.",
+    domain1Title: "Topological Solitons & Chiral Skyrmions",
+    domain1Desc:
+      "Stability, nucleation, and dynamical steering of magnetic skyrmions in thin films and curved nanomembranes. Analysis of Dzyaloshinskii-Moriya Interaction (DMI) and geometry-induced gauge fields.",
+    domain1Math:
+      "E_DMI = \\int d^3r \\, D \\cdot [m_z (\\nabla \\cdot \\mathbf{m}) - (\\mathbf{m} \\cdot \\nabla) m_z]",
+    domain2Title: "Spin-Wave Optics & Graded Refractive Media",
+    domain2Desc:
+      "Design of magnonic lenses, prisms, and waveguides with spatially engineered refractive index profiles. Physical realization of optical wave analogies, Snell's law for spin waves, nondiffracting beams, and caustic focalization.",
+    domain2Math:
+      "n(\\mathbf{r}) = \\frac{k(\\mathbf{r})}{k_0} = \\sqrt{\\frac{\\omega - \\gamma \\mu_0 H_{eff}(\\mathbf{r})}{\\gamma D_{ex}}}",
+    domain3Title: "GPU Micromagnetics & Neuromorphic Reservoirs (MSCA)",
+    domain3Desc:
+      "High-performance micromagnetic solver pipelines leveraging CUDA GPU acceleration (Mumax3, Boris). Exploration of spin-torque auto-oscillators under MSCA 'CNMA' fellowship for bio-inspired pattern recognition.",
+    domain3Math:
+      "\\frac{\\partial \\mathbf{m}}{\\partial t} = -\\gamma \\mathbf{m} \\times \\mathbf{H}_{eff} + \\alpha \\mathbf{m} \\times \\frac{\\partial \\mathbf{m}}{\\partial t} + \\mathbf{\\tau}_{STT}",
+    backToHome: "← Back to Homepage",
+  },
+  softwarePage: {
+    badge: "Open-Source Scientific Software",
+    heading: "Computational Packages",
+    headingAccent: "& Physics Tooling",
+    lead: "Open-source software packages designed for micromagnetic simulation processing, soliton trajectory tracking, and magnonic wave optics analysis.",
+    quickstart: "Quickstart & Installation",
+    techStack: "Technology Stack & Requirements",
+    keyFeatures: "Core Capabilities",
+    license: "Open-Source License",
+  },
+  talksPage: {
+    badge: "Conference & Academic Dissemination",
+    heading: "International Lectures",
+    headingAccent: "& Invited Seminars",
+    lead: "Invited presentations, plenary lectures, and technical seminars delivered across international magnetism, spintronics, and computational physics venues.",
+    filterAll: "All Presentations",
+    filterInvited: "Invited Lectures Only",
+    abstractTitle: "Presentation Abstract",
   },
 };

@@ -8,6 +8,7 @@ export interface TranslationDictionary {
     software: string;
     publications: string;
     cv: string;
+    talks: string;
     visualLab: string;
     activeResearch: string;
     labSandbox: string;
@@ -116,5 +117,40 @@ export interface TranslationDictionary {
     talksTitle: string;
     contactTitle: string;
     printCv: string;
+  };
+  researchPage: {
+    badge: string;
+    heading: string;
+    headingAccent: string;
+    lead: string;
+    domain1Title: string;
+    domain1Desc: string;
+    domain1Math: string;
+    domain2Title: string;
+    domain2Desc: string;
+    domain2Math: string;
+    domain3Title: string;
+    domain3Desc: string;
+    domain3Math: string;
+    backToHome: string;
+  };
+  softwarePage: {
+    badge: string;
+    heading: string;
+    headingAccent: string;
+    lead: string;
+    quickstart: string;
+    techStack: string;
+    keyFeatures: string;
+    license: string;
+  };
+  talksPage: {
+    badge: string;
+    heading: string;
+    headingAccent: string;
+    lead: string;
+    filterAll: string;
+    filterInvited: string;
+    abstractTitle: string;
   };
 }

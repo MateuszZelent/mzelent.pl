@@ -82,6 +82,11 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/talks" className={styles.footerLink}>
+                  {t.nav.talks}
+                </Link>
+              </li>
+              <li>
                 <Link href="/lab/visual-system?tier=medium" className={styles.footerLink}>
                   {t.nav.visualLab}
                 </Link>
@@ -93,16 +98,22 @@ export function Footer() {
             <span className={styles.colTitle}>{t.footer.architectureTitle}</span>
             <ul className={styles.linkList}>
               <li>
-                <span className={styles.stackTag}>Next.js 16 App Router</span>
+                <Link href="/research" className={styles.footerLink}>
+                  {t.nav.research} (Detail)
+                </Link>
               </li>
               <li>
-                <span className={styles.stackTag}>Three.js WebGL2 & GLSL</span>
+                <Link href="/software" className={styles.footerLink}>
+                  {t.nav.software} (Detail)
+                </Link>
               </li>
               <li>
-                <span className={styles.stackTag}>GPU Ping-Pong FBO</span>
+                <Link href="/admin/scholar" className={styles.footerLink}>
+                  Admin Scholar Sync
+                </Link>
               </li>
               <li>
-                <span className={styles.stackTag}>Zod Content Schemas</span>
+                <span className={styles.stackTag}>Next.js 16 • Three.js WebGL2</span>
               </li>
             </ul>
           </div>

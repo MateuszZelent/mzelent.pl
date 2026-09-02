@@ -22,8 +22,9 @@ The governing principle is:
 - **Phase 2:** Accepted
 - **Phase 3:** Accepted
 - **Phase 4:** Accepted
-- **Phase 5:** Active
-- **Current project phase:** Phase 5 — Detail Routes & Administration
+- **Phase 5:** Accepted
+- **Phase 6:** Active
+- **Current project phase:** Phase 6 — Production Hardening & Launch
 
 Until the Phase 1 spike is accepted:
 

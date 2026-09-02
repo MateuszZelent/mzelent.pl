@@ -60,6 +60,7 @@ export interface TranslationDictionary {
     doi: string;
     copyBibtex: string;
     copied: string;
+    citations: string;
   };
   affiliations: {
     title: string;
@@ -85,6 +86,8 @@ export interface TranslationDictionary {
     backToHome: string;
     syncNotice: string;
     noResults: string;
+    citationsLabel: string;
+    articlesLabel: string;
   };
   adminScholar: {
     badge: string;

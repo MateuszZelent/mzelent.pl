@@ -60,6 +60,7 @@ export const dictionaryEn: TranslationDictionary = {
     doi: "DOI",
     copyBibtex: "Copy BibTeX",
     copied: "Copied!",
+    citations: "Citations",
   },
   affiliations: {
     title: "Institutional Affiliations & Funding",
@@ -88,6 +89,8 @@ export const dictionaryEn: TranslationDictionary = {
     backToHome: "← Back to Homepage",
     syncNotice: "Data synchronized from Dr. Mateusz Zelent's Google Scholar profile.",
     noResults: "No publications found matching the specified filter criteria.",
+    citationsLabel: "Total Citations",
+    articlesLabel: "Peer-Reviewed Works",
   },
   adminScholar: {
     badge: "Admin Dashboard",

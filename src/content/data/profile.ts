@@ -24,11 +24,16 @@ export const profileData: Profile = {
   ],
   identifiers: {
     orcid: "0000-0002-3908-0118",
-    googleScholar: "https://scholar.google.com/citations?user=mateusz_zelent",
+    googleScholar: "https://scholar.google.pl/citations?user=XkzMx4IAAAAJ&hl=en",
     github: "https://github.com/MateuszZelent",
   },
   contact: {
     email: "mateusz.zelent@amu.edu.pl",
     office: "Room 1.54, Faculty of Physics, Uniwersytetu Poznańskiego 2, 61-614 Poznań",
+  },
+  metrics: {
+    citations: 755,
+    hIndex: 16,
+    i10Index: 21,
   },
 };

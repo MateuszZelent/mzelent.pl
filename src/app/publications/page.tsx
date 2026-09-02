@@ -69,9 +69,34 @@ export default function PublicationsPage() {
           <div className={styles.scholarNotice}>
             <span className={styles.scholarDot} aria-hidden="true" />
             <span>{t.publicationsPage.syncNotice}</span>
-            <Link href="/admin/scholar" className={styles.adminLink}>
-              [Scholar Ingestion Panel →]
-            </Link>
+            <a
+              href="https://scholar.google.pl/citations?user=XkzMx4IAAAAJ&hl=en"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.adminLink}
+              aria-label="Google Scholar Profile"
+            >
+              [Google Scholar Profile ↗]
+            </a>
+          </div>
+
+          <div className={styles.statsStrip} aria-label="Google Scholar Bibliometric Metrics">
+            <div className={styles.statCard}>
+              <span className={styles.statValue}>755+</span>
+              <span className={styles.statLabel}>{t.publicationsPage.citationsLabel}</span>
+            </div>
+            <div className={styles.statCard}>
+              <span className={styles.statValue}>16</span>
+              <span className={styles.statLabel}>h-index</span>
+            </div>
+            <div className={styles.statCard}>
+              <span className={styles.statValue}>21</span>
+              <span className={styles.statLabel}>i10-index</span>
+            </div>
+            <div className={styles.statCard}>
+              <span className={styles.statValue}>{publications.length}</span>
+              <span className={styles.statLabel}>{t.publicationsPage.articlesLabel}</span>
+            </div>
           </div>
         </header>
 
@@ -126,6 +151,9 @@ export default function PublicationsPage() {
                 <div className={styles.metaRow}>
                   <span className={styles.journalPill}>{pub.journal}</span>
                   <span className={styles.yearPill}>{pub.year}</span>
+                  {typeof pub.citations === "number" && pub.citations > 0 && (
+                    <span className={styles.citationsBadge}>Cited: {pub.citations}</span>
+                  )}
                   {pub.openAccess && (
                     <span className={styles.openAccessBadge}>{t.publications.openAccess}</span>
                   )}

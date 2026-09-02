@@ -90,16 +90,27 @@
   font-size: var(--text-mono-xs);
   font-weight: 600;
   padding: 0.2rem 0.6rem;
-  background: var(--accent-cyan-soft);
-  border: 1px solid rgba(87, 230, 221, 0.3);
+  background: var(--accent-primary-soft);
+  border: 1px solid var(--accent-primary-glow);
   border-radius: var(--radius-pill);
-  color: var(--accent-cyan);
+  color: var(--accent-primary);
 }
 
 .yearPill {
   font-family: var(--font-mono, monospace);
   font-size: var(--text-mono-xs);
   color: var(--color-ink-muted);
+}
+
+.citationsBadge {
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-mono-xs);
+  color: var(--accent-warm);
+  background: var(--accent-warm-soft);
+  border: 1px solid rgba(213, 183, 121, 0.35);
+  padding: 0.15rem 0.55rem;
+  border-radius: var(--radius-pill);
+  font-weight: 600;
 }
 
 .openAccessBadge {

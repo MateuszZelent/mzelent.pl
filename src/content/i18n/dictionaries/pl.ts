@@ -60,6 +60,7 @@ export const dictionaryPl: TranslationDictionary = {
     doi: "DOI",
     copyBibtex: "Kopiuj BibTeX",
     copied: "Skopiowano!",
+    citations: "Cytowania",
   },
   affiliations: {
     title: "Afiliacje Naukowe & Finansowanie",
@@ -89,6 +90,8 @@ export const dictionaryPl: TranslationDictionary = {
     backToHome: "← Strona Główna",
     syncNotice: "Dane zsynchronizowane z profilem Google Scholar dra Mateusza Zelenta.",
     noResults: "Brak publikacji spełniających podane kryteria wyszukiwania.",
+    citationsLabel: "Liczba cytowań",
+    articlesLabel: "Prace recenzowane",
   },
   adminScholar: {
     badge: "Panel Administracyjny",

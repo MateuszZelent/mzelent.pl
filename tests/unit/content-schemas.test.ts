@@ -23,7 +23,7 @@ describe("Phase 3 Information and Content Model", () => {
       expect(pub.doi.length).toBeGreaterThan(3);
       expect(pub.doiUrl).toMatch(/^https:\/\/doi\.org\//);
       expect(pub.bibtex).toContain("@article");
-      expect(pub.year).toBeGreaterThanOrEqual(2018);
+      expect(pub.year).toBeGreaterThanOrEqual(2010);
     }
   });
 

@@ -34,6 +34,11 @@ export function SelectedPublications() {
               <div className={styles.metaRow}>
                 <span className={styles.journalPill}>{pub.journal}</span>
                 <span className={styles.yearPill}>{pub.year}</span>
+                {typeof pub.citations === "number" && pub.citations > 0 && (
+                  <span className={styles.citationsBadge}>
+                    ★ {pub.citations} {t.publications.citations}
+                  </span>
+                )}
                 {pub.openAccess && (
                   <span className={styles.openAccessBadge}>{t.publications.openAccess}</span>
                 )}

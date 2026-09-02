@@ -108,6 +108,44 @@
   box-shadow: 0 0 6px var(--accent-cyan);
 }
 
+.statsStrip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+}
+
+.statCard {
+  display: flex;
+  flex-direction: column;
+  padding: 0.75rem 1.25rem;
+  background: var(--color-canvas-glass);
+  border: 1px solid var(--color-line-medium);
+  border-radius: var(--radius-md);
+  min-width: 130px;
+}
+
+.statValue {
+  font-family: var(--font-display, sans-serif);
+  font-size: var(--text-heading-lg);
+  font-weight: 700;
+  color: var(--color-ink);
+  line-height: 1.1;
+  background: var(--gradient-text-hero);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.statLabel {
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-mono-xs);
+  color: var(--color-ink-muted);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+  margin-top: var(--space-1);
+}
+
 .controlsBar {
   display: flex;
   flex-direction: column;
@@ -223,16 +261,27 @@
   font-size: var(--text-mono-xs);
   font-weight: 600;
   padding: 0.2rem 0.6rem;
-  background: var(--accent-cyan-soft);
-  border: 1px solid rgba(87, 230, 221, 0.3);
+  background: var(--accent-primary-soft);
+  border: 1px solid var(--accent-primary-glow);
   border-radius: var(--radius-pill);
-  color: var(--accent-cyan);
+  color: var(--accent-primary);
 }
 
 .yearPill {
   font-family: var(--font-mono, monospace);
   font-size: var(--text-mono-xs);
   color: var(--color-ink-muted);
+}
+
+.citationsBadge {
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-mono-xs);
+  color: var(--accent-warm);
+  background: var(--accent-warm-soft);
+  border: 1px solid rgba(213, 183, 121, 0.35);
+  padding: 0.15rem 0.55rem;
+  border-radius: var(--radius-pill);
+  font-weight: 600;
 }
 
 .openAccessBadge {

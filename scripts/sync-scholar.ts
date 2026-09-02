@@ -20,9 +20,11 @@ export interface ScholarAuthorProfile {
 }
 
 export const SCHOLAR_CONFIG: ScholarAuthorProfile = {
-  scholarId: "mateusz_zelent",
+  scholarId: "XkzMx4IAAAAJ",
   name: "Mateusz Zelent",
   affiliation: "RPTU Kaiserslautern-Landau / Adam Mickiewicz University",
+  totalCitations: 755,
+  hIndex: 16,
 };
 
 /**

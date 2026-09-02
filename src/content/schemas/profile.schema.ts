@@ -26,6 +26,13 @@ export const ProfileSchema = z.object({
     email: z.string().email(),
     office: z.string().optional(),
   }),
+  metrics: z
+    .object({
+      citations: z.number().nonnegative(),
+      hIndex: z.number().nonnegative(),
+      i10Index: z.number().nonnegative(),
+    })
+    .optional(),
 });
 
 export type Profile = z.infer<typeof ProfileSchema>;

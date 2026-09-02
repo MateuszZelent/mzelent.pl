@@ -24,7 +24,7 @@ void main() {
   vec3 snowColor = mix(vec3(0.92, 0.96, 1.0), vec3(1.0, 1.0, 1.0), vSeed);
 
   // Discrete, delicate opacity with visible crystalline brilliance
-  float alpha = shape * (0.7 + 0.3 * vSeed) * depthFade;
+  float alpha = shape * (0.85 + 0.15 * vSeed) * depthFade;
   
   if (alpha < 0.01) {
     discard;

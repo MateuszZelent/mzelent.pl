@@ -24,7 +24,7 @@ void main() {
   
   // Point size calculation with seed variation
   float size = uBaseSize * (0.8 + 0.6 * vSeed);
-  gl_PointSize = size * (240.0 / max(depth, 0.5)) * uPixelRatio;
-  gl_PointSize = clamp(gl_PointSize, 1.5, 9.0);
+  gl_PointSize = size * (260.0 / max(depth, 0.5)) * uPixelRatio;
+  gl_PointSize = clamp(gl_PointSize, 2.0, 14.0);
 }
 `;

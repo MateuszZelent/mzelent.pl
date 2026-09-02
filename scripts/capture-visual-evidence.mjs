@@ -11,9 +11,20 @@ async function capture() {
   const page = await context.newPage();
 
   console.log("Navigating to http://localhost:3154/?tier=medium...");
-  await page.goto("http://localhost:3154/?tier=medium", { waitUntil: "networkidle" });
+  await page.goto("http://localhost:3154/?tier=medium", { waitUntil: "domcontentloaded" });
 
   const artifactDir = "/home/kkingstoun/.gemini/antigravity-ide/brain/06fae17a-5de0-4f19-a175-cd8b7c5b8a0c";
+
+  // 0. Research section with 3D Parallax Models (NVIDIA style)
+  const researchElem = page.locator("#research");
+  if (await researchElem.count()) {
+    await researchElem.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(600);
+    await page.screenshot({
+      path: resolve(artifactDir, "homepage-research-3d-models.png"),
+    });
+    console.log("Captured homepage-research-3d-models.png");
+  }
 
   // 1. Grants section
   const grantsElem = page.locator("#grants");
@@ -50,7 +61,7 @@ async function capture() {
 
   // 4. Navigate to /publications
   console.log("Navigating to /publications...");
-  await page.goto("http://localhost:3154/publications", { waitUntil: "networkidle" });
+  await page.goto("http://localhost:3154/publications", { waitUntil: "domcontentloaded" });
   await page.screenshot({
     path: resolve(artifactDir, "publications-archive-page.png"),
   });
@@ -69,7 +80,7 @@ async function capture() {
 
   // 6. Navigate to /admin/scholar
   console.log("Navigating to /admin/scholar...");
-  await page.goto("http://localhost:3154/admin/scholar", { waitUntil: "networkidle" });
+  await page.goto("http://localhost:3154/admin/scholar", { waitUntil: "domcontentloaded" });
   await page.screenshot({
     path: resolve(artifactDir, "admin-scholar-dashboard.png"),
   });
@@ -89,7 +100,7 @@ async function capture() {
 
   // 8. Navigate to /cv
   console.log("Navigating to /cv...");
-  await page.goto("http://localhost:3154/cv", { waitUntil: "networkidle" });
+  await page.goto("http://localhost:3154/cv", { waitUntil: "domcontentloaded" });
   await page.screenshot({
     path: resolve(artifactDir, "cv-academic-profile.png"),
     fullPage: true,
@@ -98,7 +109,7 @@ async function capture() {
 
   // 9. Navigate to /research
   console.log("Navigating to /research...");
-  await page.goto("http://localhost:3154/research", { waitUntil: "networkidle" });
+  await page.goto("http://localhost:3154/research", { waitUntil: "domcontentloaded" });
   await page.screenshot({
     path: resolve(artifactDir, "research-detail-axes.png"),
     fullPage: true,
@@ -107,7 +118,7 @@ async function capture() {
 
   // 10. Navigate to /software
   console.log("Navigating to /software...");
-  await page.goto("http://localhost:3154/software", { waitUntil: "networkidle" });
+  await page.goto("http://localhost:3154/software", { waitUntil: "domcontentloaded" });
   await page.screenshot({
     path: resolve(artifactDir, "software-packages-page.png"),
     fullPage: true,
@@ -116,7 +127,7 @@ async function capture() {
 
   // 11. Navigate to /talks
   console.log("Navigating to /talks...");
-  await page.goto("http://localhost:3154/talks", { waitUntil: "networkidle" });
+  await page.goto("http://localhost:3154/talks", { waitUntil: "domcontentloaded" });
   await page.screenshot({
     path: resolve(artifactDir, "talks-seminars-page.png"),
     fullPage: true,

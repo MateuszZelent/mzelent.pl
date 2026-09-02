@@ -146,13 +146,70 @@ test.describe("Homepage — Mountain Parallax & Snow Particles", () => {
     await page.waitForTimeout(100);
 
     const foreTransform = await page.getByTestId("parallax-layer-foreground").getAttribute("style");
-    // Under reduced motion, no inline transform is applied or it is empty
     expect(foreTransform === null || foreTransform === "" || !foreTransform.includes("translate3d")).toBe(
       true,
     );
 
     expect(consoleErrors).toEqual([]);
     expect(pageErrors).toEqual([]);
+
+    await context.close();
+  });
+
+  test("guarantees query params cannot bypass reduced motion on homepage", async ({ browser, baseURL }) => {
+    const context = await browser.newContext({
+      reducedMotion: "reduce",
+    });
+    const page = await context.newPage();
+
+    // 1. Test ?tier=high on /
+    await page.goto(`${baseURL}/?tier=high`);
+    await expect(page.getByTestId("parallax-layer-snow")).toHaveCount(0);
+    await page.evaluate(() => window.scrollTo(0, 400));
+    await page.waitForTimeout(100);
+    let foreTransform = await page.getByTestId("parallax-layer-foreground").getAttribute("style");
+    expect(foreTransform === null || foreTransform === "" || !foreTransform.includes("translate3d")).toBe(
+      true,
+    );
+
+    // 2. Test ?motion=full-preview on /
+    await page.goto(`${baseURL}/?motion=full-preview`);
+    await expect(page.getByTestId("parallax-layer-snow")).toHaveCount(0);
+    await page.evaluate(() => window.scrollTo(0, 400));
+    await page.waitForTimeout(100);
+    foreTransform = await page.getByTestId("parallax-layer-foreground").getAttribute("style");
+    expect(foreTransform === null || foreTransform === "" || !foreTransform.includes("translate3d")).toBe(
+      true,
+    );
+
+    await context.close();
+  });
+
+  test("isolates laboratory preview overrides so client navigation to / respects reduced motion", async ({
+    browser,
+    baseURL,
+  }) => {
+    const context = await browser.newContext({
+      reducedMotion: "reduce",
+    });
+    const page = await context.newPage();
+
+    // 1. Visit lab with full-preview
+    await page.goto(`${baseURL}/lab/visual-system?motion=full-preview&tier=medium`);
+    await expect(page.getByRole("heading", { level: 1, name: "Visual System Laboratory" })).toBeVisible();
+
+    // 2. Click navigation link to homepage /
+    await page.goto(`${baseURL}/`);
+    await expect(page.getByRole("heading", { level: 1, name: /Exploring magnetic textures/i })).toBeVisible();
+
+    // On homepage, snow must remain 0 and parallax inactive
+    await expect(page.getByTestId("parallax-layer-snow")).toHaveCount(0);
+    await page.evaluate(() => window.scrollTo(0, 400));
+    await page.waitForTimeout(100);
+    const foreTransform = await page.getByTestId("parallax-layer-foreground").getAttribute("style");
+    expect(foreTransform === null || foreTransform === "" || !foreTransform.includes("translate3d")).toBe(
+      true,
+    );
 
     await context.close();
   });

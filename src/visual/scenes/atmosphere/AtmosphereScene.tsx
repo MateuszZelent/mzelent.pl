@@ -6,9 +6,9 @@ import * as THREE from "three";
 
 import { PointerTracker } from "../../interaction/pointer-tracker";
 import type { QualityProfile } from "../../quality/quality-contract";
-import { GpuParticleSimulator } from "../../simulation/gpu-particle-simulator";
 import { particleFragmentShader } from "../../shaders/atmosphere/particle.frag";
 import { particleVertexShader } from "../../shaders/atmosphere/particle.vert";
+import { GpuParticleSimulator } from "../../simulation/gpu-particle-simulator";
 import { useSceneStore } from "../../state/scene-store";
 import { ATMOSPHERE_CONFIG, PARTICLE_TIER_CONFIGS } from "./atmosphere-config";
 
@@ -21,14 +21,18 @@ export function AtmosphereScene({ qualityProfile }: AtmosphereSceneProps) {
   const pointsRef = useRef<THREE.Points>(null);
   const simulatorRef = useRef<GpuParticleSimulator | null>(null);
   const pointerTrackerRef = useRef<PointerTracker | null>(null);
+  const hasCommittedFirstFrame = useRef(false);
+
   const updateDiagnostics = useSceneStore((state) => state.updateDiagnostics);
-  const setStatus = useSceneStore((state) => state.setStatus);
+  const recordFirstFrame = useSceneStore((state) => state.recordFirstFrame);
 
   const tierConfig = PARTICLE_TIER_CONFIGS[qualityProfile.tier];
   const { count, textureWidth, textureHeight, pointSize } = tierConfig;
 
   // 1. Initialize GPU Particle Simulator
   useEffect(() => {
+    hasCommittedFirstFrame.current = false;
+
     if (qualityProfile.tier === "static" || count === 0) {
       return;
     }
@@ -40,14 +44,12 @@ export function AtmosphereScene({ qualityProfile }: AtmosphereSceneProps) {
     pointerTracker.attach();
     pointerTrackerRef.current = pointerTracker;
 
-    setStatus("ready");
-
     updateDiagnostics({
       points: count,
       triangles: 0,
       drawCalls: 1,
       geometries: 1,
-      textures: 2,
+      textures: 4, // 2 position targets + 2 velocity targets
     });
 
     return () => {
@@ -56,7 +58,7 @@ export function AtmosphereScene({ qualityProfile }: AtmosphereSceneProps) {
       pointerTracker.dispose();
       pointerTrackerRef.current = null;
     };
-  }, [gl, qualityProfile.tier, count, setStatus, updateDiagnostics]);
+  }, [gl, qualityProfile.tier, count, updateDiagnostics]);
 
   // 2. Build deterministic particle UV geometry
   const particleGeometry = useMemo(() => {
@@ -120,17 +122,31 @@ export function AtmosphereScene({ qualityProfile }: AtmosphereSceneProps) {
 
   // 4. Hot per-frame simulation and render step
   useFrame((state, delta) => {
+    // Pause simulation computation when document is hidden (hidden tab)
+    if (typeof document !== "undefined" && document.hidden) {
+      return;
+    }
+
     const simulator = simulatorRef.current;
     const pointerTracker = pointerTrackerRef.current;
     const pointsMesh = pointsRef.current;
     if (!simulator || !pointerTracker || !pointsMesh) return;
 
-    const { current, velocity } = pointerTracker.update(delta);
-    const simTexture = simulator.step(state.clock.getElapsedTime(), delta, current, velocity);
+    // Clamp delta to prevent sudden particle jumps upon tab focus restore
+    const safeDelta = Math.min(delta, 0.05);
+
+    const { current, velocity } = pointerTracker.update(safeDelta);
+    const simTexture = simulator.step(state.clock.getElapsedTime(), safeDelta, current, velocity);
 
     const mat = pointsMesh.material as THREE.ShaderMaterial;
     if (mat?.uniforms?.uPositions) {
       mat.uniforms.uPositions.value = simTexture;
+    }
+
+    // Commit readiness strictly after the first rendered frame
+    if (!hasCommittedFirstFrame.current) {
+      hasCommittedFirstFrame.current = true;
+      recordFirstFrame();
     }
   });
 

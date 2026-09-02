@@ -23,15 +23,18 @@ export function SnowScene({ qualityProfile }: SnowSceneProps) {
   const pointerTrackerRef = useRef<PointerTracker | null>(null);
   const pointerPos2D = useRef(new THREE.Vector2(0, 0));
   const pointerVel2D = useRef(new THREE.Vector2(0, 0));
+  const hasCommittedFirstFrame = useRef(false);
 
   const updateDiagnostics = useSceneStore((state) => state.updateDiagnostics);
-  const setStatus = useSceneStore((state) => state.setStatus);
+  const recordFirstFrame = useSceneStore((state) => state.recordFirstFrame);
 
   const config = SNOW_CONFIGS[qualityProfile.tier];
   const { particleCount, fboWidth, fboHeight } = config;
 
   // 1. Initialize GPU Snow Simulator and Pointer Tracker
   useEffect(() => {
+    hasCommittedFirstFrame.current = false;
+
     if (qualityProfile.tier === "static" || particleCount === 0) {
       return;
     }
@@ -42,8 +45,6 @@ export function SnowScene({ qualityProfile }: SnowSceneProps) {
     const pointerTracker = new PointerTracker();
     pointerTracker.attach();
     pointerTrackerRef.current = pointerTracker;
-
-    setStatus("ready");
 
     updateDiagnostics({
       points: particleCount,
@@ -59,7 +60,7 @@ export function SnowScene({ qualityProfile }: SnowSceneProps) {
       pointerTracker.dispose();
       pointerTrackerRef.current = null;
     };
-  }, [gl, qualityProfile.tier, particleCount, setStatus, updateDiagnostics]);
+  }, [gl, qualityProfile.tier, particleCount, updateDiagnostics]);
 
   // 2. Build particle UV buffer geometry
   const particleGeometry = useMemo(() => {
@@ -109,12 +110,20 @@ export function SnowScene({ qualityProfile }: SnowSceneProps) {
 
   // 4. Hot per-frame simulation and render step
   useFrame((state, delta) => {
+    // Pause simulation computation when document is hidden (hidden tab)
+    if (typeof document !== "undefined" && document.hidden) {
+      return;
+    }
+
     const simulator = simulatorRef.current;
     const pointerTracker = pointerTrackerRef.current;
     const pointsMesh = pointsRef.current;
     if (!simulator || !pointerTracker || !pointsMesh) return;
 
-    const { current, velocity } = pointerTracker.update(delta);
+    // Clamp delta to prevent sudden particle jumps upon tab focus restore
+    const safeDelta = Math.min(delta, 0.05);
+
+    const { current, velocity } = pointerTracker.update(safeDelta);
     pointerPos2D.current.set(current.x, current.y);
     pointerVel2D.current.set(velocity.x, velocity.y);
 
@@ -122,7 +131,7 @@ export function SnowScene({ qualityProfile }: SnowSceneProps) {
 
     const simTexture = simulator.step(
       state.clock.getElapsedTime(),
-      delta,
+      safeDelta,
       pointerPos2D.current,
       pointerVel2D.current,
       isPointerActive,
@@ -131,6 +140,12 @@ export function SnowScene({ qualityProfile }: SnowSceneProps) {
     const mat = pointsMesh.material as THREE.ShaderMaterial;
     if (mat?.uniforms?.uPositionTexture) {
       mat.uniforms.uPositionTexture.value = simTexture;
+    }
+
+    // Commit readiness strictly after the first rendered frame
+    if (!hasCommittedFirstFrame.current) {
+      hasCommittedFirstFrame.current = true;
+      recordFirstFrame();
     }
   });
 

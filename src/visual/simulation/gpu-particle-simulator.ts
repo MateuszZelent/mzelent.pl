@@ -9,9 +9,11 @@ import {
 import { simulationFragmentShader } from "../shaders/atmosphere/simulation.frag";
 import { simulationVertexShader } from "../shaders/atmosphere/simulation.vert";
 import { velocityFragmentShader } from "../shaders/atmosphere/velocity.frag";
+import { negotiateParticleCapabilities, type ParticleRuntimeCapabilities } from "./particle-capabilities";
 
 export class GpuParticleSimulator {
   readonly config: ParticleTierConfig;
+  readonly capabilities: ParticleRuntimeCapabilities;
   private readonly renderer: THREE.WebGLRenderer;
 
   // Double-buffered render targets for Position (xyz = position, w = energy)
@@ -40,6 +42,7 @@ export class GpuParticleSimulator {
   constructor(renderer: THREE.WebGLRenderer, tier: QualityTier) {
     this.renderer = renderer;
     this.config = PARTICLE_TIER_CONFIGS[tier];
+    this.capabilities = negotiateParticleCapabilities(renderer);
 
     const { textureWidth, textureHeight } = this.config;
 
@@ -87,10 +90,13 @@ export class GpuParticleSimulator {
     );
     this.initialVelocityTexture.needsUpdate = true;
 
-    // Create double-buffered FBO render targets with float precision
+    // Select float or half-float precision based on capability negotiation
+    const textureType =
+      this.capabilities.renderTargetType === "half-float" ? THREE.HalfFloatType : THREE.FloatType;
+
     const fboOptions: THREE.RenderTargetOptions = {
       format: THREE.RGBAFormat,
-      type: THREE.FloatType,
+      type: textureType,
       minFilter: THREE.NearestFilter,
       magFilter: THREE.NearestFilter,
       stencilBuffer: false,

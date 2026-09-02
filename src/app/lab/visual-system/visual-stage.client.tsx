@@ -121,6 +121,11 @@ export function VisualStageClient() {
     const prefersReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
     const coarsePointer = window.matchMedia?.("(pointer: coarse)").matches ?? false;
     setCapabilities(prefersReducedMotion, coarsePointer);
+
+    return () => {
+      setTierOverride(null);
+      setMotionMode("auto");
+    };
   }, [setTierOverride, setMotionMode, setCapabilities]);
 
   // Compute effective profile
@@ -145,10 +150,10 @@ export function VisualStageClient() {
     if (activeProfile.tier === "static") {
       setStatus("static");
       setPosterVisible(true);
-    } else {
+    } else if (runtimeStatus === "idle" || runtimeStatus === "static") {
       setStatus("loading");
     }
-  }, [activeProfile, setQualityTier, setStatus, setPosterVisible]);
+  }, [activeProfile, runtimeStatus, setQualityTier, setStatus, setPosterVisible]);
 
   // Support test automation remount cycles if requested
   useEffect(() => {

@@ -10,6 +10,10 @@ import { GpuParticleSimulator } from "../../src/visual/simulation/gpu-particle-s
 
 function createMockRenderer(): THREE.WebGLRenderer {
   return {
+    getContext: vi.fn().mockReturnValue({
+      getExtension: vi.fn().mockReturnValue({}),
+      getParameter: vi.fn().mockReturnValue(4),
+    }),
     getRenderTarget: vi.fn().mockReturnValue(null),
     setRenderTarget: vi.fn(),
     render: vi.fn(),

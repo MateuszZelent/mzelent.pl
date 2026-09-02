@@ -6,15 +6,32 @@ import type { QualityTier } from "../quality/quality-contract";
 import type { MotionMode } from "../state/scene-contract";
 import { useSceneStore } from "../state/scene-store";
 
+function subscribeMounted(): () => void {
+  return () => {};
+}
+
 export function RuntimeDiagnostics({
   className,
   style,
+  forceEnable = false,
 }: {
   readonly className?: string;
   readonly style?: React.CSSProperties;
+  readonly forceEnable?: boolean;
 }) {
+  const mounted = React.useSyncExternalStore(
+    subscribeMounted,
+    () => true,
+    () => false,
+  );
+
+  const isLabRoute = typeof window !== "undefined" && window.location.pathname.startsWith("/lab");
   const isEnabled =
-    process.env.NODE_ENV === "development" || process.env.NEXT_PUBLIC_ENABLE_DIAGNOSTICS === "1";
+    mounted &&
+    (forceEnable ||
+      isLabRoute ||
+      process.env.NODE_ENV === "development" ||
+      process.env.NEXT_PUBLIC_ENABLE_DIAGNOSTICS === "1");
 
   const diag = useSceneStore((state) => state.diagnostics);
   const setTierOverride = useSceneStore((state) => state.setTierOverride);

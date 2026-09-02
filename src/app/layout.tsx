@@ -19,9 +19,40 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Mateusz Zelent | Theoretical & Computational Physics",
+  metadataBase: new URL("https://mzelent.pl"),
+  title: {
+    default: "Mateusz Zelent | Theoretical & Computational Physics",
+    template: "%s | Mateusz Zelent",
+  },
   description:
     "Theoretical and computational research across chiral skyrmions, spin waves, nanomagnetic vector fields, and high-performance physics simulations.",
+  keywords: [
+    "Mateusz Zelent",
+    "Physics",
+    "Magnonics",
+    "Skyrmions",
+    "Micromagnetics",
+    "Spin Waves",
+    "Computational Physics",
+    "AMU Poznań",
+  ],
+  authors: [{ name: "Mateusz Zelent", url: "https://mzelent.pl" }],
+  creator: "Mateusz Zelent",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://mzelent.pl",
+    siteName: "Mateusz Zelent — Computational Physics Portfolio",
+    title: "Mateusz Zelent | Theoretical & Computational Physics",
+    description:
+      "Theoretical and computational research across chiral skyrmions, spin waves, nanomagnetic vector fields, and high-performance physics simulations.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Mateusz Zelent | Theoretical & Computational Physics",
+    description:
+      "Theoretical and computational research across chiral skyrmions, spin waves, nanomagnetic vector fields, and high-performance physics simulations.",
+  },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {

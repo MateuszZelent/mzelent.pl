@@ -5,6 +5,7 @@ export interface VisualCanvasProps {
   readonly qualityProfile: QualityProfile;
   readonly activeSceneId?: SceneId;
   readonly className?: string;
+  readonly style?: React.CSSProperties;
   readonly onReady?: () => void;
   readonly onError?: (error: Error) => void;
 }

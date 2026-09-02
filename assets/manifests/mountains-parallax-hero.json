@@ -1,0 +1,48 @@
+{
+  "id": "mountains-parallax-hero",
+  "purpose": "Multi-layered 2.5D mountain landscape for homepage hero with differential parallax and snow particles",
+  "kind": "image-layer-composite",
+  "author": "Antigravity Visual Pipeline",
+  "source": "Generated cinematic alpine master composition with layered depth segmentation",
+  "license": "Project Owned",
+  "sourceFiles": ["scripts/process_mountain_layers.py"],
+  "outputs": [
+    {
+      "path": "public/assets/images/mountains/sky-bg.webp",
+      "format": "webp",
+      "dimensions": { "width": 1920, "height": 1080 },
+      "sizeBytes": 26521,
+      "colorSpace": "sRGB",
+      "hasAlpha": false
+    },
+    {
+      "path": "public/assets/images/mountains/midground-peaks.webp",
+      "format": "webp",
+      "dimensions": { "width": 1920, "height": 1080 },
+      "sizeBytes": 207257,
+      "colorSpace": "sRGB",
+      "hasAlpha": true
+    },
+    {
+      "path": "public/assets/images/mountains/mist-clouds.webp",
+      "format": "webp",
+      "dimensions": { "width": 1920, "height": 1080 },
+      "sizeBytes": 98611,
+      "colorSpace": "sRGB",
+      "hasAlpha": true
+    },
+    {
+      "path": "public/assets/images/mountains/foreground-ridge.webp",
+      "format": "webp",
+      "dimensions": { "width": 1920, "height": 1080 },
+      "sizeBytes": 361779,
+      "colorSpace": "sRGB",
+      "hasAlpha": true
+    }
+  ],
+  "totalSizeBytes": 694168,
+  "optimizationTools": "Pillow 11.2.1 WebP encoder quality 85-90",
+  "qualityTierUse": ["high", "medium", "low", "static"],
+  "fallback": "Static background with graceful opacity rendering",
+  "reviewDate": "2026-09-02"
+}

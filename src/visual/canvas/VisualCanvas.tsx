@@ -13,8 +13,9 @@ import { VisualRuntime } from "./VisualRuntime";
 
 export function VisualCanvas({
   qualityProfile,
-  activeSceneId = "atmosphere",
+  activeSceneId = "snow",
   className,
+  style,
   onReady,
   onError,
 }: VisualCanvasProps) {
@@ -41,16 +42,18 @@ export function VisualCanvas({
     [onReady],
   );
 
+  const isContinuousLoop = activeSceneId === "atmosphere" || activeSceneId === "snow";
+
   return (
     <VisualRuntimeErrorBoundary onError={onError}>
       <Canvas
         className={className}
-        frameloop={activeSceneId === "atmosphere" ? "always" : "demand"}
+        frameloop={isContinuousLoop ? "always" : "demand"}
         dpr={[1, qualityProfile.dprCap]}
         gl={createRendererParameters(qualityProfile)}
         camera={{ position: [0, 0, 5], fov: 45, near: 0.1, far: 100 }}
         onCreated={handleCreated}
-        style={{ pointerEvents: "none" }}
+        style={{ pointerEvents: "none", ...style }}
       >
         <VisualRuntime qualityProfile={qualityProfile} activeSceneId={activeSceneId} />
       </Canvas>

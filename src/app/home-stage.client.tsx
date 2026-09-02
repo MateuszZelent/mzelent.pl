@@ -142,12 +142,8 @@ export function HomeVisualStage() {
     <>
       <div
         style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
           width: "100%",
           height: "100%",
-          zIndex: 4, // Sits between midground and foreground layers
           pointerEvents: "none",
         }}
         aria-hidden="true"

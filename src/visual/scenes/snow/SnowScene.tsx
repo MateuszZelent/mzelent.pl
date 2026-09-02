@@ -90,14 +90,14 @@ export function SnowScene({ qualityProfile }: SnowSceneProps) {
       fragmentShader: snowParticleFragmentShader,
       uniforms: {
         uPositionTexture: { value: null },
-        uBaseSize: { value: 3.2 },
+        uBaseSize: { value: config.pointSize },
         uPixelRatio: { value: qualityProfile.dprCap },
       },
       transparent: true,
       depthWrite: false,
       blending: THREE.NormalBlending,
     });
-  }, [qualityProfile.dprCap]);
+  }, [config.pointSize, qualityProfile.dprCap]);
 
   // Clean up geometry and material
   useEffect(() => {

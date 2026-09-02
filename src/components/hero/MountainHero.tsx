@@ -22,7 +22,11 @@ function subscribeReducedMotion(onStoreChange: () => void): () => void {
   return () => motionQuery.removeEventListener?.("change", onStoreChange);
 }
 
-export function MountainHero() {
+export interface MountainHeroProps {
+  readonly snowCanvas?: React.ReactNode;
+}
+
+export function MountainHero({ snowCanvas }: MountainHeroProps) {
   const [scrollY, setScrollY] = useState(0);
   const reducedMotion = useSyncExternalStore(subscribeReducedMotion, readReducedMotion, () => false);
   const heroRef = useRef<HTMLElement>(null);
@@ -110,7 +114,19 @@ export function MountainHero() {
         />
       </div>
 
-      {/* Layer 4: Foreground Rocky Ridge & Crags */}
+      {/* Layer 3.5: GPU Snow Canvas (Falls behind the foreground mountain) */}
+      {snowCanvas && (
+        <div
+          className={styles.layerSnow}
+          style={{ transform: `translate3d(0, ${midY * 0.5}px, 0)` }}
+          aria-hidden="true"
+          data-testid="parallax-layer-snow"
+        >
+          {snowCanvas}
+        </div>
+      )}
+
+      {/* Layer 4: Foreground Rocky Ridge & Crags (Opaque rocks sit in FRONT of falling snow) */}
       <div
         className={styles.layerForeground}
         style={{ transform: `translate3d(0, ${foreY}px, 0)` }}

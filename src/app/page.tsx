@@ -23,13 +23,11 @@ export default function HomePage() {
       <Header />
 
       <main id="main-content" tabIndex={-1}>
-        <MountainHero />
+        <MountainHero snowCanvas={<HomeVisualStage />} />
         <ResearchGrid />
       </main>
 
       <Footer />
-
-      <HomeVisualStage />
     </>
   );
 }

@@ -12,18 +12,19 @@ void main() {
     discard;
   }
 
-  // Soft Gaussian point shape with brighter core
-  float core = exp(-dist * dist * 18.0);
-  float halo = exp(-dist * dist * 6.0) * 0.4;
+  // Soft Gaussian micro-point core
+  float core = exp(-dist * dist * 24.0);
+  float halo = exp(-dist * dist * 8.0) * 0.3;
   float shape = core + halo;
 
-  // Depth fade (soften distant and very close particles)
-  float depthFade = smoothstep(0.5, 1.5, vDepth) * (1.0 - smoothstep(6.0, 10.0, vDepth));
+  // Gentle depth fade
+  float depthFade = smoothstep(0.5, 1.2, vDepth) * (1.0 - smoothstep(5.0, 9.0, vDepth));
   
-  // Natural snowflake crystalline coloring (soft pure white with subtle cold tint)
-  vec3 snowColor = mix(vec3(0.92, 0.96, 1.0), vec3(1.0, 1.0, 1.0), vSeed);
+  // Natural subtle cold-white crystalline tone
+  vec3 snowColor = mix(vec3(0.94, 0.97, 1.0), vec3(1.0, 1.0, 1.0), vSeed);
 
-  float alpha = shape * (0.65 + 0.35 * vSeed) * depthFade;
+  // Discrete, delicate opacity
+  float alpha = shape * (0.35 + 0.35 * vSeed) * depthFade;
   
   if (alpha < 0.01) {
     discard;

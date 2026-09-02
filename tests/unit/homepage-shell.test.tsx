@@ -24,6 +24,12 @@ describe("Homepage Shell & Mountain Hero Components", () => {
     expect(screen.getByTestId("parallax-layer-foreground")).toBeInTheDocument();
   });
 
+  it("renders the slotted snow layer between midground and foreground when provided", () => {
+    render(<MountainHero snowCanvas={<div data-testid="custom-snow-content" />} />);
+    expect(screen.getByTestId("parallax-layer-snow")).toBeInTheDocument();
+    expect(screen.getByTestId("custom-snow-content")).toBeInTheDocument();
+  });
+
   it("renders navigation header and research domains", () => {
     render(
       <>

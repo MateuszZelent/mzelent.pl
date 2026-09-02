@@ -84,7 +84,7 @@ function subscribeMounted(): () => void {
   return () => {};
 }
 
-export function HomeVisualStage() {
+function useActiveProfile(): { activeProfile: QualityProfile; mounted: boolean } {
   const detectedProfile = useSyncExternalStore(
     subscribeToCapabilities,
     readBrowserCapabilities,
@@ -117,6 +117,10 @@ export function HomeVisualStage() {
   }, [setTierOverride, setCapabilities]);
 
   const activeProfile: QualityProfile = useMemo(() => {
+    // OS reduced motion unconditionally forces static profile on homepage
+    if (detectedProfile.tier === "static") {
+      return STATIC_FALLBACK_PROFILE;
+    }
     if (!tierOverride) return detectedProfile;
     return {
       tier: tierOverride,
@@ -136,46 +140,65 @@ export function HomeVisualStage() {
     }
   }, [activeProfile, setQualityTier, setStatus]);
 
+  return { activeProfile, mounted };
+}
+
+export function HomeSnowCanvas() {
+  const { activeProfile, mounted } = useActiveProfile();
+  const setStatus = useSceneStore((state) => state.setStatus);
+
   const shouldRenderCanvas = mounted && activeProfile.tier !== "static";
+  if (!shouldRenderCanvas) {
+    return null;
+  }
 
   return (
-    <>
-      <div
-        style={{
-          width: "100%",
-          height: "100%",
-          pointerEvents: "none",
-        }}
-        aria-hidden="true"
-        data-testid="snow-canvas-slot"
-      >
-        {shouldRenderCanvas && (
-          <LazyVisualCanvas
-            style={{ width: "100%", height: "100%", pointerEvents: "none" }}
-            qualityProfile={activeProfile}
-            activeSceneId="snow"
-            onError={() => {
-              setStatus("failed");
-            }}
-          />
-        )}
-      </div>
-
-      <RuntimeDiagnostics
-        style={{
-          position: "fixed",
-          bottom: "1rem",
-          right: "1rem",
-          zIndex: 999,
-          background: "rgba(3, 4, 5, 0.9)",
-          border: "1px solid rgba(255, 255, 255, 0.15)",
-          borderRadius: "6px",
-          padding: "0.75rem",
-          fontFamily: "var(--font-mono, monospace)",
-          backdropFilter: "blur(12px)",
-          maxWidth: "260px",
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        pointerEvents: "none",
+      }}
+      aria-hidden="true"
+      data-testid="snow-canvas-slot"
+    >
+      <LazyVisualCanvas
+        style={{ width: "100%", height: "100%", pointerEvents: "none" }}
+        qualityProfile={activeProfile}
+        activeSceneId="snow"
+        onError={() => {
+          setStatus("failed");
         }}
       />
+    </div>
+  );
+}
+
+export function HomeDiagnostics() {
+  return (
+    <RuntimeDiagnostics
+      style={{
+        position: "fixed",
+        bottom: "1rem",
+        right: "1rem",
+        zIndex: 999,
+        background: "rgba(3, 4, 5, 0.9)",
+        border: "1px solid rgba(255, 255, 255, 0.15)",
+        borderRadius: "6px",
+        padding: "0.75rem",
+        fontFamily: "var(--font-mono, monospace)",
+        backdropFilter: "blur(12px)",
+        maxWidth: "260px",
+      }}
+    />
+  );
+}
+
+export function HomeVisualStage() {
+  return (
+    <>
+      <HomeSnowCanvas />
+      <HomeDiagnostics />
     </>
   );
 }

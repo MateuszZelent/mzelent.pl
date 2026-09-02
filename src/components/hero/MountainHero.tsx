@@ -29,10 +29,10 @@ export interface MountainHeroProps {
 
 export function MountainHero({ snowCanvas }: MountainHeroProps) {
   const osReducedMotion = useSyncExternalStore(subscribeReducedMotion, readReducedMotion, () => false);
-  const tierOverride = useSceneStore((state) => state.tierOverride);
+  const motionMode = useSceneStore((state) => state.motionMode);
 
-  // If user is previewing an active tier (high, medium, low) or didn't request reduced motion, enable parallax!
-  const isReducedMotion = tierOverride === "static" ? true : tierOverride ? false : osReducedMotion;
+  // Strict reduced motion compliance: only explicit "full-preview" in laboratory overrides OS reduced motion
+  const isReducedMotion = motionMode === "reduced" || (motionMode === "auto" && osReducedMotion);
 
   const heroRef = useRef<HTMLElement>(null);
   const skyRef = useRef<HTMLDivElement>(null);
@@ -43,7 +43,19 @@ export function MountainHero({ snowCanvas }: MountainHeroProps) {
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (typeof window === "undefined" || isReducedMotion) return;
+    if (typeof window === "undefined" || isReducedMotion) {
+      // Clear any remaining transforms when reduced motion is active
+      if (skyRef.current) skyRef.current.style.transform = "";
+      if (midRef.current) midRef.current.style.transform = "";
+      if (mistRef.current) mistRef.current.style.transform = "";
+      if (snowRef.current) snowRef.current.style.transform = "";
+      if (foreRef.current) foreRef.current.style.transform = "";
+      if (contentRef.current) {
+        contentRef.current.style.transform = "";
+        contentRef.current.style.opacity = "";
+      }
+      return;
+    }
 
     let targetScrollY = window.scrollY || 0;
     let currentScrollY = targetScrollY;
@@ -181,8 +193,8 @@ export function MountainHero({ snowCanvas }: MountainHeroProps) {
         />
       </div>
 
-      {/* Layer 3.5: GPU Snow Canvas (Falls behind the foreground mountain) */}
-      {snowCanvas && (
+      {/* Layer 3.5: GPU Snow Canvas (Falls behind the foreground mountain; disabled in reduced motion) */}
+      {!isReducedMotion && snowCanvas && (
         <div ref={snowRef} className={styles.layerSnow} aria-hidden="true" data-testid="parallax-layer-snow">
           {snowCanvas}
         </div>

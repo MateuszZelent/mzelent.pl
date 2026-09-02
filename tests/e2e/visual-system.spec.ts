@@ -9,23 +9,13 @@ test("renders the single canvas runtime and transitions from poster to ready @sm
   page.on("console", (message) => {
     if (message.type() === "error") {
       const text = message.text();
-      if (
-        !text.includes("WebGL creation failed") &&
-        !text.includes("_next/hmr") &&
-        !text.includes("Error creating WebGL context")
-      ) {
+      if (!text.includes("_next/hmr")) {
         consoleErrors.push(text);
       }
     }
   });
   page.on("pageerror", (error) => {
-    if (
-      !error.message.includes("precision") &&
-      !error.message.includes("Error creating WebGL context") &&
-      !error.message.includes("WebGL")
-    ) {
-      pageErrors.push(error.message);
-    }
+    pageErrors.push(error.message);
   });
 
   await page.goto("/lab/visual-system");
@@ -55,23 +45,13 @@ test("supports keyboard navigation to skip link and focuses laboratory shell", a
   page.on("console", (message) => {
     if (message.type() === "error") {
       const text = message.text();
-      if (
-        !text.includes("WebGL creation failed") &&
-        !text.includes("_next/hmr") &&
-        !text.includes("Error creating WebGL context")
-      ) {
+      if (!text.includes("_next/hmr")) {
         consoleErrors.push(text);
       }
     }
   });
   page.on("pageerror", (error) => {
-    if (
-      !error.message.includes("precision") &&
-      !error.message.includes("Error creating WebGL context") &&
-      !error.message.includes("WebGL")
-    ) {
-      pageErrors.push(error.message);
-    }
+    pageErrors.push(error.message);
   });
 
   await page.goto("/lab/visual-system");
@@ -99,23 +79,13 @@ test("keeps the static fallback in reduced-motion mode @visual", async ({ browse
   page.on("console", (message) => {
     if (message.type() === "error") {
       const text = message.text();
-      if (
-        !text.includes("WebGL creation failed") &&
-        !text.includes("_next/hmr") &&
-        !text.includes("Error creating WebGL context")
-      ) {
+      if (!text.includes("_next/hmr")) {
         consoleErrors.push(text);
       }
     }
   });
   page.on("pageerror", (error) => {
-    if (
-      !error.message.includes("precision") &&
-      !error.message.includes("Error creating WebGL context") &&
-      !error.message.includes("WebGL")
-    ) {
-      pageErrors.push(error.message);
-    }
+    pageErrors.push(error.message);
   });
 
   await page.goto(`${baseURL}/lab/visual-system`);
@@ -142,23 +112,13 @@ test("falls back gracefully when WebGL2 is blocked @visual", async ({ browser, b
   page.on("console", (message) => {
     if (message.type() === "error") {
       const text = message.text();
-      if (
-        !text.includes("WebGL creation failed") &&
-        !text.includes("_next/hmr") &&
-        !text.includes("Error creating WebGL context")
-      ) {
+      if (!text.includes("_next/hmr")) {
         consoleErrors.push(text);
       }
     }
   });
   page.on("pageerror", (error) => {
-    if (
-      !error.message.includes("precision") &&
-      !error.message.includes("Error creating WebGL context") &&
-      !error.message.includes("WebGL")
-    ) {
-      pageErrors.push(error.message);
-    }
+    pageErrors.push(error.message);
   });
 
   // Block WebGL2 before loading page
@@ -197,23 +157,13 @@ test("reacts smoothly to pointer movement across particle atmosphere", async ({ 
   page.on("console", (message) => {
     if (message.type() === "error") {
       const text = message.text();
-      if (
-        !text.includes("WebGL creation failed") &&
-        !text.includes("_next/hmr") &&
-        !text.includes("Error creating WebGL context")
-      ) {
+      if (!text.includes("_next/hmr")) {
         consoleErrors.push(text);
       }
     }
   });
   page.on("pageerror", (error) => {
-    if (
-      !error.message.includes("precision") &&
-      !error.message.includes("Error creating WebGL context") &&
-      !error.message.includes("WebGL")
-    ) {
-      pageErrors.push(error.message);
-    }
+    pageErrors.push(error.message);
   });
 
   await page.goto("/lab/visual-system");
@@ -243,23 +193,13 @@ test("handles WebGL context loss and restoration gracefully", async ({ page }) =
   page.on("console", (message) => {
     if (message.type() === "error") {
       const text = message.text();
-      if (
-        !text.includes("WebGL creation failed") &&
-        !text.includes("_next/hmr") &&
-        !text.includes("Error creating WebGL context")
-      ) {
+      if (!text.includes("_next/hmr")) {
         consoleErrors.push(text);
       }
     }
   });
   page.on("pageerror", (error) => {
-    if (
-      !error.message.includes("precision") &&
-      !error.message.includes("Error creating WebGL context") &&
-      !error.message.includes("WebGL")
-    ) {
-      pageErrors.push(error.message);
-    }
+    pageErrors.push(error.message);
   });
 
   await page.goto("/lab/visual-system");
@@ -306,23 +246,13 @@ test("handles viewport resize without duplicating canvas", async ({ page }) => {
   page.on("console", (message) => {
     if (message.type() === "error") {
       const text = message.text();
-      if (
-        !text.includes("WebGL creation failed") &&
-        !text.includes("_next/hmr") &&
-        !text.includes("Error creating WebGL context")
-      ) {
+      if (!text.includes("_next/hmr")) {
         consoleErrors.push(text);
       }
     }
   });
   page.on("pageerror", (error) => {
-    if (
-      !error.message.includes("precision") &&
-      !error.message.includes("Error creating WebGL context") &&
-      !error.message.includes("WebGL")
-    ) {
-      pageErrors.push(error.message);
-    }
+    pageErrors.push(error.message);
   });
 
   await page.goto("/lab/visual-system");
@@ -351,23 +281,13 @@ test("supports 5 clean remount cycles without resource leaks", async ({ page }) 
   page.on("console", (message) => {
     if (message.type() === "error") {
       const text = message.text();
-      if (
-        !text.includes("WebGL creation failed") &&
-        !text.includes("_next/hmr") &&
-        !text.includes("Error creating WebGL context")
-      ) {
+      if (!text.includes("_next/hmr")) {
         consoleErrors.push(text);
       }
     }
   });
   page.on("pageerror", (error) => {
-    if (
-      !error.message.includes("precision") &&
-      !error.message.includes("Error creating WebGL context") &&
-      !error.message.includes("WebGL")
-    ) {
-      pageErrors.push(error.message);
-    }
+    pageErrors.push(error.message);
   });
 
   await page.goto("/lab/visual-system");
@@ -418,23 +338,13 @@ test("remains readable and high contrast in forced-colors mode @visual", async (
   page.on("console", (message) => {
     if (message.type() === "error") {
       const text = message.text();
-      if (
-        !text.includes("WebGL creation failed") &&
-        !text.includes("_next/hmr") &&
-        !text.includes("Error creating WebGL context")
-      ) {
+      if (!text.includes("_next/hmr")) {
         consoleErrors.push(text);
       }
     }
   });
   page.on("pageerror", (error) => {
-    if (
-      !error.message.includes("precision") &&
-      !error.message.includes("Error creating WebGL context") &&
-      !error.message.includes("WebGL")
-    ) {
-      pageErrors.push(error.message);
-    }
+    pageErrors.push(error.message);
   });
 
   await page.goto(`${baseURL}/lab/visual-system`);
@@ -463,23 +373,13 @@ test("captures the ready visual fixture @visual", async ({ page }, testInfo) => 
   page.on("console", (message) => {
     if (message.type() === "error") {
       const text = message.text();
-      if (
-        !text.includes("WebGL creation failed") &&
-        !text.includes("_next/hmr") &&
-        !text.includes("Error creating WebGL context")
-      ) {
+      if (!text.includes("_next/hmr")) {
         consoleErrors.push(text);
       }
     }
   });
   page.on("pageerror", (error) => {
-    if (
-      !error.message.includes("precision") &&
-      !error.message.includes("Error creating WebGL context") &&
-      !error.message.includes("WebGL")
-    ) {
-      pageErrors.push(error.message);
-    }
+    pageErrors.push(error.message);
   });
 
   await page.goto("/lab/visual-system");
@@ -490,15 +390,16 @@ test("captures the ready visual fixture @visual", async ({ page }, testInfo) => 
 
   await page.screenshot({ path: testInfo.outputPath("visual-system-ready.png"), fullPage: true });
 
-  // Record machine-readable metrics JSON
+  // Record machine-readable metrics JSON per browser
   const metricsDir = path.resolve(process.cwd(), "test-results");
   if (!fs.existsSync(metricsDir)) {
     fs.mkdirSync(metricsDir, { recursive: true });
   }
 
+  const browserName = test.info().project.name;
   const metrics = {
     commitSha: process.env.GITHUB_SHA || "local",
-    browser: test.info().project.name,
+    browser: browserName,
     viewport: page.viewportSize(),
     dpr: await page.evaluate(() => window.devicePixelRatio),
     qualityTier: isEnhanced ? "medium" : "static",
@@ -511,13 +412,11 @@ test("captures the ready visual fixture @visual", async ({ page }, testInfo) => 
     textures: isEnhanced ? 2 : 0,
     contextLossCount: 0,
     restorationCount: 0,
-    firstFrameTimeMs: 45,
-    lazyEngineJsTransferBudgetKiB: 340,
     consoleErrorsCount: consoleErrors.length,
     pageErrorsCount: pageErrors.length,
   };
 
-  fs.writeFileSync(path.join(metricsDir, "metrics.json"), JSON.stringify(metrics, null, 2));
+  fs.writeFileSync(path.join(metricsDir, `metrics-${browserName}.json`), JSON.stringify(metrics, null, 2));
 
   expect(consoleErrors).toEqual([]);
   expect(pageErrors).toEqual([]);

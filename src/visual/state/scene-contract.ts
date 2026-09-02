@@ -2,11 +2,13 @@ import type { QualityTier } from "../quality/quality-contract";
 import type { RuntimeStatus } from "./runtime-status";
 
 export type SceneId = "snow" | "atmosphere" | "calibration" | "none";
+export type MotionMode = "auto" | "reduced" | "full-preview";
 
 export interface DiagnosticsSnapshot {
   readonly runtimeStatus: RuntimeStatus;
   readonly qualityTier: QualityTier;
   readonly tierOverride: QualityTier | null;
+  readonly motionMode: MotionMode;
   readonly effectiveDpr: number;
   readonly viewportWidth: number;
   readonly viewportHeight: number;
@@ -31,6 +33,7 @@ export interface SceneState {
   readonly runtimeStatus: RuntimeStatus;
   readonly qualityTier: QualityTier;
   readonly tierOverride: QualityTier | null;
+  readonly motionMode: MotionMode;
   readonly reducedMotion: boolean;
   readonly coarsePointer: boolean;
   readonly visibilityState: DocumentVisibilityState;

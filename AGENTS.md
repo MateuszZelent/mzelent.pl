@@ -18,8 +18,9 @@ The governing principle is:
 ## Current project phase
 
 - **Phase 0:** Accepted
-- **Phase 1:** Active
-- **Current project phase:** Phase 1 — Visual Technology Spike
+- **Phase 1:** Accepted
+- **Phase 2:** Active
+- **Current project phase:** Phase 2 — Visual Design System
 
 Until the Phase 1 spike is accepted:
 

@@ -1,9 +1,10 @@
 # Foundation roadmap
 
 - **Phase 0 status:** Accepted
-- **Phase 1 status:** Active
-- **Current project phase:** Phase 1 — Visual Technology Spike
-- **Decision date:** 2026-09-01
+- **Phase 1 status:** Accepted
+- **Phase 2 status:** Active
+- **Current project phase:** Phase 2 — Visual Design System
+- **Decision date:** 2026-09-02
 
 ## Gate model
 
@@ -45,7 +46,7 @@ A later phase cannot compensate for a failed earlier foundation. Each phase ends
 
 ## Phase 1 — visual technology spike
 
-**Status: Active**
+**Status: Accepted**
 
 Route: `/lab/visual-system`
 

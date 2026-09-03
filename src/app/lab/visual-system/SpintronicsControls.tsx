@@ -16,8 +16,10 @@ const PRESETS: Array<{ id: SpintronicsMode; label: string; badge: string }> = [
 ];
 
 const COLOR_MAPS: Array<{ id: SpintronicsColorMap; label: string }> = [
-  { id: "chiral", label: "Chiral In-Plane Hue" },
-  { id: "topological", label: "Topological Density q(r)" },
+  { id: "hsl-cone", label: "HSL Color Cone (MMPP)" },
+  { id: "racetrack", label: "Racetrack Spectrum" },
+  { id: "chiral", label: "Chiral Editorial" },
+  { id: "topological", label: "Topological q(r)" },
   { id: "magnetization", label: "Magnetization mz" },
 ];
 

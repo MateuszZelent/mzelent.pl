@@ -1,14 +1,15 @@
 "use client";
 
-import { useFrame, useThree } from "@react-three/fiber";
+import { useFrame } from "@react-three/fiber";
 import React, { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
+import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 
 import type { QualityProfile } from "../../quality/quality-contract";
 import { spintronicsFragmentShader } from "../../shaders/spintronics/spintronics.frag";
 import { spintronicsVertexShader } from "../../shaders/spintronics/spintronics.vert";
 import { useSceneStore } from "../../state/scene-store";
-import { SPINTRONICS_TIER_CONFIGS } from "./spintronics-config";
+import { generatePolarArrowPositions, hsl2rgb, SPINTRONICS_TIER_CONFIGS } from "./spintronics-config";
 
 interface SpintronicsSceneProps {
   readonly qualityProfile: QualityProfile;
@@ -23,9 +24,11 @@ const MODE_INDEX_MAP: Record<string, number> = {
 };
 
 const COLORMAP_INDEX_MAP: Record<string, number> = {
-  chiral: 0,
-  topological: 1,
-  magnetization: 2,
+  "hsl-cone": 0,
+  racetrack: 1,
+  chiral: 2,
+  topological: 3,
+  magnetization: 4,
 };
 
 export function SpintronicsScene({ qualityProfile }: SpintronicsSceneProps) {
@@ -60,32 +63,49 @@ export function SpintronicsScene({ qualityProfile }: SpintronicsSceneProps) {
     [],
   );
 
-  // Surface geometry
+  // Surface geometry: circular nanomembrane plane
   const geometry = useMemo(() => {
     const res = tierConfig.gridResolution;
     return new THREE.PlaneGeometry(4.6, 4.6, res, res);
   }, [tierConfig.gridResolution]);
 
-  // Vector arrows geometry and instance matrix calculations
-  const arrowCount = useMemo(() => {
-    if (!tierConfig.enableVectorArrows || !spintronicsPhysics.showVectorField) return 0;
-    const density = tierConfig.vectorDensity;
-    return density * density;
-  }, [tierConfig.enableVectorArrows, tierConfig.vectorDensity, spintronicsPhysics.showVectorField]);
+  // Polar coordinates for concentric rings
+  const ringCount = useMemo(() => {
+    if (qualityProfile.tier === "high") return 9;
+    if (qualityProfile.tier === "medium") return 8;
+    return 6;
+  }, [qualityProfile.tier]);
 
+  const polarCoords = useMemo(() => {
+    return generatePolarArrowPositions(ringCount, 2.15);
+  }, [ringCount]);
+
+  // Combined 3D Arrow Geometry: Shaft Cylinder + Head Cone
   const arrowGeometry = useMemo(() => {
-    // Elegant micro-arrow: thin cylinder + tiny cone
-    const cone = new THREE.ConeGeometry(0.024, 0.09, 8);
-    cone.translate(0, 0.045, 0);
-    return cone;
+    const shaftRadius = 0.014;
+    const shaftHeight = 0.16;
+    const shaft = new THREE.CylinderGeometry(shaftRadius, shaftRadius, shaftHeight, 10);
+    shaft.translate(0, shaftHeight * 0.5, 0);
+
+    const headRadius = 0.038;
+    const headHeight = 0.09;
+    const head = new THREE.ConeGeometry(headRadius, headHeight, 10);
+    head.translate(0, shaftHeight + headHeight * 0.5, 0);
+
+    const merged = mergeGeometries([shaft, head]);
+    shaft.dispose();
+    head.dispose();
+    return merged;
   }, []);
 
   const arrowMaterial = useMemo(() => {
-    return new THREE.MeshBasicMaterial({
-      color: new THREE.Color("#57e6dd"),
-      wireframe: false,
+    return new THREE.MeshStandardMaterial({
+      roughness: 0.28,
+      metalness: 0.22,
     });
   }, []);
+
+  const maxCapacity = 1024;
 
   // Update uniforms when store physics parameters change
   useEffect(() => {
@@ -134,10 +154,22 @@ export function SpintronicsScene({ qualityProfile }: SpintronicsSceneProps) {
     };
   }, []);
 
-  // Mark scene ready
+  // Mark scene ready and ensure instancing color is bound
   useEffect(() => {
     setStatus("ready");
     recordFirstFrame();
+
+    const mesh = instancedArrowsRef.current;
+    if (mesh) {
+      if (!mesh.instanceColor) {
+        mesh.instanceColor = new THREE.InstancedBufferAttribute(
+          new Float32Array(maxCapacity * 3),
+          3,
+        );
+      }
+      mesh.instanceColor.needsUpdate = true;
+      arrowMaterial.needsUpdate = true;
+    }
 
     const triCount = geometry.index ? geometry.index.count / 3 : 0;
     updateDiagnostics({
@@ -152,15 +184,24 @@ export function SpintronicsScene({ qualityProfile }: SpintronicsSceneProps) {
       arrowGeometry.dispose();
       arrowMaterial.dispose();
     };
-  }, [setStatus, recordFirstFrame, updateDiagnostics, geometry, arrowGeometry, arrowMaterial]);
+  }, [
+    setStatus,
+    recordFirstFrame,
+    updateDiagnostics,
+    geometry,
+    arrowGeometry,
+    arrowMaterial,
+    maxCapacity,
+  ]);
 
-  // Temp objects for instance matrix calculation (reused to prevent GC inside frame loop)
+  // Temp objects for instance matrix & color calculation (reused without allocation)
   const dummyMatrix = useMemo(() => new THREE.Matrix4(), []);
   const dummyPos = useMemo(() => new THREE.Vector3(), []);
   const dummyQuat = useMemo(() => new THREE.Quaternion(), []);
   const dummyScale = useMemo(() => new THREE.Vector3(1, 1, 1), []);
   const upVec = useMemo(() => new THREE.Vector3(0, 1, 0), []);
   const dirVec = useMemo(() => new THREE.Vector3(), []);
+  const tempColor = useMemo(() => new THREE.Color(), []);
 
   // Hot render loop
   useFrame(({ clock }) => {
@@ -181,21 +222,25 @@ export function SpintronicsScene({ qualityProfile }: SpintronicsSceneProps) {
 
     // Update vector arrow instances if enabled
     const mesh = instancedArrowsRef.current;
-    if (mesh && arrowCount > 0) {
-      const density = tierConfig.vectorDensity;
-      const step = 4.2 / density;
-      const start = -2.1 + step * 0.5;
+    if (mesh) {
+      if (!tierConfig.enableVectorArrows || !spintronicsPhysics.showVectorField) {
+        mesh.count = 0;
+        return;
+      }
 
       const mode = MODE_INDEX_MAP[spintronicsPhysics.mode] ?? 0;
       const bField = spintronicsPhysics.magneticField;
       const dmi = spintronicsPhysics.dmiStrength;
+      const colormap = spintronicsPhysics.colorMap;
 
       let idx = 0;
-      for (let ix = 0; ix < density; ix++) {
-        for (let iy = 0; iy < density; iy++) {
-          const x = start + ix * step;
-          const y = start + iy * step;
-          const r = Math.sqrt(x * x + y * y);
+
+      if (mode <= 2) {
+        // Concentric circular rings for Skyrmions & Vortex (polar geometry matching Dr. Zelent's image)
+        mesh.count = Math.min(polarCoords.length, maxCapacity);
+
+        for (let i = 0; i < polarCoords.length && idx < maxCapacity; i++) {
+          const { x, y, r, phi } = polarCoords[i];
 
           let mx = 0;
           let my = 0;
@@ -210,49 +255,119 @@ export function SpintronicsScene({ qualityProfile }: SpintronicsSceneProps) {
             const theta = Math.PI * (1.0 - normDist * normDist * (3 - 2 * normDist));
             const sinTheta = Math.sin(theta);
             const cosTheta = Math.cos(theta);
-            const phi = Math.atan2(y, x);
 
             zElev = cosTheta * 0.48;
+
             if (mode === 0) {
-              // Neel (hedgehog)
+              // Néel skyrmion (hedgehog radial in-plane orientation)
               mx = sinTheta * Math.cos(phi);
               my = sinTheta * Math.sin(phi);
             } else {
-              // Bloch (vortex)
+              // Bloch skyrmion (vortex-like tangential in-plane orientation)
               mx = -sinTheta * Math.sin(phi);
               my = sinTheta * Math.cos(phi);
             }
             mz = cosTheta;
           } else if (mode === 2) {
-            // Vortex
+            // Magnetic Vortex
             const coreR = 0.24;
             const coreProfile = Math.exp(-Math.pow(r / coreR, 2));
             zElev = coreProfile * 0.65;
-            const phi = Math.atan2(y, x);
             const inPlane = Math.sqrt(Math.max(0, 1 - coreProfile * coreProfile));
             mx = -Math.sin(phi) * inPlane;
             my = Math.cos(phi) * inPlane;
             mz = coreProfile;
-          } else {
-            // Spin Wave
-            const k = Math.PI * (spintronicsPhysics.rfFrequency / 4.8);
-            const wavePhase = k * (x + 2.2) - elapsed * (spintronicsPhysics.rfFrequency * 0.6);
-            zElev = Math.sin(wavePhase) * 0.3;
-            mx = 0;
-            my = zElev;
-            mz = Math.sqrt(Math.max(0, 1 - my * my));
           }
 
-          dummyPos.set(x, y, zElev + 0.05);
+          dummyPos.set(x, y, zElev + 0.04);
           dirVec.set(mx, my, mz).normalize();
           dummyQuat.setFromUnitVectors(upVec, dirVec);
           dummyMatrix.compose(dummyPos, dummyQuat, dummyScale);
 
+          // Color calculation according to MMPP HSL Color Cone
+          if (colormap === "hsl-cone") {
+            const inPlane = Math.sqrt(mx * mx + my * my);
+            let h = 0;
+            const s = 0.96;
+            let l = 0.5;
+
+            if (inPlane > 0.05) {
+              const inPlaneAngle = Math.atan2(my, mx);
+              h = ((inPlaneAngle / (2 * Math.PI)) % 1 + 1) % 1;
+              l = Math.max(0.32, Math.min(0.68, 0.5 + mz * 0.15));
+            } else if (mz < 0) {
+              h = 0.66; // Blue pointing down (matches Image 2 center)
+              l = 0.38;
+            } else {
+              h = 0.92; // Pink/Magenta pointing up (matches Image 2 outer ring)
+              l = 0.62;
+            }
+
+            const [cr, cg, cb] = hsl2rgb(h, s, l);
+            tempColor.setRGB(cr, cg, cb);
+          } else if (colormap === "racetrack") {
+            // Center (pointing down) Red -> Yellow -> Green -> Cyan -> Blue (pointing up)
+            const t = Math.min(1.0, Math.max(0.0, (mz + 1.0) * 0.5));
+            const h = t * 0.65;
+            const [cr, cg, cb] = hsl2rgb(h, 0.98, 0.52);
+            tempColor.setRGB(cr, cg, cb);
+          } else if (colormap === "topological") {
+            const q = (1.0 - Math.abs(mz)) * Math.exp(-r * 1.8);
+            if (q > 0.6) tempColor.setHex(0xe6a357);
+            else if (q > 0.2) tempColor.setHex(0x5672f7);
+            else tempColor.setHex(0x846cff);
+          } else {
+            // Chiral editorial
+            const normAngle = (Math.atan2(my, mx) + Math.PI) / (2 * Math.PI);
+            tempColor.setHSL(normAngle * 0.4 + 0.55, 0.85, (mz + 1.0) * 0.35 + 0.2);
+          }
+
           mesh.setMatrixAt(idx, dummyMatrix);
+          mesh.setColorAt(idx, tempColor);
           idx++;
         }
+      } else {
+        // Waveguide grid for spin waves
+        const density = Math.min(24, tierConfig.vectorDensity);
+        const totalGrid = density * density;
+        mesh.count = Math.min(totalGrid, maxCapacity);
+
+        const step = 4.2 / density;
+        const start = -2.1 + step * 0.5;
+
+        for (let ix = 0; ix < density && idx < maxCapacity; ix++) {
+          for (let iy = 0; iy < density && idx < maxCapacity; iy++) {
+            const x = start + ix * step;
+            const y = start + iy * step;
+            const k = Math.PI * (spintronicsPhysics.rfFrequency / 4.8);
+            const dist = x + 2.2;
+            const decay = Math.exp(-Math.max(0, dist) * spintronicsPhysics.dampingAlpha * 35.0);
+            const wavePhase = k * dist - elapsed * (spintronicsPhysics.rfFrequency * 0.6);
+            const zElev = Math.sin(wavePhase) * decay * 0.3;
+
+            const mx = 0;
+            const my = zElev;
+            const mz = Math.sqrt(Math.max(0, 1 - my * my));
+
+            dummyPos.set(x, y, zElev + 0.04);
+            dirVec.set(mx, my, mz).normalize();
+            dummyQuat.setFromUnitVectors(upVec, dirVec);
+            dummyMatrix.compose(dummyPos, dummyQuat, dummyScale);
+
+            const [cr, cg, cb] = hsl2rgb((((zElev * 2.0 + 0.5) % 1) + 1) % 1, 0.9, 0.55);
+            tempColor.setRGB(cr, cg, cb);
+
+            mesh.setMatrixAt(idx, dummyMatrix);
+            mesh.setColorAt(idx, tempColor);
+            idx++;
+          }
+        }
       }
+
       mesh.instanceMatrix.needsUpdate = true;
+      if (mesh.instanceColor) {
+        mesh.instanceColor.needsUpdate = true;
+      }
     }
   });
 
@@ -270,15 +385,14 @@ export function SpintronicsScene({ qualityProfile }: SpintronicsSceneProps) {
         />
       </mesh>
 
-      {/* Instanced Magnetization Vector Arrows */}
-      {arrowCount > 0 && (
-        <instancedMesh ref={instancedArrowsRef} args={[arrowGeometry, arrowMaterial, arrowCount]} />
-      )}
+      {/* Instanced 3D Magnetization Vector Arrows with HSL Cone Colors */}
+      <instancedMesh ref={instancedArrowsRef} args={[arrowGeometry, arrowMaterial, maxCapacity]} />
 
-      {/* Ambient Lighting motivated by spintronic cavity */}
-      <ambientLight intensity={0.4} />
-      <directionalLight position={[3, 4, 5]} intensity={1.2} color="#ffffff" />
-      <pointLight position={[0, 0, 2]} intensity={2.0} color="#846cff" distance={6} />
+      {/* Ambient and directional illumination revealing 3D arrow geometry */}
+      <ambientLight intensity={0.55} />
+      <directionalLight position={[3, 4, 5]} intensity={1.3} color="#ffffff" />
+      <directionalLight position={[-3, -2, 4]} intensity={0.6} color="#57e6dd" />
+      <pointLight position={[0, 0, 2]} intensity={2.2} color="#846cff" distance={6} />
     </group>
   );
 }

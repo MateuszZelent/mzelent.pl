@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  generatePolarArrowPositions,
+  hsl2rgb,
   PRESET_DESCRIPTIONS,
   SPINTRONICS_THEORY,
   SPINTRONICS_TIER_CONFIGS,
@@ -14,7 +16,7 @@ describe("3D Spintronics Simulation Engine & State Contract", () => {
     expect(initialSpintronicsPhysics.dmiStrength).toBe(1.8);
     expect(initialSpintronicsPhysics.rfFrequency).toBe(9.2);
     expect(initialSpintronicsPhysics.dampingAlpha).toBe(0.008);
-    expect(initialSpintronicsPhysics.colorMap).toBe("chiral");
+    expect(initialSpintronicsPhysics.colorMap).toBe("hsl-cone");
     expect(initialSpintronicsPhysics.showVectorField).toBe(true);
   });
 
@@ -86,5 +88,38 @@ describe("3D Spintronics Simulation Engine & State Contract", () => {
     expect(SPINTRONICS_THEORY.interfacialDmiD).toBe(1.8e-3);
     expect(SPINTRONICS_THEORY.uniaxialAnisotropyKu).toBe(5.0e5);
     expect(SPINTRONICS_THEORY.exchangeLengthLex).toBeCloseTo(5.7, 0.1);
+  });
+
+  it("converts HSL coordinates to RGB using MMPP algorithm", () => {
+    // 0 deg -> Red
+    const red = hsl2rgb(0.0, 1.0, 0.5);
+    expect(red[0]).toBeCloseTo(1.0, 2);
+    expect(red[1]).toBeCloseTo(0.0, 2);
+    expect(red[2]).toBeCloseTo(0.0, 2);
+
+    // 120 deg -> Green
+    const green = hsl2rgb(120 / 360, 1.0, 0.5);
+    expect(green[0]).toBeCloseTo(0.0, 2);
+    expect(green[1]).toBeCloseTo(1.0, 2);
+    expect(green[2]).toBeCloseTo(0.0, 2);
+
+    // 240 deg -> Blue
+    const blue = hsl2rgb(240 / 360, 1.0, 0.5);
+    expect(blue[0]).toBeCloseTo(0.0, 2);
+    expect(blue[1]).toBeCloseTo(0.0, 2);
+    expect(blue[2]).toBeCloseTo(1.0, 2);
+  });
+
+  it("generates concentric polar rings for authentic skyrmion arrow arrangement", () => {
+    const coords = generatePolarArrowPositions(8, 2.1);
+    expect(coords.length).toBeGreaterThan(100);
+    // Center arrow is at origin
+    expect(coords[0].x).toBe(0);
+    expect(coords[0].y).toBe(0);
+    expect(coords[0].r).toBe(0);
+    // All coordinates are within max radius
+    for (const c of coords) {
+      expect(c.r).toBeLessThanOrEqual(2.1001);
+    }
   });
 });

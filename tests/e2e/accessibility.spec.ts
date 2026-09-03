@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { ADMIN_COOKIE_NAME, createSessionToken } from "../../src/lib/auth/admin-auth";
 
 test.describe("Accessibility & Semantic Integrity", () => {
   test("has no automated accessibility violations on the laboratory shell @a11y", async ({ page }) => {
@@ -39,8 +40,41 @@ test.describe("Accessibility & Semantic Integrity", () => {
     expect(results.violations).toEqual([]);
   });
 
-  test("has no automated accessibility violations on the admin scholar page @a11y", async ({ page }) => {
+  test("has no automated accessibility violations on the admin scholar page @a11y", async ({
+    page,
+    context,
+  }) => {
+    const token = createSessionToken();
+    await context.addCookies([
+      {
+        name: ADMIN_COOKIE_NAME,
+        value: token,
+        url: "http://localhost:3154",
+      },
+    ]);
+
     await page.goto("/admin/scholar");
+    await page.waitForSelector("h1");
+
+    const results = await new AxeBuilder({ page }).analyze();
+    expect(results.violations).toEqual([]);
+  });
+
+  test("has no automated accessibility violations on the admin dashboard page @a11y", async ({
+    page,
+    context,
+  }) => {
+    const token = createSessionToken();
+    await context.addCookies([
+      {
+        name: ADMIN_COOKIE_NAME,
+        value: token,
+        url: "http://localhost:3154",
+      },
+    ]);
+
+    await page.goto("/admin");
+    await page.waitForSelector("h1");
 
     const results = await new AxeBuilder({ page }).analyze();
     expect(results.violations).toEqual([]);
@@ -83,6 +117,26 @@ test.describe("Accessibility & Semantic Integrity", () => {
 
   test("has no automated accessibility violations on the admin login page @a11y", async ({ page }) => {
     await page.goto("/admin/login");
+
+    const results = await new AxeBuilder({ page }).analyze();
+    expect(results.violations).toEqual([]);
+  });
+
+  test("has no automated accessibility violations on the admin blog page @a11y", async ({
+    page,
+    context,
+  }) => {
+    const token = createSessionToken();
+    await context.addCookies([
+      {
+        name: ADMIN_COOKIE_NAME,
+        value: token,
+        url: "http://localhost:3154",
+      },
+    ]);
+
+    await page.goto("/admin/blog");
+    await page.waitForSelector("h1");
 
     const results = await new AxeBuilder({ page }).analyze();
     expect(results.violations).toEqual([]);

@@ -181,18 +181,36 @@ async function capture() {
   });
   console.log("Captured admin-login-page.png");
 
-  // 15. Perform login and capture /admin/blog
+  // 15. Perform login and capture /admin dashboard
   const pwdInput = page.locator("#admin-password");
   if (await pwdInput.count()) {
     await pwdInput.fill("spintronics2026");
     await page.getByRole("button", { name: "Authorize Access" }).click();
-    await page.waitForURL("**/admin/blog", { timeout: 5000 });
+    await page.waitForURL("**/admin", { timeout: 5000 });
+    await page.waitForTimeout(600);
+    await page.screenshot({
+      path: resolve(artifactDir, "admin-unified-dashboard.png"),
+      fullPage: true,
+    });
+    console.log("Captured admin-unified-dashboard.png");
+
+    // 15b. Navigate to authenticated /admin/blog studio
+    await page.goto("http://localhost:3154/admin/blog", { waitUntil: "domcontentloaded" });
     await page.waitForTimeout(500);
     await page.screenshot({
       path: resolve(artifactDir, "admin-blog-studio.png"),
       fullPage: true,
     });
     console.log("Captured admin-blog-studio.png");
+
+    // 15c. Navigate to authenticated /admin/scholar
+    await page.goto("http://localhost:3154/admin/scholar", { waitUntil: "domcontentloaded" });
+    await page.waitForTimeout(500);
+    await page.screenshot({
+      path: resolve(artifactDir, "admin-scholar-dashboard.png"),
+      fullPage: true,
+    });
+    console.log("Captured admin-scholar-dashboard.png");
   }
 
   // 16. Spintronics 3D Simulation Laboratory

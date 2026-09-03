@@ -321,6 +321,63 @@
   background: rgba(239, 68, 68, 0.1);
 }
 
+.editBtn {
+  background: none;
+  border: none;
+  color: var(--accent-cyan);
+  cursor: pointer;
+  padding: 0.35rem 0.5rem;
+  border-radius: var(--radius-xs);
+  font-size: 0.85rem;
+  font-family: var(--font-mono, monospace);
+  transition:
+    color var(--duration-fast) ease,
+    background var(--duration-fast) ease;
+}
+
+.editBtn:hover {
+  background: rgba(0, 242, 254, 0.12);
+}
+
+.itemActions {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.cancelEditBtn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--color-ink-muted);
+  cursor: pointer;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-xs);
+  font-size: 0.78rem;
+  font-family: var(--font-mono, monospace);
+  transition: all var(--duration-fast) ease;
+}
+
+.cancelEditBtn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-mono-sm);
+  color: var(--accent-cyan);
+  text-decoration: none;
+  margin-bottom: var(--space-4);
+  transition: color var(--duration-fast) ease;
+}
+
+.backLink:hover {
+  color: var(--color-ink);
+}
+
 .bannerSuccess {
   margin-bottom: var(--space-4);
   padding: 0.6rem 0.8rem;

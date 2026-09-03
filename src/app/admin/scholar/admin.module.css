@@ -316,3 +316,53 @@
 .removeBtn:hover {
   background: rgba(239, 68, 68, 0.15);
 }
+
+.featureBtn {
+  background: none;
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  border-radius: var(--radius-xs);
+  padding: 0.3rem 0.6rem;
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-mono-xs);
+  color: #ffd700;
+  cursor: pointer;
+  transition: all var(--duration-fast) ease;
+}
+
+.featureBtnActive {
+  background: rgba(255, 215, 0, 0.2);
+  border-color: #ffd700;
+}
+
+.cardActions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.existingPubsSection {
+  margin-top: 3.5rem;
+  padding-top: 2.5rem;
+  border-top: 1px solid var(--color-line-medium);
+}
+
+.searchBar {
+  margin: 1.25rem 0 1.75rem 0;
+}
+
+.searchInput {
+  width: 100%;
+  max-width: 500px;
+  padding: 0.65rem 1rem;
+  font-size: 0.88rem;
+  color: var(--color-ink);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--color-line-medium);
+  border-radius: var(--radius-sm);
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.searchInput:focus {
+  border-color: var(--accent-cyan);
+}

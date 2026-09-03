@@ -20,6 +20,9 @@ export default function AdminBlogPage() {
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 
+  // Editing state
+  const [editingPostId, setEditingPostId] = useState<string | null>(null);
+
   // Form states
   const [title, setTitle] = useState("");
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
@@ -75,6 +78,37 @@ export default function AdminBlogPage() {
     router.replace("/admin/login");
   };
 
+  const handleStartEdit = (post: BlogPost) => {
+    setEditingPostId(post.id);
+    setTitle(post.title);
+    setDate(post.date);
+    setCategory(post.category);
+    setLocation(post.location || "RPTU Kaiserslautern-Landau");
+    setDescription(post.description);
+    setTags(post.tags.join(", "));
+    setInstrument(post.technicalDetails?.instrument || "");
+    setMagneticField(post.technicalDetails?.magneticField || "");
+    setTemperature(post.technicalDetails?.temperature || "");
+    setPreviewUrl(post.imageUrl);
+    setSelectedFile(null);
+    setErrorMsg("");
+    setSuccessMsg("");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingPostId(null);
+    setTitle("");
+    setDate(new Date().toISOString().split("T")[0]);
+    setDescription("");
+    setInstrument("");
+    setMagneticField("");
+    setTemperature("");
+    setSelectedFile(null);
+    setPreviewUrl(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
   const handleDeletePost = async (id: string) => {
     if (!confirm("Are you sure you want to delete this blog post?")) return;
 
@@ -87,6 +121,9 @@ export default function AdminBlogPage() {
 
       if (res.ok) {
         setPosts((prev) => prev.filter((p) => p.id !== id));
+        if (editingPostId === id) {
+          handleCancelEdit();
+        }
         setSuccessMsg("Blog post deleted successfully.");
         setTimeout(() => setSuccessMsg(""), 4000);
       } else {
@@ -105,6 +142,9 @@ export default function AdminBlogPage() {
 
     try {
       const formData = new FormData();
+      if (editingPostId) {
+        formData.append("id", editingPostId);
+      }
       formData.append("title", title);
       formData.append("date", date);
       formData.append("category", category);
@@ -120,27 +160,27 @@ export default function AdminBlogPage() {
         formData.append("image", selectedFile);
       }
 
+      const method = editingPostId ? "PUT" : "POST";
+
       const res = await fetch("/api/admin/blog", {
-        method: "POST",
+        method,
         body: formData,
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        setErrorMsg(data.error || "Failed to publish blog post.");
+        setErrorMsg(data.error || "Failed to save blog post.");
       } else {
-        setPosts((prev) => [data.post, ...prev.filter((p) => p.id !== data.post.id)]);
-        setSuccessMsg("Blog post published and committed successfully!");
+        if (editingPostId) {
+          setPosts((prev) => prev.map((p) => (p.id === data.post.id ? data.post : p)));
+          setSuccessMsg("Blog post updated and saved successfully!");
+        } else {
+          setPosts((prev) => [data.post, ...prev.filter((p) => p.id !== data.post.id)]);
+          setSuccessMsg("Blog post published and committed successfully!");
+        }
         // Reset form
-        setTitle("");
-        setDescription("");
-        setInstrument("");
-        setMagneticField("");
-        setTemperature("");
-        setSelectedFile(null);
-        setPreviewUrl(null);
-        if (fileInputRef.current) fileInputRef.current.value = "";
+        handleCancelEdit();
       }
     } catch {
       setErrorMsg("Error submitting post to backend.");
@@ -150,7 +190,22 @@ export default function AdminBlogPage() {
   };
 
   if (isAuthenticated === null) {
-    return null; // Initial loading check
+    return (
+      <div className={styles.container}>
+        <Header />
+        <main id="main-content" className={styles.mainContent} tabIndex={-1}>
+          <h1
+            style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0,0,0,0)" }}
+          >
+            Weryfikacja autoryzacji Blog Studio
+          </h1>
+          <div style={{ textAlign: "center", padding: "8rem 0" }}>
+            <p style={{ color: "var(--color-ink-muted)" }}>Weryfikacja tożsamości administratora...</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
   }
 
   return (
@@ -158,6 +213,15 @@ export default function AdminBlogPage() {
       <Header />
 
       <main id="main-content" className={styles.mainContent} tabIndex={-1}>
+        <div style={{ display: "flex", gap: "1.5rem", marginBottom: "1rem", flexWrap: "wrap" }}>
+          <Link href="/admin" className={styles.backLink}>
+            ← Panel Główny (/admin)
+          </Link>
+          <Link href="/blog" className={styles.backLink}>
+            Zobacz Blog Publiczny →
+          </Link>
+        </div>
+
         <div className={styles.topBar}>
           <div className={styles.titleArea}>
             <div className={styles.badge}>
@@ -168,9 +232,6 @@ export default function AdminBlogPage() {
           </div>
 
           <div className={styles.actionsGroup}>
-            <Link href="/blog" className={styles.viewBlogBtn}>
-              View Live Blog →
-            </Link>
             <button type="button" onClick={handleLogout} className={styles.logoutBtn}>
               Log Out
             </button>
@@ -181,9 +242,26 @@ export default function AdminBlogPage() {
         {errorMsg && <div className={styles.bannerError}>{errorMsg}</div>}
 
         <div className={styles.grid}>
-          {/* Upload Form */}
+          {/* Upload / Edit Form */}
           <section className={styles.panel} aria-label="Upload New Blog Entry">
-            <h2 className={styles.panelTitle}>Publish New Blog Entry</h2>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: "1.5rem",
+              }}
+            >
+              <h2 className={styles.panelTitle} style={{ margin: 0 }}>
+                {editingPostId ? "Edytuj Wpis Laboratoryjny" : "Publish New Blog Entry"}
+              </h2>
+
+              {editingPostId && (
+                <button type="button" onClick={handleCancelEdit} className={styles.cancelEditBtn}>
+                  Anuluj edycję ✕
+                </button>
+              )}
+            </div>
 
             <form onSubmit={handleSubmit} className={styles.form}>
               <div className={styles.fieldGroup}>
@@ -238,12 +316,11 @@ export default function AdminBlogPage() {
 
               <div className={styles.fieldGroup}>
                 <label className={styles.label} htmlFor="post-location">
-                  Research Location *
+                  Research Location / Facility
                 </label>
                 <input
                   id="post-location"
                   type="text"
-                  required
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                   placeholder="e.g. RPTU Kaiserslautern-Landau / UAM Poznań"
@@ -252,91 +329,126 @@ export default function AdminBlogPage() {
               </div>
 
               <div className={styles.fieldGroup}>
-                <label className={styles.label} htmlFor="post-image">
-                  Photo / Scientific Figure Upload
-                </label>
-                <div
-                  className={styles.fileDropZone}
-                  onClick={() => fileInputRef.current?.click()}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      fileInputRef.current?.click();
-                    }
-                  }}
-                  aria-label="Click to select blog image file"
-                >
-                  <input
-                    ref={fileInputRef}
-                    id="post-image"
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleFileChange(e.target.files?.[0] || null)}
-                    className={styles.fileInput}
-                  />
-                  <p className={styles.dropPrompt}>
-                    {selectedFile
-                      ? `Selected: ${selectedFile.name} (${(selectedFile.size / 1024).toFixed(1)} KB)`
-                      : "Drag & drop or click to upload scientific photograph / graphic (PNG, JPG, WEBP)"}
-                  </p>
-                </div>
-
-                {previewUrl && (
-                  <div style={{ position: "relative", width: "100%", height: 180, marginTop: 8 }}>
-                    <Image
-                      src={previewUrl}
-                      alt="Upload preview"
-                      fill
-                      unoptimized
-                      style={{ objectFit: "cover", borderRadius: 4 }}
-                    />
-                  </div>
-                )}
-              </div>
-
-              <div className={styles.fieldGroup}>
-                <label className={styles.label} htmlFor="post-description">
-                  Description & Context *
+                <label className={styles.label} htmlFor="post-desc">
+                  Scientific Description & Abstract *
                 </label>
                 <textarea
-                  id="post-description"
+                  id="post-desc"
                   required
                   rows={4}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Provide scientific notes, experimental conditions, or simulation observations..."
+                  placeholder="Concise overview of observation, methodology, results or simulation parameters..."
                   className={styles.textarea}
                 />
               </div>
 
-              <div className={styles.formRow}>
-                <div className={styles.fieldGroup}>
-                  <label className={styles.label} htmlFor="post-instrument">
-                    Apparatus / Instrument
-                  </label>
-                  <input
-                    id="post-instrument"
-                    type="text"
-                    value={instrument}
-                    onChange={(e) => setInstrument(e.target.value)}
-                    placeholder="e.g. BLS Spectrometer / MuMax3"
-                    className={styles.input}
-                  />
-                </div>
+              {/* Image Upload Zone */}
+              <div className={styles.fieldGroup}>
+                <label className={styles.label}>
+                  {editingPostId ? "Zmień Zdjęcie (opcjonalne)" : "Laboratory Photograph / Micrograph *"}
+                </label>
 
-                <div className={styles.fieldGroup}>
-                  <label className={styles.label} htmlFor="post-field">
-                    Magnetic Field (optional)
-                  </label>
+                <div
+                  className={styles.dropZone}
+                  onClick={() => fileInputRef.current?.click()}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") fileInputRef.current?.click();
+                  }}
+                >
                   <input
-                    id="post-field"
-                    type="text"
-                    value={magneticField}
-                    onChange={(e) => setMagneticField(e.target.value)}
-                    placeholder="e.g. 150 mT out-of-plane"
-                    className={styles.input}
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/png, image/jpeg, image/webp, image/avif"
+                    style={{ display: "none" }}
+                    onChange={(e) => handleFileChange(e.target.files?.[0] || null)}
                   />
+
+                  {previewUrl ? (
+                    <div className={styles.previewContainer}>
+                      <Image
+                        src={previewUrl}
+                        alt="Upload preview"
+                        fill
+                        unoptimized
+                        className={styles.previewImage}
+                      />
+                      <span className={styles.replaceHint}>Kliknij, aby zmienić grafikę</span>
+                    </div>
+                  ) : (
+                    <div className={styles.dropZoneContent}>
+                      <span className={styles.uploadIcon} aria-hidden="true">
+                        <svg
+                          width="32"
+                          height="32"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.8"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                          <polyline points="17 8 12 3 7 8" />
+                          <line x1="12" y1="3" x2="12" y2="15" />
+                        </svg>
+                      </span>
+                      <span className={styles.dropZoneText}>
+                        Kliknij lub przeciągnij plik (JPEG, PNG, WebP, AVIF do 10MB)
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Technical Details Accordion */}
+              <div className={styles.detailsBox}>
+                <span className={styles.detailsBoxTitle}>Parametry Eksperymentalne (Opcjonalne)</span>
+
+                <div className={styles.formRow}>
+                  <div className={styles.fieldGroup}>
+                    <label className={styles.labelSmall} htmlFor="spec-instrument">
+                      Aparatura Pomiarowa
+                    </label>
+                    <input
+                      id="spec-instrument"
+                      type="text"
+                      value={instrument}
+                      onChange={(e) => setInstrument(e.target.value)}
+                      placeholder="np. BLS Spectrometer / Mumax3 GPU"
+                      className={styles.inputSmall}
+                    />
+                  </div>
+
+                  <div className={styles.fieldGroup}>
+                    <label className={styles.labelSmall} htmlFor="spec-field">
+                      Pole Zewnętrzne (B)
+                    </label>
+                    <input
+                      id="spec-field"
+                      type="text"
+                      value={magneticField}
+                      onChange={(e) => setMagneticField(e.target.value)}
+                      placeholder="np. 45 mT prostopadłe"
+                      className={styles.inputSmall}
+                    />
+                  </div>
+
+                  <div className={styles.fieldGroup}>
+                    <label className={styles.labelSmall} htmlFor="spec-temp">
+                      Temperatura (T)
+                    </label>
+                    <input
+                      id="spec-temp"
+                      type="text"
+                      value={temperature}
+                      onChange={(e) => setTemperature(e.target.value)}
+                      placeholder="np. 293 K / Pokojowa"
+                      className={styles.inputSmall}
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -355,7 +467,7 @@ export default function AdminBlogPage() {
               </div>
 
               <button type="submit" disabled={loading} className={styles.submitBtn}>
-                {loading ? "Publishing Entry..." : "Publish to Blog →"}
+                {loading ? "Saving..." : editingPostId ? "Zapisz Zmiany we Wpisie →" : "Publish to Blog →"}
               </button>
             </form>
           </section>
@@ -384,15 +496,27 @@ export default function AdminBlogPage() {
                     </div>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() => handleDeletePost(post.id)}
-                    className={styles.deleteBtn}
-                    aria-label={`Delete post: ${post.title}`}
-                    title="Delete post"
-                  >
-                    ✕
-                  </button>
+                  <div className={styles.itemActions}>
+                    <button
+                      type="button"
+                      onClick={() => handleStartEdit(post)}
+                      className={styles.editBtn}
+                      aria-label={`Edit post: ${post.title}`}
+                      title="Edit post"
+                    >
+                      Edytuj
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleDeletePost(post.id)}
+                      className={styles.deleteBtn}
+                      aria-label={`Delete post: ${post.title}`}
+                      title="Delete post"
+                    >
+                      ✕
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>

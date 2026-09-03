@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
 
 import { Footer } from "../../../components/footer/Footer";
 import { Header } from "../../../components/navigation/Header";
@@ -19,14 +20,47 @@ const INITIAL_SCHOLAR_SAMPLE = `@article{zelent2024neuromorphic,
 }`;
 
 export default function AdminScholarPage() {
+  const router = useRouter();
   const { t } = useTranslation();
+
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [bibtexInput, setBibtexInput] = useState(INITIAL_SCHOLAR_SAMPLE);
   const [stagedList, setStagedList] = useState<Publication[]>([]);
+  const [existingPubs, setExistingPubs] = useState<Publication[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    async function checkAuthAndLoad() {
+      try {
+        const authRes = await fetch("/api/admin/auth");
+        const authData = await authRes.json();
+
+        if (!authData.authenticated) {
+          router.replace("/admin/login");
+          return;
+        }
+
+        setIsAuthenticated(true);
+
+        const pubRes = await fetch("/api/admin/publications");
+        if (pubRes.ok) {
+          const pubData = await pubRes.json();
+          if (pubData.publications) {
+            setExistingPubs(pubData.publications);
+          }
+        }
+      } catch {
+        router.replace("/admin/login");
+      }
+    }
+
+    checkAuthAndLoad();
+  }, [router]);
 
   const parseBibtexText = (text: string): Publication => {
-    // Regex extractors for standard BibTeX tags
     const titleMatch = text.match(/title\s*=\s*[{"]([^}"]+)[}"]/i);
     const authorMatch = text.match(/author\s*=\s*[{"]([^}"]+)[}"]/i);
     const journalMatch = text.match(/journal\s*=\s*[{"]([^}"]+)[}"]/i);
@@ -68,7 +102,6 @@ export default function AdminScholarPage() {
     try {
       const validated = parseBibtexText(bibtexInput);
       setStagedList((prev) => {
-        // Prevent duplicate DOIs
         if (prev.some((p) => p.doi === validated.doi)) {
           return prev;
         }
@@ -86,7 +119,7 @@ export default function AdminScholarPage() {
   const handleSyncFromScholar = async () => {
     setIsSyncing(true);
     setFeedback(null);
-    // Simulate fetching indexed papers from Google Scholar
+
     setTimeout(() => {
       try {
         const validated = parseBibtexText(bibtexInput);
@@ -98,7 +131,7 @@ export default function AdminScholarPage() {
           type: "success",
           message: "Google Scholar index scanned: 1 new publication staged for review!",
         });
-      } catch (err) {
+      } catch {
         setFeedback({
           type: "error",
           message: "Error fetching from Scholar profile.",
@@ -113,21 +146,128 @@ export default function AdminScholarPage() {
     setStagedList((prev) => prev.filter((p) => p.id !== id));
   };
 
-  const handleCommit = () => {
-    setFeedback({
-      type: "success",
-      message: t.adminScholar.successCommitted,
-    });
+  const handleCommit = async () => {
+    if (stagedList.length === 0) return;
+    setIsSaving(true);
+    setFeedback(null);
+
+    try {
+      for (const pub of stagedList) {
+        const res = await fetch("/api/admin/publications", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(pub),
+        });
+
+        if (!res.ok) {
+          const errData = await res.json();
+          throw new Error(errData.error || "Failed to commit publication to database");
+        }
+      }
+
+      setFeedback({
+        type: "success",
+        message: `Pomyślnie zatwierdzono ${stagedList.length} publikacji do produkcyjnej bazy danych!`,
+      });
+
+      // Refresh list
+      const pubRes = await fetch("/api/admin/publications");
+      if (pubRes.ok) {
+        const pubData = await pubRes.json();
+        if (pubData.publications) {
+          setExistingPubs(pubData.publications);
+        }
+      }
+
+      setStagedList([]);
+    } catch (err) {
+      setFeedback({
+        type: "error",
+        message: err instanceof Error ? err.message : "Błąd podczas zapisu publikacji.",
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
+
+  const handleDeleteExisting = async (id: string) => {
+    if (!confirm("Czy na pewno chcesz usunąć tę publikację z bazy?")) return;
+
+    try {
+      const res = await fetch("/api/admin/publications", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+
+      if (res.ok) {
+        setExistingPubs((prev) => prev.filter((p) => p.id !== id));
+        setFeedback({ type: "success", message: "Publikacja usunięta pomyślnie z bazy." });
+      } else {
+        setFeedback({ type: "error", message: "Nie udało się usunąć publikacji." });
+      }
+    } catch {
+      setFeedback({ type: "error", message: "Błąd sieci podczas usuwania publikacji." });
+    }
+  };
+
+  const handleToggleFeatured = async (pub: Publication) => {
+    const updated = { ...pub, featured: !pub.featured };
+
+    try {
+      const res = await fetch("/api/admin/publications", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updated),
+      });
+
+      if (res.ok) {
+        setExistingPubs((prev) => prev.map((p) => (p.id === pub.id ? updated : p)));
+      }
+    } catch {
+      setFeedback({ type: "error", message: "Błąd podczas aktualizacji publikacji." });
+    }
+  };
+
+  if (isAuthenticated === null) {
+    return (
+      <div className={styles.pageContainer}>
+        <Header />
+        <main id="main-content" className={styles.mainContent} tabIndex={-1}>
+          <h1
+            style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0,0,0,0)" }}
+          >
+            Weryfikacja autoryzacji Katalogu Publikacji
+          </h1>
+          <div style={{ textAlign: "center", padding: "8rem 0" }}>
+            <p style={{ color: "var(--color-ink-muted)" }}>Weryfikacja tożsamości administratora...</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  const filteredExisting = existingPubs.filter(
+    (p) =>
+      p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.journal.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.year.toString().includes(searchTerm),
+  );
 
   return (
     <div className={styles.pageContainer}>
       <Header />
 
       <main id="main-content" className={styles.mainContent} tabIndex={-1}>
-        <Link href="/publications" className={styles.backLink}>
-          ← {t.publicationsPage.heading} {t.publicationsPage.headingAccent}
-        </Link>
+        <div style={{ display: "flex", gap: "1.5rem", marginBottom: "1.5rem", flexWrap: "wrap" }}>
+          <Link href="/admin" className={styles.backLink}>
+            ← Panel Główny (/admin)
+          </Link>
+          <Link href="/publications" className={styles.backLink}>
+            Zobacz Wykaz Publiczny →
+          </Link>
+        </div>
 
         <header className={styles.headerArea}>
           <span className={styles.badge}>{t.adminScholar.badge}</span>
@@ -222,10 +362,11 @@ export default function AdminScholarPage() {
               <button
                 type="button"
                 onClick={handleCommit}
+                disabled={isSaving}
                 className={styles.primaryBtn}
                 data-testid="commit-staged-btn"
               >
-                {t.adminScholar.commitBtn}
+                {isSaving ? "Zapisywanie w bazie..." : t.adminScholar.commitBtn}
               </button>
             )}
           </div>
@@ -241,7 +382,7 @@ export default function AdminScholarPage() {
                     </span>
                   </div>
 
-                  <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                  <div className={styles.cardActions}>
                     <span className={styles.badgeOA}>Open Access</span>
                     <button
                       type="button"
@@ -249,7 +390,7 @@ export default function AdminScholarPage() {
                       className={styles.removeBtn}
                       aria-label={`Remove staged ${pub.title}`}
                     >
-                      Remove
+                      Usuń z bufora
                     </button>
                   </div>
                 </div>
@@ -258,6 +399,55 @@ export default function AdminScholarPage() {
           ) : (
             <p style={{ color: "var(--color-ink-muted)", fontStyle: "italic" }}>{t.adminScholar.noStaged}</p>
           )}
+        </section>
+
+        {/* Existing publications repository management */}
+        <section className={styles.existingPubsSection} aria-label="Existing Publications in Database">
+          <h2 className={styles.stagedTitle}>Baza Opublikowanych Artykułów ({existingPubs.length})</h2>
+
+          <div className={styles.searchBar}>
+            <input
+              type="text"
+              placeholder="Filtruj publikacje (tytuł, czasopismo, rok)..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className={styles.searchInput}
+              aria-label="Filtruj publikacje w bazie"
+            />
+          </div>
+
+          <div className={styles.stagedCards}>
+            {filteredExisting.slice(0, 15).map((pub) => (
+              <div key={pub.id} className={styles.stagedCard}>
+                <div className={styles.cardInfo}>
+                  <h3 className={styles.cardTitle}>{pub.title}</h3>
+                  <span className={styles.cardMeta}>
+                    {pub.journal} ({pub.year}) · {pub.authors.join(", ")} · Cytowania: {pub.citations || 0}
+                  </span>
+                </div>
+
+                <div className={styles.cardActions}>
+                  <button
+                    type="button"
+                    onClick={() => handleToggleFeatured(pub)}
+                    className={`${styles.featureBtn} ${pub.featured ? styles.featureBtnActive : ""}`}
+                    title="Przełącz status wyróżnionej publikacji na stronie głównej"
+                  >
+                    {pub.featured ? "★ Wyróżniona" : "☆ Zwykła"}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteExisting(pub.id)}
+                    className={styles.removeBtn}
+                    aria-label={`Usuń publikację ${pub.title}`}
+                  >
+                    Usuń
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </section>
       </main>
 

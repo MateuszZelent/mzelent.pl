@@ -31,7 +31,7 @@ export default function AdminLoginPage() {
       if (!res.ok) {
         setError(data.error || "Authentication failed. Please verify credentials.");
       } else {
-        router.push("/admin/blog");
+        router.push("/admin");
       }
     } catch {
       setError("Network or server connection error.");

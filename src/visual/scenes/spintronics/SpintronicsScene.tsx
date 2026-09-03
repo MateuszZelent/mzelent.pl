@@ -9,7 +9,12 @@ import type { QualityProfile } from "../../quality/quality-contract";
 import { spintronicsFragmentShader } from "../../shaders/spintronics/spintronics.frag";
 import { spintronicsVertexShader } from "../../shaders/spintronics/spintronics.vert";
 import { useSceneStore } from "../../state/scene-store";
-import { generatePolarArrowPositions, hsl2rgb, SPINTRONICS_TIER_CONFIGS } from "./spintronics-config";
+import {
+  generatePolarArrowPositions,
+  hsl2rgb,
+  SPINTRONICS_TIER_CONFIGS,
+  zelentPublicationRgb,
+} from "./spintronics-config";
 
 interface SpintronicsSceneProps {
   readonly qualityProfile: QualityProfile;
@@ -24,11 +29,12 @@ const MODE_INDEX_MAP: Record<string, number> = {
 };
 
 const COLORMAP_INDEX_MAP: Record<string, number> = {
-  "hsl-cone": 0,
-  racetrack: 1,
-  chiral: 2,
-  topological: 3,
-  magnetization: 4,
+  "zelent-prb": 0,
+  "hsl-cone": 1,
+  racetrack: 2,
+  chiral: 3,
+  topological: 4,
+  magnetization: 5,
 };
 
 export function SpintronicsScene({ qualityProfile }: SpintronicsSceneProps) {
@@ -83,18 +89,18 @@ export function SpintronicsScene({ qualityProfile }: SpintronicsSceneProps) {
   // Combined 3D Arrow Geometry: Pivot Sphere + Shaft Cylinder + Head Cone
   const arrowGeometry = useMemo(() => {
     // 1. Pivot Anchor Bead at nanodot surface (0, 0, 0)
-    const beadRadius = 0.024;
+    const beadRadius = 0.026;
     const bead = new THREE.SphereGeometry(beadRadius, 10, 8);
 
     // 2. Sleek Cylindrical Shaft
-    const shaftRadius = 0.0125;
-    const shaftHeight = 0.17;
+    const shaftRadius = 0.0135;
+    const shaftHeight = 0.18;
     const shaft = new THREE.CylinderGeometry(shaftRadius, shaftRadius, shaftHeight, 10);
     shaft.translate(0, shaftHeight * 0.5, 0);
 
     // 3. Sharp Conical Arrowhead
-    const headRadius = 0.038;
-    const headHeight = 0.095;
+    const headRadius = 0.04;
+    const headHeight = 0.1;
     const head = new THREE.ConeGeometry(headRadius, headHeight, 10);
     head.translate(0, shaftHeight + headHeight * 0.5, 0);
 
@@ -107,8 +113,8 @@ export function SpintronicsScene({ qualityProfile }: SpintronicsSceneProps) {
 
   const arrowMaterial = useMemo(() => {
     return new THREE.MeshStandardMaterial({
-      roughness: 0.18,
-      metalness: 0.35,
+      roughness: 0.16,
+      metalness: 0.38,
     });
   }, []);
 
@@ -235,26 +241,24 @@ export function SpintronicsScene({ qualityProfile }: SpintronicsSceneProps) {
           let zElev = 0;
 
           if (mode === 0 || mode === 1) {
-            // Skyrmion profile
-            const baseR = Math.max(0.25, Math.min(1.6, 0.85 + (dmi - 1.8) * 0.22 - bField * 0.0035));
-            const wallWidth = Math.max(0.18, 0.38 - dmi * 0.04);
-            const normDist = Math.max(0, Math.min(1, (r - (baseR - wallWidth)) / (2 * wallWidth)));
-            const theta = Math.PI * (1.0 - normDist * normDist * (3 - 2 * normDist));
-            const sinTheta = Math.sin(theta);
-            const cosTheta = Math.cos(theta);
+            // Exact micromagnetic domain-wall ansatz (Bogdanov & Hubert / Zelent PRB model)
+            const rSk = Math.max(0.35, Math.min(1.65, 0.88 + (dmi - 1.8) * 0.35 - bField * 0.0042));
+            const deltaW = Math.max(0.18, Math.min(0.48, 0.32 - (dmi - 1.8) * 0.04));
+            const arg = Math.max(-15, Math.min(15, (r - rSk) / deltaW));
+            mz = Math.tanh(arg);
+            const mPerp = 1.0 / Math.cosh(arg);
 
             zElev = 0.0; // Flat nanodot substrate without topography
 
             if (mode === 0) {
-              // Néel skyrmion (hedgehog radial in-plane orientation)
-              mx = sinTheta * Math.cos(phi);
-              my = sinTheta * Math.sin(phi);
+              // Néel skyrmion: radial in-plane chirality
+              mx = mPerp * Math.cos(phi);
+              my = mPerp * Math.sin(phi);
             } else {
-              // Bloch skyrmion (vortex-like tangential in-plane orientation)
-              mx = -sinTheta * Math.sin(phi);
-              my = sinTheta * Math.cos(phi);
+              // Bloch skyrmion: tangential in-plane chirality
+              mx = -mPerp * Math.sin(phi);
+              my = mPerp * Math.cos(phi);
             }
-            mz = cosTheta;
           } else if (mode === 2) {
             // Magnetic Vortex
             const coreR = 0.24;
@@ -282,31 +286,24 @@ export function SpintronicsScene({ qualityProfile }: SpintronicsSceneProps) {
           dummyQuat.setFromUnitVectors(upVec, dirVec);
           dummyMatrix.compose(dummyPos, dummyQuat, dummyScale);
 
-          // Color calculation according to MMPP HSL Color Cone
-          if (colormap === "hsl-cone") {
-            const inPlane = Math.sqrt(mx * mx + my * my);
-            let h = 0;
-            const s = 0.96;
-            let l = 0.5;
-
-            if (inPlane > 0.05) {
-              const inPlaneAngle = Math.atan2(my, mx);
-              h = (((inPlaneAngle / (2 * Math.PI)) % 1) + 1) % 1;
-              l = Math.max(0.32, Math.min(0.68, 0.5 + mz * 0.15));
-            } else if (mz < 0) {
-              h = 0.66; // Blue pointing down (matches Image 2 center)
-              l = 0.38;
-            } else {
-              h = 0.92; // Pink/Magenta pointing up (matches Image 2 outer ring)
-              l = 0.62;
-            }
-
+          // Color calculation
+          if (colormap === "zelent-prb") {
+            // Exact scientific colormap from Dr. Mateusz Zelent's publications:
+            // mz = -1 (Blue) -> mz = 0 (Green) -> mz = +1 (Magenta/Pink)
+            const [cr, cg, cb] = zelentPublicationRgb(mz);
+            tempColor.setRGB(cr, cg, cb);
+          } else if (colormap === "hsl-cone") {
+            // MMPP in-plane orientation wheel
+            const inPlaneAngle = Math.atan2(my, mx);
+            const h = (((inPlaneAngle / (2 * Math.PI)) % 1) + 1) % 1;
+            const s = Math.min(1.0, Math.sqrt(mx * mx + my * my));
+            const l = Math.max(0.12, Math.min(0.88, (mz + 1.0) * 0.5));
             const [cr, cg, cb] = hsl2rgb(h, s, l);
             tempColor.setRGB(cr, cg, cb);
           } else if (colormap === "racetrack") {
             // Center (pointing down) Red -> Yellow -> Green -> Cyan -> Blue (pointing up)
             const t = Math.min(1.0, Math.max(0.0, (mz + 1.0) * 0.5));
-            const h = t * 0.65;
+            const h = (1.0 - t) * 0.65;
             const [cr, cg, cb] = hsl2rgb(h, 0.98, 0.52);
             tempColor.setRGB(cr, cg, cb);
           } else if (colormap === "topological") {
@@ -315,9 +312,9 @@ export function SpintronicsScene({ qualityProfile }: SpintronicsSceneProps) {
             else if (q > 0.2) tempColor.setHex(0x5672f7);
             else tempColor.setHex(0x846cff);
           } else {
-            // Chiral editorial
-            const normAngle = (Math.atan2(my, mx) + Math.PI) / (2 * Math.PI);
-            tempColor.setHSL(normAngle * 0.4 + 0.55, 0.85, (mz + 1.0) * 0.35 + 0.2);
+            // Direct mz colormap
+            const t = Math.min(1.0, Math.max(0.0, (mz + 1.0) * 0.5));
+            tempColor.setRGB(0.05 + 0.87 * t, 0.15 - 0.01 * t, 0.88 - 0.36 * t);
           }
 
           mesh.setMatrixAt(idx, dummyMatrix);

@@ -52,7 +52,7 @@ export function VisualCanvas({
         frameloop={isContinuousLoop ? "always" : "demand"}
         dpr={[1, qualityProfile.dprCap]}
         gl={createRendererParameters(qualityProfile)}
-        camera={{ position: [0, 0, 5], fov: 45, near: 0.1, far: 100 }}
+        camera={{ position: [0, 0, 5.2], fov: 45, near: 0.1, far: 100 }}
         onCreated={handleCreated}
         style={{ pointerEvents: activeSceneId === "spintronics" ? "auto" : "none", ...style }}
       >

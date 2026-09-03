@@ -35,7 +35,7 @@ export const initialSpintronicsPhysics: SpintronicsPhysicsState = {
   dmiStrength: 1.8, // mJ/m²
   rfFrequency: 9.2, // GHz
   dampingAlpha: 0.008,
-  colorMap: "hsl-cone",
+  colorMap: "zelent-prb",
   showVectorField: true,
 };
 

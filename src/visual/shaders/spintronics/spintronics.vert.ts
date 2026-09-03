@@ -7,6 +7,7 @@ uniform float uRfFrequency; // GHz
 uniform float uDampingAlpha;
 
 varying vec2 vUv;
+varying vec2 vLocalPos;
 varying vec3 vWorldPosition;
 varying vec3 vNormalVec;
 varying float vElevation;
@@ -16,6 +17,7 @@ varying vec3 vMagVector;
 void main() {
   vUv = uv;
   vec3 pos = position;
+  vLocalPos = pos.xy;
   float r = length(pos.xy);
   vDistCenter = r;
 
@@ -24,25 +26,26 @@ void main() {
 
   if (uMode == 0 || uMode == 1) {
     // Topologically protected Skyrmion (Neel or Bloch)
-    // Radius modulated by DMI and external field Bz
-    float baseR = 0.85 + (uDmiStrength - 1.8) * 0.22 - (uMagneticField * 0.0035);
-    baseR = max(0.25, min(1.6, baseR));
-    float wallWidth = max(0.18, 0.38 - (uDmiStrength * 0.04));
+    // Equilibrium radius R_sk governed by DMI constant D and perpendicular Zeeman field Bz
+    float rSk = clamp(0.88 + (uDmiStrength - 1.8) * 0.35 - uMagneticField * 0.0042, 0.35, 1.65);
+    float deltaW = clamp(0.32 - (uDmiStrength - 1.8) * 0.04, 0.18, 0.48);
     
-    // Domain wall profile Theta(r)
-    float theta = 3.14159265 * (1.0 - smoothstep(baseR - wallWidth, baseR + wallWidth, r));
-    float cosTheta = cos(theta);
-    float sinTheta = sin(theta);
+    // Exact domain-wall ansatz (Bogdanov-Hubert / Zelent PRB model):
+    // mz(r) = tanh((r - R_sk) / deltaW)
+    // mPerp(r) = sech((r - R_sk) / deltaW)
+    float arg = clamp((r - rSk) / deltaW, -15.0, 15.0);
+    float mzVal = tanh(arg);
+    float mPerp = 1.0 / cosh(arg);
     float phi = atan(pos.y, pos.x);
 
     elevation = 0.0; // Flat disk nanodot substrate
 
     if (uMode == 0) {
-      // Neel skyrmion (hedgehog radial in-plane component)
-      m = vec3(sinTheta * cos(phi), sinTheta * sin(phi), cosTheta);
+      // Neel skyrmion (hedgehog radial in-plane chirality)
+      m = vec3(mPerp * cos(phi), mPerp * sin(phi), mzVal);
     } else {
-      // Bloch skyrmion (vortex tangential in-plane component)
-      m = vec3(-sinTheta * sin(phi), sinTheta * cos(phi), cosTheta);
+      // Bloch skyrmion (vortex tangential in-plane chirality)
+      m = vec3(-mPerp * sin(phi), mPerp * cos(phi), mzVal);
     }
   } else if (uMode == 2) {
     // Magnetic Vortex with out-of-plane singularity core

@@ -6,7 +6,8 @@ export type MotionMode = "auto" | "reduced" | "full-preview";
 
 export type SpintronicsMode = "skyrmion-neel" | "skyrmion-bloch" | "vortex" | "spin-wave" | "caustic-lens";
 
-export type SpintronicsColorMap = "hsl-cone" | "racetrack" | "chiral" | "topological" | "magnetization";
+export type SpintronicsColorMap =
+  "zelent-prb" | "hsl-cone" | "racetrack" | "chiral" | "topological" | "magnetization";
 
 export interface SpintronicsPhysicsState {
   readonly mode: SpintronicsMode;

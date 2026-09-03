@@ -6,6 +6,7 @@ import {
   PRESET_DESCRIPTIONS,
   SPINTRONICS_THEORY,
   SPINTRONICS_TIER_CONFIGS,
+  zelentPublicationRgb,
 } from "../../src/visual/scenes/spintronics/spintronics-config";
 import { initialSpintronicsPhysics, useSceneStore } from "../../src/visual/state/scene-store";
 
@@ -16,7 +17,7 @@ describe("3D Spintronics Simulation Engine & State Contract", () => {
     expect(initialSpintronicsPhysics.dmiStrength).toBe(1.8);
     expect(initialSpintronicsPhysics.rfFrequency).toBe(9.2);
     expect(initialSpintronicsPhysics.dampingAlpha).toBe(0.008);
-    expect(initialSpintronicsPhysics.colorMap).toBe("hsl-cone");
+    expect(initialSpintronicsPhysics.colorMap).toBe("zelent-prb");
     expect(initialSpintronicsPhysics.showVectorField).toBe(true);
   });
 
@@ -110,8 +111,28 @@ describe("3D Spintronics Simulation Engine & State Contract", () => {
     expect(blue[2]).toBeCloseTo(1.0, 2);
   });
 
+  it("converts magnetization mz to continuous scientific colormap from Dr. Zelent's publications", () => {
+    // mz = -1.0 -> Deep Cobalt Blue (core)
+    const coreColor = zelentPublicationRgb(-1.0);
+    expect(coreColor[0]).toBeLessThan(0.1);
+    expect(coreColor[1]).toBeLessThan(0.2);
+    expect(coreColor[2]).toBeGreaterThan(0.8);
+
+    // mz = 0.0 -> Emerald Green (in-plane domain wall transition)
+    const wallColor = zelentPublicationRgb(0.0);
+    expect(wallColor[0]).toBeLessThan(0.25);
+    expect(wallColor[1]).toBeGreaterThan(0.8);
+    expect(wallColor[2]).toBeLessThan(0.3);
+
+    // mz = +1.0 -> Crimson Pink / Magenta (periphery)
+    const outerColor = zelentPublicationRgb(1.0);
+    expect(outerColor[0]).toBeGreaterThan(0.85);
+    expect(outerColor[1]).toBeLessThan(0.2);
+    expect(outerColor[2]).toBeGreaterThan(0.4);
+  });
+
   it("generates concentric polar rings for authentic skyrmion arrow arrangement", () => {
-    const coords = generatePolarArrowPositions(8, 2.1);
+    const coords = generatePolarArrowPositions(7, 2.15);
     expect(coords.length).toBeGreaterThan(100);
     // Center arrow is at origin
     expect(coords[0].x).toBe(0);
@@ -119,7 +140,7 @@ describe("3D Spintronics Simulation Engine & State Contract", () => {
     expect(coords[0].r).toBe(0);
     // All coordinates are within max radius
     for (const c of coords) {
-      expect(c.r).toBeLessThanOrEqual(2.1001);
+      expect(c.r).toBeLessThanOrEqual(2.1501);
     }
   });
 });

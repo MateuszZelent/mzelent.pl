@@ -43,9 +43,9 @@ export function SpintronicsScene({ qualityProfile }: SpintronicsSceneProps) {
   const materialRef = useRef<THREE.ShaderMaterial>(null);
   const instancedArrowsRef = useRef<THREE.InstancedMesh>(null);
 
-  // Rotation damping refs
-  const targetRotation = useRef({ x: -0.65, y: 0.35 });
-  const currentRotation = useRef({ x: -0.65, y: 0.35 });
+  // Rotation damping refs (oblique scientific perspective)
+  const targetRotation = useRef({ x: -0.55, y: 0.25 });
+  const currentRotation = useRef({ x: -0.55, y: 0.25 });
   const isDragging = useRef(false);
   const previousPointerPos = useRef({ x: 0, y: 0 });
 
@@ -80,19 +80,26 @@ export function SpintronicsScene({ qualityProfile }: SpintronicsSceneProps) {
     return generatePolarArrowPositions(ringCount, 2.15);
   }, [ringCount]);
 
-  // Combined 3D Arrow Geometry: Shaft Cylinder + Head Cone
+  // Combined 3D Arrow Geometry: Pivot Sphere + Shaft Cylinder + Head Cone
   const arrowGeometry = useMemo(() => {
-    const shaftRadius = 0.014;
-    const shaftHeight = 0.16;
+    // 1. Pivot Anchor Bead at nanodot surface (0, 0, 0)
+    const beadRadius = 0.024;
+    const bead = new THREE.SphereGeometry(beadRadius, 10, 8);
+
+    // 2. Sleek Cylindrical Shaft
+    const shaftRadius = 0.0125;
+    const shaftHeight = 0.17;
     const shaft = new THREE.CylinderGeometry(shaftRadius, shaftRadius, shaftHeight, 10);
     shaft.translate(0, shaftHeight * 0.5, 0);
 
+    // 3. Sharp Conical Arrowhead
     const headRadius = 0.038;
-    const headHeight = 0.09;
+    const headHeight = 0.095;
     const head = new THREE.ConeGeometry(headRadius, headHeight, 10);
     head.translate(0, shaftHeight + headHeight * 0.5, 0);
 
-    const merged = mergeGeometries([shaft, head]);
+    const merged = mergeGeometries([bead, shaft, head]);
+    bead.dispose();
     shaft.dispose();
     head.dispose();
     return merged;
@@ -100,8 +107,8 @@ export function SpintronicsScene({ qualityProfile }: SpintronicsSceneProps) {
 
   const arrowMaterial = useMemo(() => {
     return new THREE.MeshStandardMaterial({
-      roughness: 0.28,
-      metalness: 0.22,
+      roughness: 0.18,
+      metalness: 0.35,
     });
   }, []);
 
@@ -154,22 +161,10 @@ export function SpintronicsScene({ qualityProfile }: SpintronicsSceneProps) {
     };
   }, []);
 
-  // Mark scene ready and ensure instancing color is bound
+  // Mark scene ready
   useEffect(() => {
     setStatus("ready");
     recordFirstFrame();
-
-    const mesh = instancedArrowsRef.current;
-    if (mesh) {
-      if (!mesh.instanceColor) {
-        mesh.instanceColor = new THREE.InstancedBufferAttribute(
-          new Float32Array(maxCapacity * 3),
-          3,
-        );
-      }
-      mesh.instanceColor.needsUpdate = true;
-      arrowMaterial.needsUpdate = true;
-    }
 
     const triCount = geometry.index ? geometry.index.count / 3 : 0;
     updateDiagnostics({
@@ -184,15 +179,7 @@ export function SpintronicsScene({ qualityProfile }: SpintronicsSceneProps) {
       arrowGeometry.dispose();
       arrowMaterial.dispose();
     };
-  }, [
-    setStatus,
-    recordFirstFrame,
-    updateDiagnostics,
-    geometry,
-    arrowGeometry,
-    arrowMaterial,
-    maxCapacity,
-  ]);
+  }, [setStatus, recordFirstFrame, updateDiagnostics, geometry, arrowGeometry, arrowMaterial]);
 
   // Temp objects for instance matrix & color calculation (reused without allocation)
   const dummyMatrix = useMemo(() => new THREE.Matrix4(), []);
@@ -256,7 +243,7 @@ export function SpintronicsScene({ qualityProfile }: SpintronicsSceneProps) {
             const sinTheta = Math.sin(theta);
             const cosTheta = Math.cos(theta);
 
-            zElev = cosTheta * 0.48;
+            zElev = 0.0; // Flat nanodot substrate without topography
 
             if (mode === 0) {
               // Néel skyrmion (hedgehog radial in-plane orientation)
@@ -272,15 +259,26 @@ export function SpintronicsScene({ qualityProfile }: SpintronicsSceneProps) {
             // Magnetic Vortex
             const coreR = 0.24;
             const coreProfile = Math.exp(-Math.pow(r / coreR, 2));
-            zElev = coreProfile * 0.65;
+            zElev = 0.0; // Flat vortex nanodot
             const inPlane = Math.sqrt(Math.max(0, 1 - coreProfile * coreProfile));
             mx = -Math.sin(phi) * inPlane;
             my = Math.cos(phi) * inPlane;
             mz = coreProfile;
           }
 
-          dummyPos.set(x, y, zElev + 0.04);
-          dirVec.set(mx, my, mz).normalize();
+          dummyPos.set(x, y, 0.0);
+
+          if (!reducedMotion) {
+            // Subtle coherent magnonic precession micro-motion around local effective field
+            const precessionAngle = elapsed * 2.4 + phi * 1.5;
+            const precessAmp = 0.032 * (1.0 - Math.abs(mz) * 0.4);
+            const px = Math.cos(precessionAngle) * precessAmp;
+            const py = Math.sin(precessionAngle) * precessAmp;
+            dirVec.set(mx + px, my + py, mz).normalize();
+          } else {
+            dirVec.set(mx, my, mz).normalize();
+          }
+
           dummyQuat.setFromUnitVectors(upVec, dirVec);
           dummyMatrix.compose(dummyPos, dummyQuat, dummyScale);
 
@@ -293,7 +291,7 @@ export function SpintronicsScene({ qualityProfile }: SpintronicsSceneProps) {
 
             if (inPlane > 0.05) {
               const inPlaneAngle = Math.atan2(my, mx);
-              h = ((inPlaneAngle / (2 * Math.PI)) % 1 + 1) % 1;
+              h = (((inPlaneAngle / (2 * Math.PI)) % 1) + 1) % 1;
               l = Math.max(0.32, Math.min(0.68, 0.5 + mz * 0.15));
             } else if (mz < 0) {
               h = 0.66; // Blue pointing down (matches Image 2 center)
@@ -388,11 +386,12 @@ export function SpintronicsScene({ qualityProfile }: SpintronicsSceneProps) {
       {/* Instanced 3D Magnetization Vector Arrows with HSL Cone Colors */}
       <instancedMesh ref={instancedArrowsRef} args={[arrowGeometry, arrowMaterial, maxCapacity]} />
 
-      {/* Ambient and directional illumination revealing 3D arrow geometry */}
-      <ambientLight intensity={0.55} />
-      <directionalLight position={[3, 4, 5]} intensity={1.3} color="#ffffff" />
-      <directionalLight position={[-3, -2, 4]} intensity={0.6} color="#57e6dd" />
-      <pointLight position={[0, 0, 2]} intensity={2.2} color="#846cff" distance={6} />
+      {/* Multi-directional scientific illumination revealing 3D arrow geometry */}
+      <ambientLight intensity={0.65} />
+      <directionalLight position={[4, 5, 6]} intensity={1.5} color="#ffffff" />
+      <directionalLight position={[-4, -3, 4]} intensity={0.8} color="#57e6dd" />
+      <directionalLight position={[0, -2, -4]} intensity={0.6} color="#445588" />
+      <pointLight position={[0, 0, 2.5]} intensity={2.6} color="#846cff" distance={8} />
     </group>
   );
 }

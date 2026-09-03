@@ -98,14 +98,19 @@ void main() {
     }
   }
 
+  // Concentric nanoscale lithography guide tracks
+  float ringDist = fract(vDistCenter / 0.5);
+  float ringLine = smoothstep(0.96, 0.99, ringDist) + smoothstep(0.04, 0.01, ringDist);
+  baseColor += vec3(ringLine * 0.06);
+
   // Micro-mesh grid lines (mimicking scanning microwave or MFM probe grid)
   vec2 grid = abs(fract(vUv * 48.0 - 0.5) - 0.5) / fwidth(vUv * 48.0);
   float gridLine = 1.0 - min(min(grid.x, grid.y), 1.0);
-  baseColor += vec3(gridLine * 0.05);
+  baseColor += vec3(gridLine * 0.035);
 
-  // Surface lighting and specular reflection
+  // Surface lighting and specular reflection on flat nanodot substrate
   vec3 viewDir = normalize(vec3(0.0, 0.0, 5.0) - vWorldPosition);
-  vec3 lightDir = normalize(vec3(1.5, 2.0, 3.0));
+  vec3 lightDir = normalize(vec3(1.5, 2.0, 3.5));
   float diff = max(dot(vNormalVec, lightDir), 0.0);
   
   vec3 halfDir = normalize(lightDir + viewDir);
@@ -114,12 +119,19 @@ void main() {
   // Fresnel rim glow
   float fresnel = pow(1.0 - max(dot(vNormalVec, viewDir), 0.0), 3.0);
 
-  vec3 finalColor = baseColor * (0.65 + diff * 0.35) + (vec3(1.0) * spec * 0.25) + (COLOR_VIOLET * fresnel * 0.25);
+  // Outer circular bevel rim highlight (fabricated nanodot edge)
+  float bevelRim = smoothstep(2.12, 2.19, vDistCenter) * smoothstep(2.26, 2.20, vDistCenter);
+  vec3 rimColor = mix(COLOR_CYAN, COLOR_TITANIUM, 0.6);
 
-  // Clean vignette boundary falloff for circular disk / nanodot appearance
-  float vignette = smoothstep(2.35, 1.6, vDistCenter);
-  finalColor *= vignette;
+  vec3 finalColor = baseColor * (0.75 + diff * 0.25) 
+                  + (vec3(1.0) * spec * 0.28) 
+                  + (COLOR_VIOLET * fresnel * 0.22)
+                  + (rimColor * bevelRim * 0.75);
 
-  gl_FragColor = vec4(finalColor, 0.92 * vignette);
+  // Clean circular nanodot disk boundary falloff
+  float diskMask = smoothstep(2.26, 2.20, vDistCenter);
+  finalColor *= diskMask;
+
+  gl_FragColor = vec4(finalColor, 0.88 * diskMask);
 }
 `;

@@ -14,14 +14,8 @@
 /* Telemetry HUD Row */
 .hudRow {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
   gap: var(--space-3);
-}
-
-@media (max-width: 840px) {
-  .hudRow {
-    grid-template-columns: repeat(2, 1fr);
-  }
 }
 
 .hudCard {
@@ -128,14 +122,8 @@
 /* Sliders Grid */
 .slidersGrid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: var(--space-4);
-}
-
-@media (max-width: 768px) {
-  .slidersGrid {
-    grid-template-columns: 1fr;
-  }
 }
 
 .sliderCard {

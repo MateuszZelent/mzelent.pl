@@ -23,7 +23,7 @@ const COLOR_MAPS: Array<{ id: SpintronicsColorMap; label: string }> = [
   { id: "magnetization", label: "Magnetization mz" },
 ];
 
-export function SpintronicsControls() {
+export function SpintronicsControls({ className }: { className?: string } = {}) {
   const physics = useSceneStore((state) => state.spintronicsPhysics);
   const setPhysics = useSceneStore((state) => state.setSpintronicsPhysics);
   const diagnostics = useSceneStore((state) => state.diagnostics);
@@ -39,7 +39,11 @@ export function SpintronicsControls() {
   const totalEnergy = totalVal.toFixed(2);
 
   return (
-    <div className={styles.container} data-testid="spintronics-controls">
+    <div
+      className={`${styles.container} ${className || ""}`}
+      data-testid="spintronics-controls"
+      suppressHydrationWarning
+    >
       {/* Live Physics HUD Banner */}
       <div className={styles.hudRow}>
         <div className={styles.hudCard}>
@@ -108,6 +112,7 @@ export function SpintronicsControls() {
             aria-valuemax={150}
             aria-valuenow={physics.magneticField}
             aria-label="External magnetic field Bz"
+            suppressHydrationWarning
           />
           <span className={styles.sliderHint}>Shrinks / expands the central topological domain core</span>
         </div>
@@ -133,6 +138,7 @@ export function SpintronicsControls() {
             aria-valuemax={3.5}
             aria-valuenow={physics.dmiStrength}
             aria-label="Dzyaloshinskii-Moriya Interaction constant"
+            suppressHydrationWarning
           />
           <span className={styles.sliderHint}>Controls chiral wall rotation and skyrmion stability</span>
         </div>
@@ -158,6 +164,7 @@ export function SpintronicsControls() {
             aria-valuemax={20}
             aria-valuenow={physics.rfFrequency}
             aria-label="RF Microwave Excitation Frequency"
+            suppressHydrationWarning
           />
           <span className={styles.sliderHint}>Modulates spin-wave dispersion wavelength λ</span>
         </div>
@@ -183,6 +190,7 @@ export function SpintronicsControls() {
             aria-valuemax={0.05}
             aria-valuenow={physics.dampingAlpha}
             aria-label="Gilbert damping parameter alpha"
+            suppressHydrationWarning
           />
           <span className={styles.sliderHint}>Governs dissipation and spatial wave decay length</span>
         </div>
@@ -211,6 +219,7 @@ export function SpintronicsControls() {
             checked={physics.showVectorField}
             onChange={(e) => setPhysics({ showVectorField: e.target.checked })}
             className={styles.checkboxInput}
+            suppressHydrationWarning
           />
           <span>Show 3D Vector Moment Field</span>
         </label>

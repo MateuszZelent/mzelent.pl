@@ -35,7 +35,7 @@ void main() {
     float sinTheta = sin(theta);
     float phi = atan(pos.y, pos.x);
 
-    elevation = cosTheta * 0.48;
+    elevation = 0.0; // Flat disk nanodot substrate
 
     if (uMode == 0) {
       // Neel skyrmion (hedgehog radial in-plane component)
@@ -48,7 +48,7 @@ void main() {
     // Magnetic Vortex with out-of-plane singularity core
     float coreR = 0.24;
     float coreProfile = exp(-pow(r / coreR, 2.0));
-    elevation = coreProfile * 0.65;
+    elevation = 0.0; // Flat nanodisk substrate
     float phi = atan(pos.y, pos.x);
     float inPlane = sqrt(max(0.0, 1.0 - pow(coreProfile, 2.0)));
     m = vec3(-sin(phi) * inPlane, cos(phi) * inPlane, coreProfile);

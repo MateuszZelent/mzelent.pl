@@ -77,6 +77,43 @@
   margin: 0 0 var(--space-8) 0;
 }
 
+/* Search & Filtering */
+.searchContainer {
+  position: relative;
+  margin-bottom: var(--space-6);
+  max-width: 540px;
+}
+
+.searchInput {
+  width: 100%;
+  background: var(--color-canvas-subtle);
+  border: 1px solid var(--color-line-medium);
+  border-radius: var(--radius-pill);
+  padding: 0.65rem 1.25rem;
+  font-family: var(--font-display, sans-serif);
+  font-size: var(--text-body-sm);
+  color: var(--color-ink);
+  transition:
+    border-color var(--duration-fast) ease,
+    box-shadow var(--duration-fast) ease;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 14px var(--accent-primary-glow);
+}
+
+.resultsMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-8);
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-mono-xs);
+  color: var(--color-ink-muted);
+}
+
 /* Category Filter Bar */
 .filterBar {
   display: flex;
@@ -85,7 +122,7 @@
   flex-wrap: wrap;
   padding-bottom: var(--space-6);
   border-bottom: 1px solid var(--color-line-subtle);
-  margin-bottom: var(--space-12);
+  margin-bottom: var(--space-8);
 }
 
 .filterBtn {
@@ -183,7 +220,8 @@
   overflow: hidden;
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75);
   cursor: pointer;
-  group: "";
+  will-change: transform;
+  transition: transform 0.15s cubic-bezier(0.2, 0, 0.2, 1);
 }
 
 .ambientBacklight {

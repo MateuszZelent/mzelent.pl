@@ -3,10 +3,21 @@ import { NextResponse } from "next/server";
 
 import {
   ADMIN_COOKIE_NAME,
+  checkRateLimit,
   createSessionToken,
+  recordFailedAttempt,
+  resetRateLimit,
   verifyAdminPassword,
   verifySessionToken,
 } from "../../../../lib/auth/admin-auth";
+
+function getClientIdentifier(request: Request): string {
+  const forwarded = request.headers.get("x-forwarded-for");
+  if (forwarded) {
+    return forwarded.split(",")[0].trim();
+  }
+  return request.headers.get("x-real-ip") || "localhost-client";
+}
 
 export async function GET() {
   const cookieStore = await cookies();
@@ -17,6 +28,22 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const clientKey = getClientIdentifier(request);
+
+  // Enforce sliding window rate limit
+  const rateLimitStatus = checkRateLimit(clientKey);
+  if (!rateLimitStatus.allowed) {
+    return NextResponse.json(
+      {
+        error: `Security lockout: Too many failed login attempts. Retry in ${rateLimitStatus.retryAfterSeconds} seconds.`,
+      },
+      {
+        status: 429,
+        headers: { "Retry-After": String(rateLimitStatus.retryAfterSeconds) },
+      },
+    );
+  }
+
   try {
     const body = await request.json();
     const { password } = body;
@@ -27,8 +54,24 @@ export async function POST(request: Request) {
 
     const isValid = verifyAdminPassword(password);
     if (!isValid) {
+      const lockResult = recordFailedAttempt(clientKey);
+      if (lockResult.locked) {
+        return NextResponse.json(
+          {
+            error: `Maximum attempts exceeded. Access locked for ${lockResult.retryAfterSeconds} seconds.`,
+          },
+          {
+            status: 429,
+            headers: { "Retry-After": String(lockResult.retryAfterSeconds) },
+          },
+        );
+      }
+
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     }
+
+    // Reset rate limiter on successful authentication
+    resetRateLimit(clientKey);
 
     const token = createSessionToken();
     const cookieStore = await cookies();

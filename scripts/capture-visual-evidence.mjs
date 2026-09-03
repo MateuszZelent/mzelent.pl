@@ -136,7 +136,13 @@ async function capture() {
 
   // 12. Navigate to /blog
   console.log("Navigating to /blog...");
-  await page.goto("http://localhost:3154/blog", { waitUntil: "domcontentloaded" });
+  await page.goto("http://localhost:3154/blog", { waitUntil: "networkidle" });
+  await page.evaluate(async () => {
+    window.scrollTo(0, document.body.scrollHeight);
+    await new Promise((r) => setTimeout(r, 500));
+    window.scrollTo(0, 0);
+    await new Promise((r) => setTimeout(r, 400));
+  });
   await page.screenshot({
     path: resolve(artifactDir, "blog-parallax-gallery.png"),
     fullPage: true,

@@ -33,4 +33,30 @@ describe("Blog Data & Schema Validation", () => {
     expect(curvedMembrane).toBeDefined();
     expect(curvedMembrane?.category).toBe("Equipment");
   });
+
+  it("filters and searches blog entries accurately across categories and query terms", () => {
+    // Category filter: Laboratory
+    const labPosts = blogPosts.filter((p) => p.category === "Laboratory");
+    expect(labPosts.length).toBeGreaterThanOrEqual(2);
+    expect(labPosts.every((p) => p.category === "Laboratory")).toBe(true);
+
+    // Fulltext search by apparatus: "MuMax3"
+    const mumaxMatches = blogPosts.filter(
+      (p) =>
+        p.title.toLowerCase().includes("mumax") ||
+        p.technicalDetails?.simulationEngine?.toLowerCase().includes("mumax"),
+    );
+    expect(mumaxMatches.length).toBeGreaterThanOrEqual(1);
+    expect(mumaxMatches[0].id).toBe("skyrmion-lattice-dynamics");
+
+    // Fulltext search by tag: "MSCA CNMA"
+    const mscaMatches = blogPosts.filter((p) => p.tags.some((t) => t.toLowerCase().includes("msca cnma")));
+    expect(mscaMatches.length).toBeGreaterThanOrEqual(1);
+
+    // Fulltext search by location: "Kaiserslautern"
+    const kaiserslauternMatches = blogPosts.filter((p) =>
+      p.location.toLowerCase().includes("kaiserslautern"),
+    );
+    expect(kaiserslauternMatches.length).toBeGreaterThanOrEqual(2);
+  });
 });

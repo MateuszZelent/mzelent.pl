@@ -3,7 +3,7 @@ import { resolve } from "node:path";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
-import { ADMIN_COOKIE_NAME, verifySessionToken } from "../../../../lib/auth/admin-auth";
+import { ADMIN_COOKIE_NAME, validateImageBuffer, verifySessionToken } from "../../../../lib/auth/admin-auth";
 import { type BlogPost, BlogPostSchema } from "../../../../content/schemas/blog.schema";
 import { blogPostsData } from "../../../../content/data/blog";
 
@@ -67,17 +67,27 @@ export async function POST(request: Request) {
       let imageUrl = (formData.get("imageUrl") as string)?.trim() || "";
 
       if (imageFile && imageFile.size > 0) {
+        const arrayBuffer = await imageFile.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+
+        // Enforce authentic image format and 10MB ceiling
+        const validation = validateImageBuffer(buffer);
+        if (!validation.valid || !validation.format) {
+          return NextResponse.json(
+            { error: validation.error || "Invalid image file format" },
+            { status: 400 },
+          );
+        }
+
         const uploadDir = resolve(process.cwd(), "public/uploads/blog");
         if (!existsSync(uploadDir)) {
           mkdirSync(uploadDir, { recursive: true });
         }
 
-        const safeExt = imageFile.name.split(".").pop()?.toLowerCase() || "webp";
+        const safeExt = validation.format === "jpeg" ? "jpg" : validation.format;
         const filename = `blog-${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${safeExt}`;
         const filePath = resolve(uploadDir, filename);
 
-        const arrayBuffer = await imageFile.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
         writeFileSync(filePath, buffer);
 
         imageUrl = `/uploads/blog/${filename}`;

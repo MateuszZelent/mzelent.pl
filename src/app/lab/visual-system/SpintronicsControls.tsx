@@ -16,8 +16,8 @@ const PRESETS: Array<{ id: SpintronicsMode; label: string; badge: string }> = [
 ];
 
 const COLOR_MAPS: Array<{ id: SpintronicsColorMap; label: string }> = [
+  { id: "hsl-cone", label: "MMPP HSL Cone (+z biały, -z czarny)" },
   { id: "zelent-prb", label: "Zelent Spectrum (PRB/RRL)" },
-  { id: "hsl-cone", label: "HSL Color Cone (MMPP)" },
   { id: "racetrack", label: "Racetrack (Red-Core)" },
   { id: "chiral", label: "Chiral Editorial" },
   { id: "topological", label: "Topological q(r)" },

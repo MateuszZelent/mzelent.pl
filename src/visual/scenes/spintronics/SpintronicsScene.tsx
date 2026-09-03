@@ -29,8 +29,8 @@ const MODE_INDEX_MAP: Record<string, number> = {
 };
 
 const COLORMAP_INDEX_MAP: Record<string, number> = {
-  "zelent-prb": 0,
-  "hsl-cone": 1,
+  "hsl-cone": 0,
+  "zelent-prb": 1,
   racetrack: 2,
   chiral: 3,
   topological: 4,
@@ -287,18 +287,17 @@ export function SpintronicsScene({ qualityProfile }: SpintronicsSceneProps) {
           dummyMatrix.compose(dummyPos, dummyQuat, dummyScale);
 
           // Color calculation
-          if (colormap === "zelent-prb") {
-            // Exact scientific colormap from Dr. Mateusz Zelent's publications:
-            // mz = -1 (Blue) -> mz = 0 (Green) -> mz = +1 (Magenta/Pink)
-            const [cr, cg, cb] = zelentPublicationRgb(mz);
-            tempColor.setRGB(cr, cg, cb);
-          } else if (colormap === "hsl-cone") {
-            // MMPP in-plane orientation wheel
+          if (colormap === "hsl-cone") {
+            // Exact MMPP HSL Color Cone (+z = white, -z = black, in-plane = continuous rainbow)
             const inPlaneAngle = Math.atan2(my, mx);
             const h = (((inPlaneAngle / (2 * Math.PI)) % 1) + 1) % 1;
-            const s = Math.min(1.0, Math.sqrt(mx * mx + my * my));
-            const l = Math.max(0.12, Math.min(0.88, (mz + 1.0) * 0.5));
+            const s = 1.0;
+            const l = Math.max(0.0, Math.min(1.0, (mz + 1.0) * 0.5));
             const [cr, cg, cb] = hsl2rgb(h, s, l);
+            tempColor.setRGB(cr, cg, cb);
+          } else if (colormap === "zelent-prb") {
+            // Zelent PRB/RRL publication colormap (Blue -> Green -> Magenta)
+            const [cr, cg, cb] = zelentPublicationRgb(mz);
             tempColor.setRGB(cr, cg, cb);
           } else if (colormap === "racetrack") {
             // Center (pointing down) Red -> Yellow -> Green -> Cyan -> Blue (pointing up)

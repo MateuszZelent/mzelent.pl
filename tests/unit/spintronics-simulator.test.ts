@@ -17,7 +17,7 @@ describe("3D Spintronics Simulation Engine & State Contract", () => {
     expect(initialSpintronicsPhysics.dmiStrength).toBe(1.8);
     expect(initialSpintronicsPhysics.rfFrequency).toBe(9.2);
     expect(initialSpintronicsPhysics.dampingAlpha).toBe(0.008);
-    expect(initialSpintronicsPhysics.colorMap).toBe("zelent-prb");
+    expect(initialSpintronicsPhysics.colorMap).toBe("hsl-cone");
     expect(initialSpintronicsPhysics.showVectorField).toBe(true);
   });
 
@@ -92,6 +92,19 @@ describe("3D Spintronics Simulation Engine & State Contract", () => {
   });
 
   it("converts HSL coordinates to RGB using MMPP algorithm", () => {
+    // -z core (mz = -1.0) -> L = 0.0 -> PURE BLACK
+    const blackCore = hsl2rgb(0.0, 1.0, 0.0);
+    expect(blackCore[0]).toBe(0);
+    expect(blackCore[1]).toBe(0);
+    expect(blackCore[2]).toBe(0);
+
+    // +z perimeter (mz = +1.0) -> L = 1.0 -> PURE WHITE
+    const whitePerimeter = hsl2rgb(0.0, 1.0, 1.0);
+    expect(whitePerimeter[0]).toBe(1);
+    expect(whitePerimeter[1]).toBe(1);
+    expect(whitePerimeter[2]).toBe(1);
+
+    // In-plane domain wall (mz = 0.0) -> L = 0.5:
     // 0 deg -> Red
     const red = hsl2rgb(0.0, 1.0, 0.5);
     expect(red[0]).toBeCloseTo(1.0, 2);

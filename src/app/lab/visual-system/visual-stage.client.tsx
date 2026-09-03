@@ -83,6 +83,16 @@ function subscribeToCapabilities(onStoreChange: () => void): () => void {
   };
 }
 
+function getInitialScene(): "spintronics" | "atmosphere" {
+  if (typeof window === "undefined") return "spintronics";
+  const params = new URLSearchParams(window.location.search);
+  const sceneParam = params.get("scene");
+  if (sceneParam === "atmosphere") return "atmosphere";
+  if (sceneParam === "spintronics") return "spintronics";
+  if (params.has("tier") || params.has("motion")) return "atmosphere";
+  return "spintronics";
+}
+
 export function VisualStageClient() {
   const detectedProfile = useSyncExternalStore(
     subscribeToCapabilities,
@@ -91,6 +101,7 @@ export function VisualStageClient() {
   );
 
   const [testMounted, setTestMounted] = useState(true);
+  const [currentScene] = useState<"spintronics" | "atmosphere">(getInitialScene);
 
   const runtimeStatus = useSceneStore((state) => state.runtimeStatus);
   const posterVisible = useSceneStore((state) => state.posterVisible);
@@ -197,7 +208,7 @@ export function VisualStageClient() {
           <LazyVisualCanvas
             className={styles.webglCanvas}
             qualityProfile={activeProfile}
-            activeSceneId="atmosphere"
+            activeSceneId={currentScene}
             onError={() => {
               setStatus("failed");
               setPosterVisible(true);

@@ -2,7 +2,13 @@ import { create } from "zustand";
 
 import type { QualityTier } from "../quality/quality-contract";
 import { isValidStatusTransition, type RuntimeStatus } from "./runtime-status";
-import type { DiagnosticsSnapshot, MotionMode, SceneId, SceneState } from "./scene-contract";
+import type {
+  DiagnosticsSnapshot,
+  MotionMode,
+  SceneId,
+  SceneState,
+  SpintronicsPhysicsState,
+} from "./scene-contract";
 
 export interface SceneStoreActions {
   readonly setStatus: (status: RuntimeStatus) => boolean;
@@ -17,10 +23,21 @@ export interface SceneStoreActions {
   readonly recordContextLoss: () => void;
   readonly recordContextRestore: () => void;
   readonly updateDiagnostics: (patch: Partial<DiagnosticsSnapshot>) => void;
+  readonly setSpintronicsPhysics: (patch: Partial<SpintronicsPhysicsState>) => void;
   readonly reset: () => void;
 }
 
 export type VisualSceneStore = SceneState & SceneStoreActions;
+
+export const initialSpintronicsPhysics: SpintronicsPhysicsState = {
+  mode: "skyrmion-neel",
+  magneticField: 45, // mT
+  dmiStrength: 1.8, // mJ/m²
+  rfFrequency: 9.2, // GHz
+  dampingAlpha: 0.008,
+  colorMap: "chiral",
+  showVectorField: true,
+};
 
 const initialDiagnostics: DiagnosticsSnapshot = {
   runtimeStatus: "idle",
@@ -64,6 +81,7 @@ const initialState: SceneState = {
   contextLossCount: 0,
   contextRestoreCount: 0,
   diagnostics: initialDiagnostics,
+  spintronicsPhysics: initialSpintronicsPhysics,
 };
 
 export const useSceneStore = create<VisualSceneStore>((set, get) => ({
@@ -173,6 +191,11 @@ export const useSceneStore = create<VisualSceneStore>((set, get) => ({
   updateDiagnostics: (patch: Partial<DiagnosticsSnapshot>) =>
     set((state) => ({
       diagnostics: { ...state.diagnostics, ...patch },
+    })),
+
+  setSpintronicsPhysics: (patch: Partial<SpintronicsPhysicsState>) =>
+    set((state) => ({
+      spintronicsPhysics: { ...state.spintronicsPhysics, ...patch },
     })),
 
   reset: () => set(initialState),

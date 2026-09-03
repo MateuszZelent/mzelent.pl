@@ -198,6 +198,55 @@ export function HomeSnowCanvas() {
   );
 }
 
+export function HomeSpintronicsCanvas() {
+  const { activeProfile, mounted } = useActiveProfile();
+  const setStatus = useSceneStore((state) => state.setStatus);
+
+  const shouldRenderCanvas = mounted && activeProfile.tier !== "static";
+  if (!shouldRenderCanvas) {
+    return (
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          minHeight: "480px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "radial-gradient(circle, rgba(132,108,255,0.15) 0%, rgba(3,4,5,0.95) 70%)",
+        }}
+      >
+        <span
+          style={{ fontFamily: "var(--font-mono)", color: "var(--color-ink-muted)", fontSize: "0.85rem" }}
+        >
+          [3D WebGL Simulation Fallback — Static Mode]
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        minHeight: "520px",
+        position: "relative",
+      }}
+      data-testid="spintronics-canvas-slot"
+    >
+      <LazyVisualCanvas
+        style={{ width: "100%", height: "100%", position: "absolute", inset: 0 }}
+        qualityProfile={activeProfile}
+        activeSceneId="spintronics"
+        onError={() => {
+          setStatus("failed");
+        }}
+      />
+    </div>
+  );
+}
+
 export function HomeDiagnostics() {
   return (
     <RuntimeDiagnostics

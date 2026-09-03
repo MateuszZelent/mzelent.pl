@@ -32,6 +32,13 @@ export interface TranslationDictionary {
     titleAccent: string;
     lead: string;
   };
+  spintronicsSection: {
+    tag: string;
+    title: string;
+    titleAccent: string;
+    lead: string;
+    openLabLink: string;
+  };
   grants: {
     tag: string;
     title: string;

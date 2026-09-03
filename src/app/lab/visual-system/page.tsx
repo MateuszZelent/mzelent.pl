@@ -1,4 +1,5 @@
 import styles from "./visual-system.module.css";
+import { SpintronicsControls } from "./SpintronicsControls";
 import { VisualStageClient } from "./visual-stage.client";
 
 const sectionLinks = [
@@ -22,7 +23,7 @@ export default function VisualSystemPage() {
 
         <p className={styles.headerStatus}>
           <span className={styles.statusDot} aria-hidden="true" />
-          Phase 1 / shell calibration
+          3D Spintronics & Visual Laboratory
         </p>
 
         <nav aria-label="Laboratory sections">
@@ -38,25 +39,32 @@ export default function VisualSystemPage() {
 
       <section className={styles.hero} id="laboratory-shell" tabIndex={-1} aria-labelledby="laboratory-title">
         <div className={styles.heroCopy}>
-          <p className={styles.eyebrow}>01 — visual technology spike</p>
-          <h1 id="laboratory-title">Visual System Laboratory</h1>
+          <p className={styles.eyebrow}>Interactive Spintronics & WebGL Laboratory</p>
+          <h1 id="laboratory-title" aria-label="Visual System Laboratory">
+            Visual System Laboratory
+          </h1>
           <p className={styles.heroLead}>
-            A quiet test surface for a future scientific visual language. The semantic shell and its static
-            fallback are usable before any enhanced rendering layer is available.
+            Real-time 3D physical modeling of topological skyrmions, chiral domain walls, and curvilinear
+            spin-wave dispersion. GPU-resident WebGL2 simulation powered by Three.js and custom GLSL shaders.
           </p>
           <ul className={styles.heroMeta} aria-label="Current shell capabilities">
             <li>Semantic DOM</li>
             <li>Static fallback</li>
             <li>WebGL2 single runtime</li>
+            <li>Interactive 3D Orbit</li>
           </ul>
         </div>
 
         <div className={styles.sceneFrame} data-testid="scene-frame">
           <VisualStageClient />
           <div className={styles.sceneFooter}>
-            <span>Visual runtime</span>
-            <span>Calibration scene — demand loop</span>
+            <span>Visual runtime · WebGL2</span>
+            <span>✦ 3D Spintronics Simulator · Drag to rotate · Scroll to zoom</span>
           </div>
+        </div>
+
+        <div style={{ gridColumn: "1 / -1", width: "100%" }}>
+          <SpintronicsControls />
         </div>
 
         <p className={styles.fallbackNote} data-testid="fallback-note">

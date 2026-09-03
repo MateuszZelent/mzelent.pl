@@ -26,6 +26,17 @@ async function capture() {
     console.log("Captured homepage-research-3d-models.png");
   }
 
+  // 0.5 Spintronics 3D Simulation Section on Homepage
+  const simElem = page.locator("#simulation");
+  if (await simElem.count()) {
+    await simElem.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(800);
+    await page.screenshot({
+      path: resolve(artifactDir, "homepage-spintronics-simulation.png"),
+    });
+    console.log("Captured homepage-spintronics-simulation.png");
+  }
+
   // 1. Grants section
   const grantsElem = page.locator("#grants");
   if (await grantsElem.count()) {
@@ -183,6 +194,15 @@ async function capture() {
     });
     console.log("Captured admin-blog-studio.png");
   }
+
+  // 16. Spintronics 3D Simulation Laboratory
+  await page.goto("http://localhost:3154/lab/visual-system?scene=spintronics", { waitUntil: "networkidle" });
+  await page.waitForTimeout(1000);
+  await page.screenshot({
+    path: resolve(artifactDir, "spintronics-laboratory-3d.png"),
+    fullPage: true,
+  });
+  console.log("Captured spintronics-laboratory-3d.png");
 
   await browser.close();
   console.log("Finished capturing visual evidence!");

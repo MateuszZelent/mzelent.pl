@@ -11,6 +11,7 @@ import { GrantsSection } from "../components/sections/GrantsSection";
 import { ResearchGrid } from "../components/sections/ResearchGrid";
 import { SelectedPublications } from "../components/sections/SelectedPublications";
 import { SoftwareShowcase } from "../components/sections/SoftwareShowcase";
+import { SpintronicsSection } from "../components/sections/SpintronicsSection";
 import { HomeDiagnostics, HomeSnowCanvas } from "./home-stage.client";
 
 export const metadata: Metadata = {
@@ -38,6 +39,7 @@ export default function HomePage() {
       <main id="main-content" tabIndex={-1}>
         <MountainHero snowCanvas={<HomeSnowCanvas />} />
         <ResearchGrid />
+        <SpintronicsSection />
         <GrantsSection />
         <SoftwareShowcase />
         <SelectedPublications />

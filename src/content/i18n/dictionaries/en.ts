@@ -32,6 +32,13 @@ export const dictionaryEn: TranslationDictionary = {
     titleAccent: "& Magnetic Nanostructures",
     lead: "Bridging fundamental analytical magnetics with massive numerical simulations, chiral spin textures, and GPU-accelerated wave modeling.",
   },
+  spintronicsSection: {
+    tag: "02 / INTERACTIVE 3D SIMULATION",
+    title: "3D Spintronics Simulator",
+    titleAccent: "& Skyrmion Physics Engine",
+    lead: "Real-time physical modeling of chiral Néel and Bloch skyrmions, magnetic vortices, and spin-wave dispersion. Direct interaction with magnetic moment vectors on GPU via WebGL2.",
+    openLabLink: "Open Full Research Laboratory →",
+  },
   grants: {
     tag: "02 / Active Scientific Projects & Grants",
     title: "Funded Research",

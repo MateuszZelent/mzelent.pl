@@ -42,7 +42,8 @@ export function VisualCanvas({
     [onReady],
   );
 
-  const isContinuousLoop = activeSceneId === "atmosphere" || activeSceneId === "snow";
+  const isContinuousLoop =
+    activeSceneId === "atmosphere" || activeSceneId === "snow" || activeSceneId === "spintronics";
 
   return (
     <VisualRuntimeErrorBoundary onError={onError}>
@@ -53,7 +54,7 @@ export function VisualCanvas({
         gl={createRendererParameters(qualityProfile)}
         camera={{ position: [0, 0, 5], fov: 45, near: 0.1, far: 100 }}
         onCreated={handleCreated}
-        style={{ pointerEvents: "none", ...style }}
+        style={{ pointerEvents: activeSceneId === "spintronics" ? "auto" : "none", ...style }}
       >
         <VisualRuntime qualityProfile={qualityProfile} activeSceneId={activeSceneId} />
       </Canvas>

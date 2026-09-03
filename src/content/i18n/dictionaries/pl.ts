@@ -32,6 +32,13 @@ export const dictionaryPl: TranslationDictionary = {
     titleAccent: "& Nanostruktury Magnetyczne",
     lead: "Łączenie fundamentalnej magnetyki analitycznej z wielkoskalowymi symulacjami numerycznymi, chiralnymi strukturami spinowymi i akcelerowanym na GPU modelowaniem fal.",
   },
+  spintronicsSection: {
+    tag: "02 / INTERAKTYWNA SYMULACJA 3D",
+    title: "Symulator Spintroniki 3D",
+    titleAccent: "& Manipulacja Skyrmionem",
+    lead: "Fizyczne modelowanie w czasie rzeczywistym chiralnych skyrmionów Néela i Blocha, wirów magnetycznych oraz fal spinowych. Pełna interakcja z wektorami momentu magnetycznego na GPU w WebGL2.",
+    openLabLink: "Otwórz pełne laboratorium badawcze →",
+  },
   grants: {
     tag: "02 / Aktywne Projekty & Granty",
     title: "Finansowane Badania",

@@ -9,6 +9,7 @@ import type { QualityProfile } from "../quality/quality-contract";
 import { AtmosphereScene } from "../scenes/atmosphere/AtmosphereScene";
 import { CalibrationScene } from "../scenes/calibration/CalibrationScene";
 import { SnowScene } from "../scenes/snow/SnowScene";
+import { SpintronicsScene } from "../scenes/spintronics/SpintronicsScene";
 import type { SceneId } from "../state/scene-contract";
 import { useSceneStore } from "../state/scene-store";
 import { configureRenderer } from "./renderer-config";
@@ -31,7 +32,10 @@ export function VisualRuntime({ qualityProfile, activeSceneId = "snow" }: Visual
     configureRenderer(gl);
 
     const isWebGL2 = gl.capabilities.isWebGL2;
-    const frameloop = activeSceneId === "atmosphere" || activeSceneId === "snow" ? "always" : "demand";
+    const frameloop =
+      activeSceneId === "atmosphere" || activeSceneId === "snow" || activeSceneId === "spintronics"
+        ? "always"
+        : "demand";
 
     updateDiagnostics({
       webgl2Supported: isWebGL2,
@@ -126,6 +130,7 @@ export function VisualRuntime({ qualityProfile, activeSceneId = "snow" }: Visual
       {activeSceneId === "snow" && <SnowScene qualityProfile={qualityProfile} />}
       {activeSceneId === "atmosphere" && <AtmosphereScene qualityProfile={qualityProfile} />}
       {activeSceneId === "calibration" && <CalibrationScene />}
+      {activeSceneId === "spintronics" && <SpintronicsScene qualityProfile={qualityProfile} />}
     </>
   );
 }

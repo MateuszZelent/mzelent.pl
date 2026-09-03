@@ -366,3 +366,88 @@
 .searchInput:focus {
   border-color: var(--accent-cyan);
 }
+
+.syncStatsCard {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: rgba(0, 242, 254, 0.04);
+  border: 1px solid rgba(0, 242, 254, 0.25);
+  border-radius: var(--radius-md);
+}
+
+.syncStatsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.syncStatsTitle {
+  font-family: var(--font-display, sans-serif);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-ink);
+  margin: 0;
+}
+
+.syncMetricsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.syncMetricItem {
+  background: rgba(0, 0, 0, 0.4);
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.syncMetricVal {
+  display: block;
+  font-family: var(--font-display, sans-serif);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--accent-cyan);
+  line-height: 1.2;
+}
+
+.syncMetricLbl {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  color: var(--color-ink-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.syncActionRow {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.secondaryBtn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--color-ink);
+  padding: 0.6rem 1.1rem;
+  border-radius: var(--radius-xs);
+  font-family: var(--font-mono, monospace);
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all var(--duration-fast) ease;
+}
+
+.secondaryBtn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.secondaryBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

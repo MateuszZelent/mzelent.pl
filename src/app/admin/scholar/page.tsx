@@ -8,6 +8,7 @@ import { Footer } from "../../../components/footer/Footer";
 import { Header } from "../../../components/navigation/Header";
 import { useTranslation } from "../../../content/i18n/i18n-context";
 import { type Publication, PublicationSchema } from "../../../content/schemas/publication.schema";
+import type { ScholarAuthorStats } from "../../api/admin/scholar/sync/route";
 import styles from "./admin.module.css";
 
 const INITIAL_SCHOLAR_SAMPLE = `@article{zelent2024neuromorphic,
@@ -31,6 +32,13 @@ export default function AdminScholarPage() {
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Live Scholar Sync states
+  const [scholarStats, setScholarStats] = useState<ScholarAuthorStats | null>(null);
+  const [scholarNewWorks, setScholarNewWorks] = useState<Publication[]>([]);
+  const [scholarCitationUpdates, setScholarCitationUpdates] = useState<
+    Array<{ id: string; title: string; oldCitations: number; newCitations: number }>
+  >([]);
 
   useEffect(() => {
     async function checkAuthAndLoad() {
@@ -120,26 +128,105 @@ export default function AdminScholarPage() {
     setIsSyncing(true);
     setFeedback(null);
 
-    setTimeout(() => {
-      try {
-        const validated = parseBibtexText(bibtexInput);
-        setStagedList((prev) => {
-          if (prev.some((p) => p.doi === validated.doi)) return prev;
-          return [validated, ...prev];
-        });
-        setFeedback({
-          type: "success",
-          message: "Google Scholar index scanned: 1 new publication staged for review!",
-        });
-      } catch {
-        setFeedback({
-          type: "error",
-          message: "Error fetching from Scholar profile.",
-        });
-      } finally {
-        setIsSyncing(false);
+    try {
+      const res = await fetch("/api/admin/scholar/sync?userId=XkzMx4IAAAAJ");
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Błąd podczas synchronizacji z Google Scholar");
       }
-    }, 600);
+
+      setScholarStats(data.stats);
+      setScholarNewWorks(data.newWorks || []);
+      setScholarCitationUpdates(data.citationUpdates || []);
+
+      const newMsg =
+        data.newWorks?.length > 0
+          ? ` Znaleziono ${data.newWorks.length} nowych publikacji!`
+          : " Wszystkie publikacje są już w bazie.";
+      const updatesMsg =
+        data.citationUpdates?.length > 0
+          ? ` Wykryto ${data.citationUpdates.length} zmian liczby cytowań.`
+          : "";
+
+      setFeedback({
+        type: "success",
+        message: `Pobrano profil Scholar (XkzMx4IAAAAJ): ${data.stats.totalCitations} cytowań, h-indeks: ${data.stats.hIndex}, i10-indeks: ${data.stats.i10Index}.${newMsg}${updatesMsg}`,
+      });
+    } catch (err) {
+      setFeedback({
+        type: "error",
+        message: err instanceof Error ? err.message : "Błąd sieci podczas pobierania ze Scholar.",
+      });
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  const handleStageAllNewWorks = () => {
+    if (scholarNewWorks.length === 0) return;
+    setStagedList((prev) => {
+      const combined = [...scholarNewWorks, ...prev];
+      const seen = new Set<string>();
+      return combined.filter((p) => {
+        if (seen.has(p.title)) return false;
+        seen.add(p.title);
+        return true;
+      });
+    });
+    setScholarNewWorks([]);
+    setFeedback({
+      type: "success",
+      message: `Przeniesiono ${scholarNewWorks.length} prac ze Scholar do bufora (staged) do zatwierdzenia!`,
+    });
+  };
+
+  const handleApplyCitationUpdates = async () => {
+    setIsSyncing(true);
+    setFeedback(null);
+
+    try {
+      const res = await fetch("/api/admin/scholar/sync?userId=XkzMx4IAAAAJ&updateCitations=true");
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error || "Błąd aktualizacji cytowań");
+
+      setFeedback({
+        type: "success",
+        message: `Pomyślnie zaktualizowano liczbę cytowań dla ${data.citationsUpdatedInDb} publikacji w bazie!`,
+      });
+
+      // Synchronize profile stats
+      if (data.stats) {
+        await fetch("/api/admin/profile", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            metrics: {
+              citations: data.stats.totalCitations,
+              hIndex: data.stats.hIndex,
+              i10Index: data.stats.i10Index,
+            },
+          }),
+        });
+      }
+
+      // Refresh existing publications list
+      const pubRes = await fetch("/api/admin/publications");
+      if (pubRes.ok) {
+        const pubData = await pubRes.json();
+        if (pubData.publications) setExistingPubs(pubData.publications);
+      }
+
+      setScholarCitationUpdates([]);
+    } catch (err) {
+      setFeedback({
+        type: "error",
+        message: err instanceof Error ? err.message : "Błąd aktualizacji bazy cytowań.",
+      });
+    } finally {
+      setIsSyncing(false);
+    }
   };
 
   const handleRemoveStaged = (id: string) => {
@@ -281,7 +368,7 @@ export default function AdminScholarPage() {
             <div className={styles.statusCard}>
               <span className={styles.statusDot} aria-hidden="true" />
               <span>
-                {t.adminScholar.statusConnected}: <strong>mateusz_zelent</strong>
+                {t.adminScholar.statusConnected}: <strong>XkzMx4IAAAAJ</strong> (Mateusz Zelent)
               </span>
             </div>
 
@@ -297,9 +384,12 @@ export default function AdminScholarPage() {
           <section className={styles.panel} aria-label="Google Scholar Sync">
             <div className={styles.panelHeader}>
               <h2 className={styles.panelTitle}>{t.adminScholar.syncTitle}</h2>
-              <span className={styles.badge}>SCHOLAR</span>
+              <span className={styles.badge}>GOOGLE SCHOLAR</span>
             </div>
-            <p className={styles.panelDesc}>{t.adminScholar.syncDesc}</p>
+            <p className={styles.panelDesc}>
+              Automatyczny serwerowy skaner profilu <code>XkzMx4IAAAAJ</code>. Pobiera aktualną liczbę
+              cytowań, h-indeks oraz parsuje nowo opublikowane artykuły.
+            </p>
 
             <button
               type="button"
@@ -308,7 +398,7 @@ export default function AdminScholarPage() {
               className={styles.primaryBtn}
               data-testid="scholar-sync-trigger"
             >
-              {isSyncing ? "Connecting to Scholar..." : t.adminScholar.syncBtn}
+              {isSyncing ? "Łączenie z Google Scholar..." : "Synchronizuj z Google Scholar (Auto-Sync) ↻"}
             </button>
           </section>
 
@@ -341,6 +431,56 @@ export default function AdminScholarPage() {
             </div>
           </section>
         </div>
+
+        {/* Live Scholar Stats and Actions Card */}
+        {scholarStats && (
+          <div className={styles.syncStatsCard}>
+            <div className={styles.syncStatsHeader}>
+              <h3 className={styles.syncStatsTitle}>
+                Statystyki z Profilu Google Scholar (Użytkownik: XkzMx4IAAAAJ)
+              </h3>
+              <span className={styles.badge}>DANE NA ŻYWO</span>
+            </div>
+
+            <div className={styles.syncMetricsGrid}>
+              <div className={styles.syncMetricItem}>
+                <span className={styles.syncMetricVal}>{scholarStats.totalCitations}</span>
+                <span className={styles.syncMetricLbl}>Wszystkie Cytowania</span>
+              </div>
+              <div className={styles.syncMetricItem}>
+                <span className={styles.syncMetricVal}>{scholarStats.citationsSince2019}</span>
+                <span className={styles.syncMetricLbl}>Cytowania (od 2019)</span>
+              </div>
+              <div className={styles.syncMetricItem}>
+                <span className={styles.syncMetricVal}>{scholarStats.hIndex}</span>
+                <span className={styles.syncMetricLbl}>h-indeks</span>
+              </div>
+              <div className={styles.syncMetricItem}>
+                <span className={styles.syncMetricVal}>{scholarStats.i10Index}</span>
+                <span className={styles.syncMetricLbl}>i10-indeks</span>
+              </div>
+            </div>
+
+            <div className={styles.syncActionRow}>
+              {scholarNewWorks.length > 0 && (
+                <button type="button" onClick={handleStageAllNewWorks} className={styles.primaryBtn}>
+                  Dodaj {scholarNewWorks.length} Nowych Prac ze Scholar do Bufora →
+                </button>
+              )}
+
+              {scholarCitationUpdates.length > 0 && (
+                <button
+                  type="button"
+                  onClick={handleApplyCitationUpdates}
+                  disabled={isSyncing}
+                  className={styles.secondaryBtn}
+                >
+                  Zaktualizuj Liczby Cytowań w Bazie ({scholarCitationUpdates.length} zmian)
+                </button>
+              )}
+            </div>
+          </div>
+        )}
 
         {feedback && (
           <div
@@ -417,7 +557,7 @@ export default function AdminScholarPage() {
           </div>
 
           <div className={styles.stagedCards}>
-            {filteredExisting.slice(0, 15).map((pub) => (
+            {filteredExisting.slice(0, 20).map((pub) => (
               <div key={pub.id} className={styles.stagedCard}>
                 <div className={styles.cardInfo}>
                   <h3 className={styles.cardTitle}>{pub.title}</h3>

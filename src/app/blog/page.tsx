@@ -109,6 +109,10 @@ function ParallaxGalleryItem({ post, onOpenLightbox, specsTitle }: ParallaxItemP
               {post.technicalDetails.magnification && (
                 <span>Magnification: {post.technicalDetails.magnification}</span>
               )}
+              {post.technicalDetails.frequency && <span>Freq: {post.technicalDetails.frequency}</span>}
+              {post.technicalDetails.wavelength && (
+                <span>Wavelength: {post.technicalDetails.wavelength}</span>
+              )}
             </div>
           </div>
         )}
@@ -127,9 +131,21 @@ function ParallaxGalleryItem({ post, onOpenLightbox, specsTitle }: ParallaxItemP
 
 export default function BlogPage() {
   const { t } = useTranslation();
+  const [postsList, setPostsList] = useState(blogPosts);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [activeLightboxPost, setActiveLightboxPost] = useState<BlogPost | null>(null);
+
+  useEffect(() => {
+    fetch("/api/blog")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data?.posts && Array.isArray(data.posts)) {
+          setPostsList(data.posts);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // Close lightbox on Escape key
   useEffect(() => {
@@ -152,7 +168,7 @@ export default function BlogPage() {
     { id: "Conference", label: t.blogPage.categoryConf },
   ];
 
-  const filteredPosts = blogPosts.filter((post) => {
+  const filteredPosts = postsList.filter((post) => {
     const matchesCategory = selectedCategory === "all" || post.category === selectedCategory;
 
     if (!matchesCategory) return false;

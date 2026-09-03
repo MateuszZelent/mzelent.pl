@@ -30,6 +30,8 @@ export const BlogPostSchema = z.object({
       simulationEngine: z.string().optional(),
       magneticField: z.string().optional(),
       temperature: z.string().optional(),
+      frequency: z.string().optional(),
+      wavelength: z.string().optional(),
     })
     .optional(),
 });

@@ -97,6 +97,18 @@ async function capture() {
   });
   console.log("Captured admin-scholar-dashboard.png");
 
+  // Trigger Scholar Auto-Sync to capture synced state
+  const syncBtn = page.locator("[data-testid='scholar-sync-trigger']");
+  if (await syncBtn.count()) {
+    await syncBtn.click();
+    await page.waitForTimeout(2000);
+    await page.screenshot({
+      path: resolve(artifactDir, "admin-scholar-synced.png"),
+      fullPage: true,
+    });
+    console.log("Captured admin-scholar-synced.png");
+  }
+
   // 7. Parse BibTeX and capture staged state
   const parseBtn = page.locator("[data-testid='bibtex-parse-btn']");
   if (await parseBtn.count()) {

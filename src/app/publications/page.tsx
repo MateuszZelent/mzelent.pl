@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 import { Footer } from "../../components/footer/Footer";
 import { Header } from "../../components/navigation/Header";
@@ -11,19 +11,31 @@ import styles from "./publications.module.css";
 
 export default function PublicationsPage() {
   const { t } = useTranslation();
+  const [pubsList, setPubsList] = useState(publications);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedJournal, setSelectedJournal] = useState<string>("ALL");
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
+  useEffect(() => {
+    fetch("/api/publications")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data?.publications && Array.isArray(data.publications)) {
+          setPubsList(data.publications);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   const journals = useMemo(() => {
     const set = new Set<string>();
-    publications.forEach((pub) => set.add(pub.journal));
+    pubsList.forEach((pub) => set.add(pub.journal));
     return Array.from(set);
-  }, []);
+  }, [pubsList]);
 
   const filteredPublications = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
-    return publications.filter((pub) => {
+    return pubsList.filter((pub) => {
       const matchesJournal = selectedJournal === "ALL" || pub.journal === selectedJournal;
       if (!matchesJournal) return false;
 
@@ -37,7 +49,7 @@ export default function PublicationsPage() {
 
       return titleMatch || authorMatch || keywordMatch || journalMatch || yearMatch;
     });
-  }, [searchQuery, selectedJournal]);
+  }, [pubsList, searchQuery, selectedJournal]);
 
   const handleCopyBibtex = async (id: string, bibtex: string) => {
     try {

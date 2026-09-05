@@ -46,8 +46,8 @@ test.describe("Homepage — Mountain Parallax & Snow Particles", () => {
     await expect(page.getByTestId("research-card-topological-solitons")).toBeVisible();
     await expect(page.getByTestId("research-card-spin-wave-optics")).toBeVisible();
     await expect(page.getByTestId("research-card-gpu-vector-fields")).toBeVisible();
-    await expect(page.getByTestId("software-card-mag-lens-sim")).toBeVisible();
-    await expect(page.getByTestId("software-card-skyrmion-tracker-gpu")).toBeVisible();
+    await expect(page.getByTestId("software-card-mmpp")).toBeVisible();
+    await expect(page.getByTestId("software-card-mmpp-gui")).toBeVisible();
 
     expect(consoleErrors).toEqual([]);
     expect(pageErrors).toEqual([]);

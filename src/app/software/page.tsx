@@ -59,20 +59,14 @@ export default function SoftwareDetailPage() {
                   </ul>
                 </div>
 
-                <div className={styles.detailBlock}>
-                  <h3 className={styles.detailTitle}>{t.softwarePage.quickstart}</h3>
-                  <div className={styles.codeBox}>
-                    {pkg.id === "mag-lens-sim" ? (
-                      <code>
-                        {`# Install via git clone\ngit clone ${pkg.repoUrl}.git\ncd mag-lens-sim && pip install -e .\n\n# Python API Quickstart\nimport maglens as ml\nlens = ml.GradedLens(index_profile="parabolic")\nrays = lens.trace(k0=1.2e7, freq=14.5e9)`}
-                      </code>
-                    ) : (
-                      <code>
-                        {`# Install via pip\npip install git+${pkg.repoUrl}.git\n\n# Run GPU centroid & Q tracker\npython -m skyrmion_tracker \\\n  --input ./mumax_run_*.ovf \\\n  --device cuda:0 \\\n  --calc-gyrovector`}
-                      </code>
-                    )}
+                {pkg.quickstart && (
+                  <div className={styles.detailBlock}>
+                    <h3 className={styles.detailTitle}>{t.softwarePage.quickstart}</h3>
+                    <div className={styles.codeBox}>
+                      <code>{pkg.quickstart}</code>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
 
               <div className={styles.cardFooter}>

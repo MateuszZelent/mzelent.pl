@@ -13,6 +13,7 @@ export const SoftwareSchema = z.object({
   license: z.string().min(1),
   featured: z.boolean().default(false),
   highlights: z.array(z.string()).min(1),
+  quickstart: z.string().optional(),
 });
 
 export type Software = z.infer<typeof SoftwareSchema>;

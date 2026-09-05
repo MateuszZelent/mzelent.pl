@@ -55,7 +55,7 @@ export const dictionaryPl: TranslationDictionary = {
     tag: "03 / Oprogramowanie & Solwery",
     title: "Narzędzia Open-Source",
     titleAccent: "do Symulacji Nanomagnetycznych",
-    lead: "Specjalistyczne pakiety numeryczne do obliczania trajektorii fal spinowych, optyki promieniowej i śledzenia ładunku topologicznego w czasie rzeczywistym.",
+    lead: "Autorskie pakiety obliczeniowe (MMPP, MMPP GUI, pyzfn, AMUMax, SpinView, MANNGA) do wielowymiarowego post-processingu symulacji mikromagnetycznych, analizy dyspersji fal spinowych i solwerów GPU.",
     repoLink: "Repozytorium GitHub",
   },
   publications: {
@@ -160,7 +160,7 @@ export const dictionaryPl: TranslationDictionary = {
     badge: "Oprogramowanie Open-Source",
     heading: "Pakiety Obliczeniowe",
     headingAccent: "i Narzędzia Naukowe",
-    lead: "Autorskie pakiety do modelowania zjawisk magnonicznych, śledzenia trajektorii solitonów oraz przetwarzania symulacji GPU.",
+    lead: "Autorskie pakiety i narzędzia numeryczne do post-processingu symulacji mikromagnetycznych, analizy dyspersji fal spinowych oraz obliczeń na klastrach GPU.",
     quickstart: "Szybki start & Instalacja",
     techStack: "Stos technologiczny & Wymagania",
     keyFeatures: "Główne możliwości",

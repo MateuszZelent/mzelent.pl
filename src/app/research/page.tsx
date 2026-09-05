@@ -123,7 +123,7 @@ export default function ResearchDetailPage() {
                   Explore Wave Optics Articles (APL 2022) →
                 </Link>
                 <Link href="/software" className={styles.actionLink}>
-                  MagLens Solver Package →
+                  Computational Packages (MMPP) →
                 </Link>
               </div>
             </div>

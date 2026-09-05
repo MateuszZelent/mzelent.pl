@@ -55,7 +55,7 @@ export const dictionaryEn: TranslationDictionary = {
     tag: "03 / Computational Software & Solvers",
     title: "Open-Source Tools",
     titleAccent: "for Nanomagnetic Simulation",
-    lead: "Specialized numerical packages designed to calculate spin-wave trajectories, ray optics, and real-time topological soliton numbers from continuum micromagnetic datasets.",
+    lead: "High-performance computational packages and toolkits (MMPP, MMPP GUI, pyzfn, AMUMax, SpinView, MANNGA) for multidimensional micromagnetic post-processing, spin-wave dispersion analysis, and GPU solvers.",
     repoLink: "GitHub Repository",
   },
   publications: {
@@ -159,7 +159,7 @@ export const dictionaryEn: TranslationDictionary = {
     badge: "Open-Source Scientific Software",
     heading: "Computational Packages",
     headingAccent: "& Physics Tooling",
-    lead: "Open-source software packages designed for micromagnetic simulation processing, soliton trajectory tracking, and magnonic wave optics analysis.",
+    lead: "High-performance open-source computational packages and toolkits engineered for micromagnetic simulation analysis, spin-wave dispersion extraction, and GPU solver execution.",
     quickstart: "Quickstart & Installation",
     techStack: "Technology Stack & Requirements",
     keyFeatures: "Core Capabilities",

@@ -173,6 +173,32 @@ test("falls back gracefully when WebGL2 is blocked @visual", async ({ browser, b
   await context.close();
 });
 
+test("enforces static fallback when render target framebuffer is unsupported", async ({ page }) => {
+  await page.addInitScript(() => {
+    if (typeof WebGL2RenderingContext !== "undefined") {
+      WebGL2RenderingContext.prototype.checkFramebufferStatus = function () {
+        return 0; // Simulate framebuffer incomplete
+      };
+    }
+  });
+
+  await page.goto("/lab/visual-system?tier=medium&motion=full-preview&scene=atmosphere");
+
+  await expect(page.getByTestId("static-poster")).toHaveAttribute("data-poster-state", "visible");
+
+  await page.waitForFunction(
+    () => {
+      const diag = (window as any).__SCENE_STORE__?.getState().diagnostics;
+      return diag?.runtimeStatus === "static" && diag?.staticReason === "unsupported-render-target";
+    },
+    { timeout: 15_000 },
+  );
+
+  const diag = await page.evaluate(() => (window as any).__SCENE_STORE__?.getState().diagnostics);
+  expect(diag?.runtimeStatus).toBe("static");
+  expect(diag?.staticReason).toBe("unsupported-render-target");
+});
+
 test("handles WebGL context loss and restoration gracefully", async ({ page }) => {
   const consoleErrors: string[] = [];
   const pageErrors: string[] = [];

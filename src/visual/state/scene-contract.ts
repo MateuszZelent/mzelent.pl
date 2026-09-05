@@ -19,8 +19,14 @@ export interface SpintronicsPhysicsState {
   readonly showVectorField: boolean;
 }
 
+export type StaticReason =
+  "reduced-motion" | "no-webgl2" | "unsupported-render-target" | "runtime-failure" | null;
+
+export type RenderTargetFormat = "rgba16f" | "rgba32f" | "unsupported";
+
 export interface DiagnosticsSnapshot {
   readonly runtimeStatus: RuntimeStatus;
+  readonly staticReason: StaticReason;
   readonly qualityTier: QualityTier;
   readonly tierOverride: QualityTier | null;
   readonly motionMode: MotionMode;
@@ -28,6 +34,9 @@ export interface DiagnosticsSnapshot {
   readonly viewportWidth: number;
   readonly viewportHeight: number;
   readonly webgl2Supported: boolean;
+  readonly renderTargetFormat: RenderTargetFormat;
+  readonly fragmentHighPrecision: boolean;
+  readonly framebufferComplete: boolean;
   readonly reducedMotionDetected: boolean;
   readonly canvasCount: number;
   readonly contextLossCount: number;
@@ -35,13 +44,24 @@ export interface DiagnosticsSnapshot {
   readonly visibilityState: DocumentVisibilityState;
   readonly frameloop: "demand" | "never" | "always";
   readonly drawCalls: number;
+  readonly visibleDrawCalls: number;
+  readonly simulationPassesPerFrame: number;
+  readonly totalDrawCallsPerFrame: number;
   readonly triangles: number;
   readonly points: number;
   readonly geometries: number;
   readonly textures: number;
+  readonly renderTargetCount: number;
+  readonly estimatedGpuBytes: number;
+  readonly finiteState: boolean;
   readonly activeSceneId: SceneId;
   readonly posterVisible: boolean;
   readonly firstFrameCommitted: boolean;
+  readonly frameSampleCount: number;
+  readonly frameP50Ms: number;
+  readonly frameP95Ms: number;
+  readonly frameWorstMs: number;
+  readonly slowFrameCount: number;
   readonly p50Ms: number;
   readonly p95Ms: number;
   readonly firstFrameTimeMs: number;
@@ -49,6 +69,7 @@ export interface DiagnosticsSnapshot {
 
 export interface SceneState {
   readonly runtimeStatus: RuntimeStatus;
+  readonly staticReason: StaticReason;
   readonly qualityTier: QualityTier;
   readonly tierOverride: QualityTier | null;
   readonly motionMode: MotionMode;
@@ -60,6 +81,7 @@ export interface SceneState {
   readonly firstFrameCommitted: boolean;
   readonly contextLossCount: number;
   readonly contextRestoreCount: number;
+  readonly contextGeneration: number;
   readonly diagnostics: DiagnosticsSnapshot;
   readonly spintronicsPhysics: SpintronicsPhysicsState;
 }

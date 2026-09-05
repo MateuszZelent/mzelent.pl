@@ -6,6 +6,7 @@ import {
   PARTICLE_TIER_CONFIGS,
   type ParticleTierConfig,
 } from "../scenes/atmosphere/atmosphere-config";
+import { copyFragmentShader } from "../shaders/atmosphere/copy.frag";
 import { simulationFragmentShader } from "../shaders/atmosphere/simulation.frag";
 import { simulationVertexShader } from "../shaders/atmosphere/simulation.vert";
 import { velocityFragmentShader } from "../shaders/atmosphere/velocity.frag";
@@ -39,10 +40,14 @@ export class GpuParticleSimulator {
   private readonly quadMeshVel: THREE.Mesh;
   private readonly quadMeshPos: THREE.Mesh;
 
-  constructor(renderer: THREE.WebGLRenderer, tier: QualityTier) {
+  constructor(
+    renderer: THREE.WebGLRenderer,
+    tier: QualityTier | ParticleTierConfig,
+    capabilities?: ParticleRuntimeCapabilities,
+  ) {
     this.renderer = renderer;
-    this.config = PARTICLE_TIER_CONFIGS[tier];
-    this.capabilities = negotiateParticleCapabilities(renderer);
+    this.config = typeof tier === "string" ? PARTICLE_TIER_CONFIGS[tier] : tier;
+    this.capabilities = capabilities ?? negotiateParticleCapabilities(renderer);
 
     const { textureWidth, textureHeight } = this.config;
 
@@ -92,7 +97,7 @@ export class GpuParticleSimulator {
 
     // Select float or half-float precision based on capability negotiation
     const textureType =
-      this.capabilities.renderTargetType === "half-float" ? THREE.HalfFloatType : THREE.FloatType;
+      this.capabilities.renderTargetFormat === "rgba16f" ? THREE.HalfFloatType : THREE.FloatType;
 
     const fboOptions: THREE.RenderTargetOptions = {
       format: THREE.RGBAFormat,
@@ -131,7 +136,8 @@ export class GpuParticleSimulator {
         uBounds: { value: new THREE.Vector3(bounds.x, bounds.y, bounds.z) },
         uSpeed: { value: ATMOSPHERE_CONFIG.simulation.speed },
         uCurlScale: { value: ATMOSPHERE_CONFIG.simulation.curlScale },
-        uDamping: { value: ATMOSPHERE_CONFIG.simulation.damping },
+        uDragPerSecond: { value: ATMOSPHERE_CONFIG.simulation.dragPerSecond },
+        uBoundaryRestitution: { value: ATMOSPHERE_CONFIG.simulation.boundaryRestitution },
         uReturnStrength: { value: ATMOSPHERE_CONFIG.simulation.returnStrength },
         uPointerRadius: { value: ATMOSPHERE_CONFIG.simulation.pointerRadius },
         uPointerStrength: { value: ATMOSPHERE_CONFIG.simulation.pointerStrength },
@@ -151,7 +157,6 @@ export class GpuParticleSimulator {
       uniforms: {
         uPositions: { value: this.initialPositionTexture },
         uVelocities: { value: this.initialVelocityTexture },
-        uInitialPositions: { value: this.initialPositionTexture },
         uTime: { value: 0.0 },
         uDelta: { value: 0.016 },
         uPointer: { value: new THREE.Vector3(0, 0, 0) },
@@ -166,19 +171,44 @@ export class GpuParticleSimulator {
     this.quadMeshPos = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), this.simMaterialPos);
     this.simScenePos.add(this.quadMeshPos);
 
-    // Initial render passes to seed targetPosA and targetVelA
+    // Seed initial double-buffered render targets deterministically via copy pass
+    const copyMaterial = new THREE.ShaderMaterial({
+      vertexShader: simulationVertexShader,
+      fragmentShader: copyFragmentShader,
+      uniforms: {
+        uSource: { value: null },
+      },
+      depthTest: false,
+      depthWrite: false,
+    });
+    const copyScene = new THREE.Scene();
+    const copyQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), copyMaterial);
+    copyScene.add(copyQuad);
+
     const prevRenderTarget = this.renderer.getRenderTarget();
 
+    // 1. Seed initial zero velocity state to targetVelA
+    copyMaterial.uniforms.uSource.value = this.initialVelocityTexture;
     this.renderer.setRenderTarget(this.targetVelA);
-    this.renderer.render(this.simSceneVel, this.simCamera);
+    this.renderer.render(copyScene, this.simCamera);
 
+    // 2. Seed initial position distribution to targetPosA
+    copyMaterial.uniforms.uSource.value = this.initialPositionTexture;
     this.renderer.setRenderTarget(this.targetPosA);
-    this.renderer.render(this.simScenePos, this.simCamera);
+    this.renderer.render(copyScene, this.simCamera);
 
     this.renderer.setRenderTarget(prevRenderTarget);
+
+    // Clean up temporary seed pass resources and initial velocity texture
+    copyQuad.geometry.dispose();
+    copyMaterial.dispose();
+    this.initialVelocityTexture.dispose();
   }
 
   step(time: number, delta: number, pointer: THREE.Vector3, pointerVelocity: THREE.Vector2): THREE.Texture {
+    if (delta <= 0.0) {
+      return this.getCurrentTexture();
+    }
     const clampedDelta = Math.min(delta, 0.05);
 
     // === Pass 1: Compute updated velocity ===
@@ -228,13 +258,20 @@ export class GpuParticleSimulator {
     return this.readTargetVel.texture;
   }
 
+  getReadTargetPos(): THREE.WebGLRenderTarget {
+    return this.readTargetPos;
+  }
+
+  getReadTargetVel(): THREE.WebGLRenderTarget {
+    return this.readTargetVel;
+  }
+
   dispose(): void {
     this.targetPosA.dispose();
     this.targetPosB.dispose();
     this.targetVelA.dispose();
     this.targetVelB.dispose();
     this.initialPositionTexture.dispose();
-    this.initialVelocityTexture.dispose();
     this.simMaterialVel.dispose();
     this.simMaterialPos.dispose();
     this.quadMeshVel.geometry.dispose();

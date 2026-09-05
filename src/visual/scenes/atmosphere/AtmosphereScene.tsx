@@ -6,9 +6,11 @@ import * as THREE from "three";
 
 import { PointerTracker } from "../../interaction/pointer-tracker";
 import type { QualityProfile } from "../../quality/quality-contract";
+import { GpuParticleSimulator } from "../../simulation/gpu-particle-simulator";
+import { negotiateParticleCapabilities } from "../../simulation/particle-capabilities";
+import { createParticleTestBridge, isTestBridgeEnabled } from "../../simulation/particle-test-bridge";
 import { particleFragmentShader } from "../../shaders/atmosphere/particle.frag";
 import { particleVertexShader } from "../../shaders/atmosphere/particle.vert";
-import { GpuParticleSimulator } from "../../simulation/gpu-particle-simulator";
 import { useSceneStore } from "../../state/scene-store";
 import { ATMOSPHERE_CONFIG, PARTICLE_TIER_CONFIGS } from "./atmosphere-config";
 
@@ -22,9 +24,14 @@ export function AtmosphereScene({ qualityProfile }: AtmosphereSceneProps) {
   const simulatorRef = useRef<GpuParticleSimulator | null>(null);
   const pointerTrackerRef = useRef<PointerTracker | null>(null);
   const hasCommittedFirstFrame = useRef(false);
+  const wasHiddenRef = useRef(false);
 
   const updateDiagnostics = useSceneStore((state) => state.updateDiagnostics);
+  const setStatus = useSceneStore((state) => state.setStatus);
+  const setStaticReason = useSceneStore((state) => state.setStaticReason);
+  const setPosterVisible = useSceneStore((state) => state.setPosterVisible);
   const recordFirstFrame = useSceneStore((state) => state.recordFirstFrame);
+  const contextGeneration = useSceneStore((state) => state.contextGeneration);
 
   const tierConfig = PARTICLE_TIER_CONFIGS[qualityProfile.tier];
   const { count, textureWidth, textureHeight, pointSize } = tierConfig;
@@ -37,28 +44,81 @@ export function AtmosphereScene({ qualityProfile }: AtmosphereSceneProps) {
       return;
     }
 
-    const simulator = new GpuParticleSimulator(gl, qualityProfile.tier);
+    const capabilities = negotiateParticleCapabilities(gl);
+    if (capabilities.renderTargetFormat === "unsupported" || !capabilities.framebufferComplete) {
+      setStatus("static");
+      setStaticReason(capabilities.staticReason ?? "unsupported-render-target");
+      setPosterVisible(true);
+      updateDiagnostics({
+        webgl2Supported: capabilities.webgl2,
+        renderTargetFormat: "unsupported",
+        fragmentHighPrecision: capabilities.fragmentHighPrecision,
+        framebufferComplete: false,
+        staticReason: capabilities.staticReason ?? "unsupported-render-target",
+      });
+      return;
+    }
+
+    const simulator = new GpuParticleSimulator(gl, qualityProfile.tier, capabilities);
     simulatorRef.current = simulator;
 
     const pointerTracker = new PointerTracker();
     pointerTracker.attach();
     pointerTrackerRef.current = pointerTracker;
 
+    const bytesPerComponent = capabilities.renderTargetFormat === "rgba16f" ? 2 : 4;
+    const targetBytes = 4 * textureWidth * textureHeight * 4 * bytesPerComponent;
+    const initialTextureBytes = textureWidth * textureHeight * 16;
+    const geometryBytes = count * 24;
+    const estimatedGpuBytes = targetBytes + initialTextureBytes + geometryBytes;
+
     updateDiagnostics({
       points: count,
       triangles: 0,
-      drawCalls: 1,
+      drawCalls: 3,
+      visibleDrawCalls: 1,
+      simulationPassesPerFrame: 2,
+      totalDrawCallsPerFrame: 3,
       geometries: 1,
-      textures: 4, // 2 position targets + 2 velocity targets
+      textures: 5,
+      renderTargetCount: 4,
+      renderTargetFormat: capabilities.renderTargetFormat,
+      webgl2Supported: capabilities.webgl2,
+      fragmentHighPrecision: capabilities.fragmentHighPrecision,
+      framebufferComplete: capabilities.framebufferComplete,
+      estimatedGpuBytes,
+      finiteState: true,
+      staticReason: null,
     });
 
+    if (isTestBridgeEnabled() && typeof window !== "undefined") {
+      const bridge = createParticleTestBridge(gl, simulator);
+      if (bridge) {
+        (window as any).__PARTICLE_TEST_BRIDGE__ = bridge;
+      }
+    }
+
     return () => {
+      if (typeof window !== "undefined") {
+        delete (window as any).__PARTICLE_TEST_BRIDGE__;
+      }
       simulator.dispose();
       simulatorRef.current = null;
       pointerTracker.dispose();
       pointerTrackerRef.current = null;
     };
-  }, [gl, qualityProfile.tier, count, updateDiagnostics]);
+  }, [
+    gl,
+    qualityProfile.tier,
+    count,
+    textureWidth,
+    textureHeight,
+    contextGeneration,
+    setStatus,
+    setStaticReason,
+    setPosterVisible,
+    updateDiagnostics,
+  ]);
 
   // 2. Build deterministic particle UV geometry
   const particleGeometry = useMemo(() => {
@@ -122,8 +182,8 @@ export function AtmosphereScene({ qualityProfile }: AtmosphereSceneProps) {
 
   // 4. Hot per-frame simulation and render step
   useFrame((state, delta) => {
-    // Pause simulation computation when document is hidden (hidden tab)
     if (typeof document !== "undefined" && document.hidden) {
+      wasHiddenRef.current = true;
       return;
     }
 
@@ -132,8 +192,13 @@ export function AtmosphereScene({ qualityProfile }: AtmosphereSceneProps) {
     const pointsMesh = pointsRef.current;
     if (!simulator || !pointerTracker || !pointsMesh) return;
 
-    // Clamp delta to prevent sudden particle jumps upon tab focus restore
-    const safeDelta = Math.min(delta, 0.05);
+    let safeDelta = delta;
+    if (wasHiddenRef.current) {
+      wasHiddenRef.current = false;
+      safeDelta = 0.016;
+    } else {
+      safeDelta = Math.min(Math.max(delta, 0.0001), 0.064);
+    }
 
     const { current, velocity } = pointerTracker.update(safeDelta);
     const simTexture = simulator.step(state.clock.getElapsedTime(), safeDelta, current, velocity);
@@ -142,12 +207,6 @@ export function AtmosphereScene({ qualityProfile }: AtmosphereSceneProps) {
     if (mat?.uniforms?.uPositions) {
       mat.uniforms.uPositions.value = simTexture;
     }
-
-    // Commit readiness strictly after the first rendered frame
-    if (!hasCommittedFirstFrame.current) {
-      hasCommittedFirstFrame.current = true;
-      recordFirstFrame();
-    }
   });
 
   if (qualityProfile.tier === "static" || count === 0) {
@@ -155,6 +214,17 @@ export function AtmosphereScene({ qualityProfile }: AtmosphereSceneProps) {
   }
 
   return (
-    <points ref={pointsRef} geometry={particleGeometry} material={particleMaterial} frustumCulled={false} />
+    <points
+      ref={pointsRef}
+      geometry={particleGeometry}
+      material={particleMaterial}
+      frustumCulled={false}
+      onAfterRender={() => {
+        if (!hasCommittedFirstFrame.current && simulatorRef.current) {
+          hasCommittedFirstFrame.current = true;
+          recordFirstFrame();
+        }
+      }}
+    />
   );
 }

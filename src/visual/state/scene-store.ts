@@ -8,10 +8,12 @@ import type {
   SceneId,
   SceneState,
   SpintronicsPhysicsState,
+  StaticReason,
 } from "./scene-contract";
 
 export interface SceneStoreActions {
   readonly setStatus: (status: RuntimeStatus) => boolean;
+  readonly setStaticReason: (reason: StaticReason) => void;
   readonly setQualityTier: (tier: QualityTier) => void;
   readonly setTierOverride: (override: QualityTier | null) => void;
   readonly setMotionMode: (mode: MotionMode) => void;
@@ -19,7 +21,7 @@ export interface SceneStoreActions {
   readonly setVisibilityState: (visibility: DocumentVisibilityState) => void;
   readonly setActiveSceneId: (sceneId: SceneId) => void;
   readonly setPosterVisible: (visible: boolean) => void;
-  readonly recordFirstFrame: () => void;
+  readonly recordFirstFrame: (timestamp?: number) => void;
   readonly recordContextLoss: () => void;
   readonly recordContextRestore: () => void;
   readonly updateDiagnostics: (patch: Partial<DiagnosticsSnapshot>) => void;
@@ -41,6 +43,7 @@ export const initialSpintronicsPhysics: SpintronicsPhysicsState = {
 
 const initialDiagnostics: DiagnosticsSnapshot = {
   runtimeStatus: "idle",
+  staticReason: null,
   qualityTier: "medium",
   tierOverride: null,
   motionMode: "auto",
@@ -48,6 +51,9 @@ const initialDiagnostics: DiagnosticsSnapshot = {
   viewportWidth: 0,
   viewportHeight: 0,
   webgl2Supported: false,
+  renderTargetFormat: "unsupported",
+  fragmentHighPrecision: false,
+  framebufferComplete: false,
   reducedMotionDetected: false,
   canvasCount: 0,
   contextLossCount: 0,
@@ -55,13 +61,24 @@ const initialDiagnostics: DiagnosticsSnapshot = {
   visibilityState: "visible",
   frameloop: "demand",
   drawCalls: 0,
+  visibleDrawCalls: 0,
+  simulationPassesPerFrame: 0,
+  totalDrawCallsPerFrame: 0,
   triangles: 0,
   points: 0,
   geometries: 0,
   textures: 0,
+  renderTargetCount: 0,
+  estimatedGpuBytes: 0,
+  finiteState: true,
   activeSceneId: "none",
   posterVisible: true,
   firstFrameCommitted: false,
+  frameSampleCount: 0,
+  frameP50Ms: 0,
+  frameP95Ms: 0,
+  frameWorstMs: 0,
+  slowFrameCount: 0,
   p50Ms: 0,
   p95Ms: 0,
   firstFrameTimeMs: 0,
@@ -69,6 +86,7 @@ const initialDiagnostics: DiagnosticsSnapshot = {
 
 const initialState: SceneState = {
   runtimeStatus: "idle",
+  staticReason: null,
   qualityTier: "medium",
   tierOverride: null,
   motionMode: "auto",
@@ -80,6 +98,7 @@ const initialState: SceneState = {
   firstFrameCommitted: false,
   contextLossCount: 0,
   contextRestoreCount: 0,
+  contextGeneration: 0,
   diagnostics: initialDiagnostics,
   spintronicsPhysics: initialSpintronicsPhysics,
 };
@@ -99,6 +118,12 @@ export const useSceneStore = create<VisualSceneStore>((set, get) => ({
     }));
     return true;
   },
+
+  setStaticReason: (staticReason: StaticReason) =>
+    set((state) => ({
+      staticReason,
+      diagnostics: { ...state.diagnostics, staticReason },
+    })),
 
   setQualityTier: (qualityTier: QualityTier) =>
     set((state) => ({
@@ -144,6 +169,10 @@ export const useSceneStore = create<VisualSceneStore>((set, get) => ({
     })),
 
   recordFirstFrame: (timestamp?: number) => {
+    const current = get().runtimeStatus;
+    if (current !== "loading" && current !== "restoring") {
+      return;
+    }
     const firstFrameTimeMs =
       timestamp ?? (typeof performance !== "undefined" ? Math.round(performance.now()) : 0);
     set((state) => ({
@@ -177,9 +206,11 @@ export const useSceneStore = create<VisualSceneStore>((set, get) => ({
   recordContextRestore: () =>
     set((state) => {
       const contextRestoreCount = state.contextRestoreCount + 1;
+      const contextGeneration = state.contextGeneration + 1;
       return {
         runtimeStatus: "restoring",
         contextRestoreCount,
+        contextGeneration,
         diagnostics: {
           ...state.diagnostics,
           runtimeStatus: "restoring",

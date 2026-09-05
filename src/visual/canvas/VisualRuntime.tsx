@@ -98,6 +98,12 @@ export function VisualRuntime({ qualityProfile, activeSceneId = "snow" }: Visual
         geometries: memoryGeometries,
         p50Ms: frameMetrics.p50Ms,
         p95Ms: frameMetrics.p95Ms,
+        frameSampleCount: frameMetrics.sampleCount,
+        frameP50Ms: frameMetrics.p50Ms,
+        frameP95Ms: frameMetrics.p95Ms,
+        frameWorstMs: frameMetrics.worstMs,
+        slowFrameCount: frameMetrics.slowFrameCount,
+        firstFrameTimeMs: frameMetrics.firstFrameTimeMs,
       });
 
       // Expose authentic runtime telemetry on window for Playwright verification

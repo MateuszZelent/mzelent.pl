@@ -3,7 +3,6 @@ precision highp float;
 
 uniform sampler2D uPositions;
 uniform sampler2D uVelocities;
-uniform sampler2D uInitialPositions;
 uniform float uTime;
 uniform float uDelta;
 uniform vec3 uPointer; // x, y, active intensity [0..1]
@@ -14,15 +13,21 @@ varying vec2 vUv;
 
 void main() {
   vec4 currentPos = texture2D(uPositions, vUv);
+
+  // Non-positive delta must leave state unchanged
+  if (uDelta <= 0.0) {
+    gl_FragColor = currentPos;
+    return;
+  }
+
   vec4 currentVel = texture2D(uVelocities, vUv);
-  vec4 initPos = texture2D(uInitialPositions, vUv);
 
   vec3 pos = currentPos.xyz;
   vec3 vel = currentVel.xyz;
   float energy = currentPos.w;
 
-  // 1. Position integration from physical velocity vector
-  pos += vel * uDelta * 60.0;
+  // 1. Stateful inertial position integration (dt in seconds, no frame-rate multiplier)
+  pos += vel * uDelta;
 
   // 2. Interaction energy boost
   if (uPointer.z > 0.01) {
@@ -35,15 +40,22 @@ void main() {
 
   // Energy excitation from velocity speed
   float speed = length(vel);
-  energy = clamp(energy + speed * 0.15, 0.0, 2.0);
+  energy = clamp(energy + speed * 0.003, 0.0, 2.0);
 
-  // Natural energy dissipation
-  energy = mix(energy, 0.2, clamp(uDelta * 1.5, 0.0, 1.0));
+  // Natural energy dissipation with frame-rate invariant exponential decay
+  energy = 0.2 + (energy - 0.2) * exp(-1.5 * uDelta);
 
-  // 3. Soft boundary containment with soft harmonic clamp
-  if (abs(pos.x) > uBounds.x) { pos.x = sign(pos.x) * uBounds.x; }
-  if (abs(pos.y) > uBounds.y) { pos.y = sign(pos.y) * uBounds.y; }
-  if (abs(pos.z) > uBounds.z) { pos.z = sign(pos.z) * uBounds.z; }
+  // 3. Boundary containment: clamp slightly inward so particles never get stuck on the wall
+  const float eps = 0.002;
+  pos.x = clamp(pos.x, -uBounds.x + eps, uBounds.x - eps);
+  pos.y = clamp(pos.y, -uBounds.y + eps, uBounds.y - eps);
+  pos.z = clamp(pos.z, -uBounds.z + eps, uBounds.z - eps);
+
+  // Guarantee finite values
+  if (isnan(pos.x) || isnan(pos.y) || isnan(pos.z) || isinf(pos.x) || isinf(pos.y) || isinf(pos.z) || isnan(energy)) {
+    pos = vec3(0.0);
+    energy = 0.2;
+  }
 
   // Output updated position (xyz) and energy (w)
   gl_FragColor = vec4(pos, energy);

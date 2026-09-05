@@ -116,14 +116,21 @@ export function RuntimeDiagnostics({
       data-status={diag.runtimeStatus}
       data-tier={diag.qualityTier}
       data-motion-mode={diag.motionMode}
+      data-static-reason={diag.staticReason ?? "none"}
       data-dpr={diag.effectiveDpr}
       data-canvas-count={diag.canvasCount}
       data-webgl2={diag.webgl2Supported}
       data-draw-calls={diag.drawCalls}
+      data-visible-draw-calls={diag.visibleDrawCalls}
+      data-simulation-passes={diag.simulationPassesPerFrame}
+      data-total-draw-calls={diag.totalDrawCallsPerFrame}
       data-triangles={diag.triangles}
       data-points={diag.points}
       data-geometries={diag.geometries}
       data-textures={diag.textures}
+      data-render-target-count={diag.renderTargetCount}
+      data-render-target-format={diag.renderTargetFormat}
+      data-finite-state={diag.finiteState}
       data-context-loss={diag.contextLossCount}
       data-context-restore={diag.contextRestoreCount}
       data-frameloop={diag.frameloop}
@@ -186,6 +193,12 @@ export function RuntimeDiagnostics({
             {diag.reducedMotionDetected ? "active (enforced)" : "off"}
           </dd>
         </div>
+        {diag.staticReason && (
+          <div style={{ display: "flex", justifyContent: "space-between", padding: "2px 0" }}>
+            <dt>Static Reason</dt>
+            <dd style={{ color: "var(--accent-magenta)", fontWeight: 600 }}>{diag.staticReason}</dd>
+          </div>
+        )}
         <div style={{ display: "flex", justifyContent: "space-between", padding: "2px 0" }}>
           <dt>Motion Mode</dt>
           <dd style={{ color: "var(--color-ink)" }}>{diag.motionMode}</dd>

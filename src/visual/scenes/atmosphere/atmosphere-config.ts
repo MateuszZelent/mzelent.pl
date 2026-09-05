@@ -34,6 +34,13 @@ export const PARTICLE_TIER_CONFIGS: Record<QualityTier, ParticleTierConfig> = {
   },
 };
 
+export const TEST_PARTICLE_FIXTURE: ParticleTierConfig = {
+  count: 64,
+  textureWidth: 8,
+  textureHeight: 8,
+  pointSize: 1.0,
+};
+
 export const ATMOSPHERE_CONFIG = {
   name: "GPU Particle Atmosphere",
   bounds: {
@@ -42,16 +49,18 @@ export const ATMOSPHERE_CONFIG = {
     z: 2.2,
   },
   simulation: {
-    speed: 0.18,
+    speed: 10.8, // curl acceleration in units/s^2
     curlScale: 0.55,
-    damping: 0.965,
-    returnStrength: 0.008,
+    damping: 0.965, // frame-decay reference
+    dragPerSecond: 2.14, // continuous gamma drag in s^-1, equivalent to 0.965 at 60 Hz
+    boundaryRestitution: 0.65, // coefficient of restitution on boundary reflection
+    returnStrength: 0.48, // harmonic return acceleration in s^-2
     pointerRadius: 0.45,
-    pointerStrength: 0.35,
+    pointerStrength: 21.0, // pointer repulsion acceleration in units/s^2
   },
   colors: {
-    cyan: "#9d84fc",
-    violet: "#8b6ff9",
+    cyan: "#57e6dd",
+    violet: "#846cff",
     highlight: "#fff5ea",
     ambient: "#030405",
   },

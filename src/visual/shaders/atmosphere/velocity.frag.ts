@@ -11,12 +11,22 @@ uniform vec2 uPointerVelocity;
 uniform vec3 uBounds;
 uniform float uSpeed;
 uniform float uCurlScale;
-uniform float uDamping;
+uniform float uDragPerSecond;
+uniform float uBoundaryRestitution;
 uniform float uReturnStrength;
 uniform float uPointerRadius;
 uniform float uPointerStrength;
 
 varying vec2 vUv;
+
+// Safe normalization preventing division by zero and NaN propagation
+vec3 safeNormalize(vec3 value) {
+  float lengthSquared = dot(value, value);
+  if (lengthSquared < 1e-10) {
+    return vec3(0.0);
+  }
+  return value * inversesqrt(lengthSquared);
+}
 
 // Simplex-inspired 3D noise for divergence-free vector field advection
 vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
@@ -84,7 +94,7 @@ float snoise(vec3 v) {
   return 42.0 * dot(m * m, vec4(dot(p0, x0), dot(p1, x1), dot(p2, x2), dot(p3, x3)));
 }
 
-// Curl noise computes the curl of 3D potential for authentic fluid vector advection
+// Curl noise computes the curl of 3D potential for stateful inertial visual particle simulation
 vec3 computeCurl(vec3 p) {
   float eps = 0.08;
   float n1 = snoise(vec3(p.x, p.y + eps, p.z));
@@ -98,23 +108,30 @@ vec3 computeCurl(vec3 p) {
   float y = (n3 - n4) - (n5 - n6);
   float z = (n5 - n6) - (n1 - n2);
 
-  return normalize(vec3(x, y, z));
+  return safeNormalize(vec3(x, y, z));
 }
 
 void main() {
-  vec4 currentPos = texture2D(uPositions, vUv);
   vec4 currentVel = texture2D(uVelocities, vUv);
+
+  // Non-positive delta must leave state unchanged
+  if (uDelta <= 0.0) {
+    gl_FragColor = currentVel;
+    return;
+  }
+
+  vec4 currentPos = texture2D(uPositions, vUv);
   vec4 initPos = texture2D(uInitialPositions, vUv);
 
   vec3 pos = currentPos.xyz;
   vec3 vel = currentVel.xyz;
   float age = currentVel.w + uDelta;
 
-  // 1. Organic curl advection force
+  // 1. Organic curl advection acceleration
   vec3 noiseCoord = pos * uCurlScale + vec3(0.0, 0.0, uTime * 0.12);
   vec3 curl = computeCurl(noiseCoord) * uSpeed;
 
-  // 2. Magnetic harmonic confinement return force
+  // 2. Harmonic magnetic confinement return acceleration
   vec3 returnVec = initPos.xyz - pos;
   vec3 returnForce = returnVec * uReturnStrength;
 
@@ -125,7 +142,7 @@ void main() {
     float dist = length(toPointer);
     if (dist < uPointerRadius) {
       float influence = smoothstep(uPointerRadius, 0.0, dist) * uPointer.z;
-      vec2 pushDir = dist > 0.001 ? normalize(toPointer) : vec2(0.0, 1.0);
+      vec2 pushDir = dist > 0.001 ? safeNormalize(vec3(toPointer, 0.0)).xy : vec2(0.0, 1.0);
       
       // Radial push + tangential vortex swirl
       vec2 swirlDir = vec2(-pushDir.y, pushDir.x);
@@ -137,14 +154,23 @@ void main() {
     }
   }
 
-  // 4. Integrate acceleration into velocity with physical damping
+  // 4. Integrate acceleration into velocity with frame-rate invariant continuous exponential decay
   vec3 totalAcceleration = curl + returnForce + pointerForce;
-  vel = (vel + totalAcceleration * uDelta) * uDamping;
+  float decay = exp(-uDragPerSecond * uDelta);
+  vel = (vel + totalAcceleration * uDelta) * decay;
 
-  // Soft boundary damping
-  if (abs(pos.x) > uBounds.x) vel.x *= -0.5;
-  if (abs(pos.y) > uBounds.y) vel.y *= -0.5;
-  if (abs(pos.z) > uBounds.z) vel.z *= -0.5;
+  // 5. Directional boundary reflection: reflect velocity only when at or beyond wall moving outward
+  if (pos.x >= uBounds.x && vel.x > 0.0) { vel.x = -vel.x * uBoundaryRestitution; }
+  if (pos.x <= -uBounds.x && vel.x < 0.0) { vel.x = -vel.x * uBoundaryRestitution; }
+  if (pos.y >= uBounds.y && vel.y > 0.0) { vel.y = -vel.y * uBoundaryRestitution; }
+  if (pos.y <= -uBounds.y && vel.y < 0.0) { vel.y = -vel.y * uBoundaryRestitution; }
+  if (pos.z >= uBounds.z && vel.z > 0.0) { vel.z = -vel.z * uBoundaryRestitution; }
+  if (pos.z <= -uBounds.z && vel.z < 0.0) { vel.z = -vel.z * uBoundaryRestitution; }
+
+  // Guarantee finite values
+  if (isnan(vel.x) || isnan(vel.y) || isnan(vel.z) || isinf(vel.x) || isinf(vel.y) || isinf(vel.z)) {
+    vel = vec3(0.0);
+  }
 
   gl_FragColor = vec4(vel, age);
 }

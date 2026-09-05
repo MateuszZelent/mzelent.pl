@@ -20,9 +20,10 @@
     "typecheck": "pnpm typegen && tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "PLAYWRIGHT_USE_PRODUCTION=1 playwright test",
+    "test:e2e": "PLAYWRIGHT_USE_PRODUCTION=1 playwright test --grep-invert @perf",
     "test:visual": "PLAYWRIGHT_USE_PRODUCTION=1 playwright test --grep @visual",
     "test:a11y": "PLAYWRIGHT_USE_PRODUCTION=1 playwright test --grep @a11y",
+    "perf:visual": "PLAYWRIGHT_REAL_GPU=1 PLAYWRIGHT_USE_PRODUCTION=1 playwright test --grep @perf --project=chromium",
     "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build"
   },
   "dependencies": {

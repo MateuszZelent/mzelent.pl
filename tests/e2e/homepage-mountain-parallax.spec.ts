@@ -76,7 +76,10 @@ test.describe("Homepage — Mountain Parallax & Snow Particles", () => {
     await page.goto(`${baseURL}/`);
 
     // Scroll down 400px
-    await page.evaluate(() => window.scrollTo(0, 400));
+    await page.evaluate(() => {
+      window.scrollTo(0, 400);
+      window.dispatchEvent(new Event("scroll"));
+    });
 
     // Poll until the lerped transforms update deterministically
     await expect

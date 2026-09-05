@@ -12,6 +12,9 @@ describe("Real Runtime Evidence — FrameMonitor & GPU Telemetry", () => {
       lastDurationMs: 0,
       p50Ms: 0,
       p95Ms: 0,
+      worstMs: 0,
+      slowFrameCount: 0,
+      firstFrameTimeMs: 0,
     });
 
     // Simulate 60 frames with realistic 16.6ms intervals (60fps), with occasional 33ms spikes

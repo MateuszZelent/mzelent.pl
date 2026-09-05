@@ -112,6 +112,7 @@ export function VisualStageClient() {
   const setQualityTier = useSceneStore((state) => state.setQualityTier);
   const setTierOverride = useSceneStore((state) => state.setTierOverride);
   const setMotionMode = useSceneStore((state) => state.setMotionMode);
+  const setStaticReason = useSceneStore((state) => state.setStaticReason);
   const setCapabilities = useSceneStore((state) => state.setCapabilities);
 
   // Check URL query param for tier & motion overrides on the laboratory bench
@@ -136,24 +137,53 @@ export function VisualStageClient() {
     return () => {
       setTierOverride(null);
       setMotionMode("auto");
+      setStaticReason(null);
     };
-  }, [setTierOverride, setMotionMode, setCapabilities]);
+  }, [setTierOverride, setMotionMode, setCapabilities, setStaticReason]);
+
+  const hasWebGL2 = typeof window !== "undefined" ? Boolean(window.WebGL2RenderingContext) : true;
+  const isReducedMotion =
+    typeof window !== "undefined"
+      ? Boolean(window.matchMedia?.("(prefers-reduced-motion: reduce)").matches)
+      : false;
 
   // Compute effective profile
   const activeProfile: QualityProfile = useMemo(() => {
-    // If OS prefers reduced motion, force static unless explicitly on laboratory full-preview mode
+    // WebGL2 absence can never be bypassed, even by full-preview
+    if (!hasWebGL2) {
+      return STATIC_FALLBACK_PROFILE;
+    }
+
+    // full-preview can ONLY bypass OS reduced motion
     if (detectedProfile.tier === "static" && motionMode !== "full-preview") {
       return STATIC_FALLBACK_PROFILE;
     }
-    if (!tierOverride) return detectedProfile;
+
+    if (!tierOverride) {
+      if (detectedProfile.tier === "static" && motionMode === "full-preview") {
+        return {
+          tier: "medium",
+          dprCap: 1.35,
+          maxPixelLoad: 4_500_000,
+          antialias: true,
+          powerPreference: "default",
+        };
+      }
+      return detectedProfile;
+    }
+
+    if (tierOverride === "static") {
+      return STATIC_FALLBACK_PROFILE;
+    }
+
     return {
       tier: tierOverride,
       dprCap: tierOverride === "high" ? 1.75 : tierOverride === "medium" ? 1.35 : 1.0,
       maxPixelLoad: 4_500_000,
-      antialias: tierOverride !== "low" && tierOverride !== "static",
+      antialias: tierOverride !== "low",
       powerPreference: tierOverride === "high" ? "high-performance" : "default",
     };
-  }, [tierOverride, motionMode, detectedProfile]);
+  }, [hasWebGL2, detectedProfile, motionMode, tierOverride]);
 
   // Synchronize store when profile is evaluated
   useEffect(() => {
@@ -161,10 +191,30 @@ export function VisualStageClient() {
     if (activeProfile.tier === "static") {
       setStatus("static");
       setPosterVisible(true);
-    } else if (runtimeStatus === "idle" || runtimeStatus === "static") {
-      setStatus("loading");
+      if (!hasWebGL2) {
+        setStaticReason("no-webgl2");
+      } else if (isReducedMotion && motionMode !== "full-preview") {
+        setStaticReason("reduced-motion");
+      } else {
+        setStaticReason("runtime-failure");
+      }
+    } else {
+      const current = useSceneStore.getState();
+      if (current.runtimeStatus === "idle") {
+        setStaticReason(null);
+        setStatus("loading");
+      }
     }
-  }, [activeProfile, runtimeStatus, setQualityTier, setStatus, setPosterVisible]);
+  }, [
+    activeProfile,
+    hasWebGL2,
+    isReducedMotion,
+    motionMode,
+    setQualityTier,
+    setStatus,
+    setPosterVisible,
+    setStaticReason,
+  ]);
 
   // Support test automation remount cycles if requested
   useEffect(() => {
@@ -182,6 +232,18 @@ export function VisualStageClient() {
         "visual:test-remount" as keyof WindowEventMap,
         handleTestRemount as EventListener,
       );
+    };
+  }, []);
+
+  // Expose store handle to test automation on the laboratory bench
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      (window as any).__SCENE_STORE__ = useSceneStore;
+    }
+    return () => {
+      if (typeof window !== "undefined") {
+        delete (window as any).__SCENE_STORE__;
+      }
     };
   }, []);
 
